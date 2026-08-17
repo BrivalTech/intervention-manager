@@ -86,10 +86,10 @@ Le gestionnaire renseigne uniquement les informations nécessaires:
 - technicien
 ### Suivre une intervention
 L'intervention suit un cycle :
-1. Planifiée
-2. À réaliser
-3. En cours
-4. Terminée
+1. À réaliser
+2. En cours
+3. Terminée
++ Annulée
 ## Parcours du technicien
 1. Se connecter
 2. Consulter ses interventions
