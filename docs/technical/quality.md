@@ -356,7 +356,99 @@ Chaque nouvelle fonctionnalité doit respecter les principes suivants :
 7. les modifications doivent rester limitées au périmètre du changement réalisé
 8. les secrets et données sensibles ne doivent jamais être ajoutés au dépôt Git
 ---
-## 9. Définition de "terminé"
+## 9. Documentation du code
+### 9.1 Objectif
+Le code doit être suffisamment explicite par son organisation, ses noms de
+classes, de fonctions et de variables.
+
+Les docstrinngs complètent cette lisibilité lorsqu'elles apportent des
+informations utiles sur le rôle ou le comportement d'un élément du code.
+
+Elles ne doivent pas répéter simplement ce qui est déjà évident dans le nom
+ou l'implémentation.
+### 9.2 Langue
+Les docstrings sont rédigées en anglais, afin de rester cohérentes avec le
+code source et les conventions utilisées dans le projet.
+
+La documentation fonctionnelle et technique du projet peut rester rédigée en
+français.
+### 9.3 Classe métier
+Les classes représentant des concepts métier doivent disposer d'une
+docstring concise décrivant leur responsabilité.
+
+Exemple :
+```text
+class Client(models.Model):
+    """ Represent a client for whom interventions can be managed. """
+    ...
+```
+La docstring décrit le rôle de la classe sans détailler chacun de ses
+attributs lorsque ceux-ci suffisamment explicites.
+### 9.4 Méthodes métier
+Les méthodes représentant un comportement métier doivent être documentées.
+
+Exemple :
+```text
+def archive(self):
+    """ Archive the client by marking it as inactive. """
+    self.is_active = False
+    self.save(update_fields=["is_active", "updated_at"])
+```
+La docstring doit expliquer le comportement métier de la méthode plutôt que
+paraphraser son implémentation ligne par ligne.
+### 9.5 Fonction triviales
+Une docstring n'est pas obligatoire lorsque le comportement est
+immédiatement compréhensible à partir du nom et de l'implémentation.
+
+Par exemple :
+```text
+def __str__(self):
+    return self.name
+```
+Ajouter une docstring indiquant uniquement que la méthode retourne le nom du
+client apporterait peu d'information supplémentaire.
+### 9.6 Tests
+Les tests dont le nom décrit clairement le comportement vérifié ne
+nécessient pas de docstring.
+
+Exemple :
+```text
+def test_client_can_be_archived():
+    ...
+```
+Une docstring peut être ajouté lorsque le test couvre :
+- une règle métier complexe
+- un cas limite difficile à comprendre
+- une régression particulière
+- un comportement dont la justification n'est pas évidente.
+- ### 9.7 Docstring détaillées
+- Lorsqu'une fonction ou une méthode devient suffisamment complexe, la
+  docstring peut préciser les paramètres, les valeurs de retour ou les
+  exceptions qu'elle peut lever.
+
+Exemple :
+```text
+def perform_operation(value):
+    """ Perform a business operation.
+        Args:
+            value: value used by the operation
+        Raises:
+            ValidationError: if the business rule is not satisfied
+        Returns:
+            The result of the operation.
+    """
+```
+Les sections `Args`, `Raises`, et `Returns`ne doivent être ajoutées que
+lorqu'elles apportent une information utile.
+### 9.8 Principe général
+La règle retenue pour le projet est la suivante :
+
+***Les classes et comportements métier publics sont documentés par une
+docstring concise. Les fonctions triviales et les tests dont le nom exprime
+clairement le comportement ne nécessitent pas de docstring.***
+
+La documentation du code doit rester utiles, concise et maintenable.
+## 10. Définition de "terminé"
 Une tâche de développement peut être considérée comme terminée lorsque :
 - le comportement attendu est implémenté
 - le code respecte les conventions du projet
@@ -368,8 +460,9 @@ Une tâche de développement peut être considérée comme terminée lorsque :
 - les hooks pre-commit passent
 - aucune information sensible est présente dans les modifications
 - la documentation technique est mise à jour lorsque le changement le nécessite
+- les classes et comportements métier publics sont documentés lorsque nécessaire
 ---
-## 10. Commande de référence
+## 11. Commande de référence
 ```text
 | Obectif                    | Commande                                      |
 | -------------------------- | --------------------------------------------- |
@@ -383,8 +476,8 @@ Une tâche de développement peut être considérée comme terminée lorsque :
 | Tous les hooks pre-commit  | `pre-commit run --all-files`                  |
 ```
 ---
-## 11. Évolution de la stratégie qualité
-Cette startégie constitue la base qualité du projet.
+## 12. Évolution de la stratégie qualité
+Cette stratégie constitue la base qualité du projet.
 
 Elle pourra évoluer avec l'application, notamment avec l'ajout futur de :
 - tests d'intégration plus complexes
