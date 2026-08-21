@@ -1,5 +1,5 @@
 # Gestionnaire d'interventions
-Application web de gestion d'interventions conçue avec une démarche 
+Application web de gestion d'interventions conçue avec une démarche
 d'accessibilité et d'éco-conception numérique.
 ## État du projet
 Projet en phase de cadrage.

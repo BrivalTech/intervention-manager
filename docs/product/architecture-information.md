@@ -1,6 +1,6 @@
 # Architecture de l'information
 ## Principes de navigation
-La conception de l'application se fait à partir des tâches des utilisateur 
+La conception de l'application se fait à partir des tâches des utilisateur
 et non à partir des modèles.
 ## Architecture générale
 ```text
@@ -35,7 +35,7 @@ Tableau de bord
 ```
 ## Tableau de bord
 ### Gestionnaire
-L'interface répond à la question : "Quelle intervention nécessitent mon 
+L'interface répond à la question : "Quelle intervention nécessitent mon
 attention aujourd'hui ?"
 
 Exemple d'interface:
@@ -134,7 +134,7 @@ Il n'y a pas:
 - de slider
 - de dépendance JavaScript
 ## Gestion des messages et erreurs
-Chaque message doit être lisible, compréhensible et correspondant à son 
+Chaque message doit être lisible, compréhensible et correspondant à son
 objectif.
 
 Une erreur doit être:

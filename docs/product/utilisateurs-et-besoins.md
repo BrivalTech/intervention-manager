@@ -1,7 +1,7 @@
 # Utilisateurs et besoins
 ## Profils utilisateurs
 ### Administrateur
-L'administrateur est responsable de la configuration et de la gestion 
+L'administrateur est responsable de la configuration et de la gestion
 globale de l'application.
 
 Ses objectifs:
@@ -43,7 +43,7 @@ Il doit pouvoir :
 - suivre le statu
 - retrouver rapidement une intervention passée
 ### Technicien
-Le technicien utilise l'application principalement pour consulter et traiter 
+Le technicien utilise l'application principalement pour consulter et traiter
 les interventions qui lui sont affectées.
 
 Il doit pouvoir:
@@ -71,7 +71,7 @@ Il doit pouvoir:
 | gérer les utilisateurs             | oui            | non          | non        |
 ## Parcours du gestionnaire
 ### Rechercher un client
-Rechercher un client avant d'en créer un autre : 
+Rechercher un client avant d'en créer un autre :
 - Si le client est trouvé alors on le sélectionne
 - Dans le cas contraire on le crée.
 
@@ -97,7 +97,7 @@ L'intervention suit un cycle :
 4. Démarrer une intervention
 5. Terminer une intervention
 
-C'est une décision d'éco-conception, en concevant un écran autour du besoin  
+C'est une décision d'éco-conception, en concevant un écran autour du besoin
 plutôt qu'autour des données disponibles.
 ## Principes d'accessibilité
 - gestion au clavier
@@ -121,8 +121,8 @@ Les détails ne seront chargés que lorsque l'utilisateur ouvrira l'intervention
 ## Gestion des droits
 Un utilisateur ne doit accéder qu'aux informations nécessaires à son rôle.
 
-Un technicien n'a aucune raison de pouvoir parcourir l'ensemble de la base 
-clients. Il doit pouvoir accéder aux informations du client nécessaire à 
+Un technicien n'a aucune raison de pouvoir parcourir l'ensemble de la base
+clients. Il doit pouvoir accéder aux informations du client nécessaire à
 l'intervention qui lui est affectée.
 
 Ce qui améliore simultanément:

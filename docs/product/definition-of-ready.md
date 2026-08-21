@@ -1,5 +1,5 @@
 # Definition of Ready
-Le projet peut entrer en phase de conception technique lorsque les 
+Le projet peut entrer en phase de conception technique lorsque les
 conditions suivantes sont remplies.
 ## Besoin
 - [x] Le problème métier est défini.

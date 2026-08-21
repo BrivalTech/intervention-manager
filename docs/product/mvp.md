@@ -1,6 +1,6 @@
 # MVP — Gestionnaire d'interventions
 ## Objectif du MVP
-Le MVP va permettre de réaliser le cycle suivant de bout en bout, sans 
+Le MVP va permettre de réaliser le cycle suivant de bout en bout, sans
 chercher à reproduire une logiciel métier complet.
 
 Cycle de vie:
@@ -30,7 +30,7 @@ Inclus dans le MVP :
 - accès selon le rôle
 - utilisateur authentifié
 
-Non inclus : 
+Non inclus :
 - inscription publique
 - connexion Google / Microsoft
 - MFA applicatif
@@ -42,7 +42,7 @@ Trois rôles :
 - Gestionnaire
 - Technicien
 
-Un administrateur peut : 
+Un administrateur peut :
 - consulter les utilisateurs
 - créer un utilisateur
 - modifier les informations d'un utilisateur
@@ -82,7 +82,7 @@ TERMINÉE
 + ANNULÉE
 ```
 ## Compte rendu
-À la fin d'une intervention, le technicien doit pouvoir saisir un compte 
+À la fin d'une intervention, le technicien doit pouvoir saisir un compte
 rendu textuel.
 
 Non inclus dans le MVP :
@@ -106,12 +106,12 @@ Exemple pour le gestionnaire :
 Aujourd'hui
 --------------------------------
  5 interventions
- 
+
  09:00  Dupont      Martin      En cours
  11:00  STE         Durand      À réaliser
  14:00  Martin SA   Martin      À réaliser
  ----
- 
+
  [Voir toutes les interventions]
 ```
 Exemple pour le technicien :
@@ -132,7 +132,7 @@ Dépannage
 [Voir l'intervention]
 ```
 ## Accessibilité — Definition of Done
-Une fonctionnalité ne sera pas considérée comme terminée uniquement parce 
+Une fonctionnalité ne sera pas considérée comme terminée uniquement parce
 qu'elle fonctionne à la souris.
 
 Définition de "Done" :
@@ -146,9 +146,9 @@ Définition de "Done" :
 - responsive
 - zoom à 200%
 ## Éco-conception — Definition of Done
-Pour chaque fonctionnalité, il faut se poser la question du besoin, est-il 
-justifié ? Si c'est justifié, il faut trouver la solution la plus simple, 
-avec des données minimales, des requêtes optimisées et des ressources front 
+Pour chaque fonctionnalité, il faut se poser la question du besoin, est-il
+justifié ? Si c'est justifié, il faut trouver la solution la plus simple,
+avec des données minimales, des requêtes optimisées et des ressources front
 nécessaires ?
 ## Hors périmètre
 - calendrier graphique
