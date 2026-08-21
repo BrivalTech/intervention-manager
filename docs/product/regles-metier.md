@@ -46,7 +46,7 @@ En cours -> Terminée
 Il n'a pas la possibilité d'annuler une intervention directement dans le MVP.
 ### Compte rendu
 Une intervention ne peut être terminée qu si un compte rendu a été renseigné.
-Si pas de compte rendu un message s'affiche, par exemple: `"Un compte rendu est 
+Si pas de compte rendu un message s'affiche, par exemple: `"Un compte rendu est
 nécessaire pour terminer cette intervention"`
 ### Intervention terminée
 Une fois terminée, l'intervention devient principalement consultative.
@@ -58,13 +58,13 @@ Le technicien ne doit plus pouvoir modifier:
 - affectation
 - description métier
 ### Dates
-Il sera interdit au gestionnaire de créer (accidentellement) une nouvelle 
-intervention avec une date dans le passé. La date/heure d'une nouvelle 
+Il sera interdit au gestionnaire de créer (accidentellement) une nouvelle
+intervention avec une date dans le passé. La date/heure d'une nouvelle
 intervention doit être dans le futur.
 
 Les anciennes interventions restes consultables.
 ### Conflits de planning
-Un technicien ne peut pas avoir duex interventions à la même heure. Pour 
+Un technicien ne peut pas avoir duex interventions à la même heure. Pour
 cela on stockera :
 ```text
 date
@@ -73,21 +73,21 @@ heure de fin
 ```
 pour empêcher le chevauchement d'intervention.
 ### Archivage
-Un client ne peut être archivé s'il possède une intervention non terminée ou 
-non annulée. Même principe pour un technicien, s'il possède des 
-interventions futures, la désactivation sera bloquée tant que les 
-interventions actives lui sont affectées. Cela oblige le gestionnaire à 
-réaffecter proprement les interventions avant de désactiver le compte du 
+Un client ne peut être archivé s'il possède une intervention non terminée ou
+non annulée. Même principe pour un technicien, s'il possède des
+interventions futures, la désactivation sera bloquée tant que les
+interventions actives lui sont affectées. Cela oblige le gestionnaire à
+réaffecter proprement les interventions avant de désactiver le compte du
 technicien.
 ## Gestion des données
 ### Données minimales
-Pour l'éco-conception et la protection des données, l'application ne stocke 
-aucunes données utilisateur ou client sans besoin fonctionnel identifié. Par 
-exemple, l'application ne collectera pas la date de naissance, photo ou les 
+Pour l'éco-conception et la protection des données, l'application ne stocke
+aucunes données utilisateur ou client sans besoin fonctionnel identifié. Par
+exemple, l'application ne collectera pas la date de naissance, photo ou les
 réseaux sociaux du client, si elle n'en a pas besoin.
 ### Suppression
-L'application MVP ne supprimera pas physiquement depuis l'interface métier 
-les clients, techniciens et interventions. Il sera utilisé le statut booléen 
+L'application MVP ne supprimera pas physiquement depuis l'interface métier
+les clients, techniciens et interventions. Il sera utilisé le statut booléen
 `is_active`.
 ## Critères d'acceptation
 ### Création d'intervention

@@ -1,21 +1,21 @@
 # Cadrage du Gestionnaire d'intervention
 ## Contexte
-Une PME spécialisée dans l'installation, l'entretien et le dépannage 
-d'équipements technique intervient régulièrement chez des clients 
+Une PME spécialisée dans l'installation, l'entretien et le dépannage
+d'équipements technique intervient régulièrement chez des clients
 professionnels.
 
-L'entreprise doit planifier les interventions, affecter les techniciens 
+L'entreprise doit planifier les interventions, affecter les techniciens
 disponibles et permettre le suivi de leur réalisation.
 
-Aujourd'hui, les informations sont dispersées entre différents outils : 
-e-mails, téléphone, feuille de calculs et documents internes. Cela rend le 
-suivi des interventions difficile et augmente le risque d'erreur ou de perte 
+Aujourd'hui, les informations sont dispersées entre différents outils :
+e-mails, téléphone, feuille de calculs et documents internes. Cela rend le
+suivi des interventions difficile et augmente le risque d'erreur ou de perte
 d'inormation.
 
-L'entreprise souhate disposer d'une application web simple permettant de 
+L'entreprise souhate disposer d'une application web simple permettant de
 centraliser et de suivre son activité d'intervention.
 ## Problème
-Comment permettre à une petite entreprise de gérer simplement le cycle de 
+Comment permettre à une petite entreprise de gérer simplement le cycle de
 vie de ses interventions, depuis la demande du client jusqu'à leur réalisation
 par un technicien ?
 
@@ -28,7 +28,7 @@ Plusieurs difficultés:
 - risque de doublons ou d'oublis
 - accès à l'information potentiellement difficile sur le terrain
 ## Objectif du produit
-Centraliser la gestion des clients, des techniciens et des interventions 
+Centraliser la gestion des clients, des techniciens et des interventions
 dans une application web simple, accessible et sobre, permettant de planifier,
 consulter et suivre efficacement les interventions.
 ## Objectifs secondaires
@@ -40,7 +40,7 @@ consulter et suivre efficacement les interventions.
 6. conservation d'un historique exploitable
 7. fonctionnement sur un ordinateur, tablette ou smartphone
 8. utilisation eu clavier et avec des technologies d'assistance
-9. limitation des ressources techniques et données transférées au strict 
+9. limitation des ressources techniques et données transférées au strict
    nécessaire
 ## Cycle de vie d'une intervention
 ```text
@@ -65,7 +65,7 @@ Historique
 ## Principe d'accessibilité
 Les fonctionnalités essentielles doivent pouvoir être réalisées sans souris.
 ## Principe d'éco-conception
-Chaque fonctionnalité et chaque ressource technique doit répondre à un 
+Chaque fonctionnalité et chaque ressource technique doit répondre à un
 besoin utilisateur identifié.
 ## Hors périmètre
 - ERP

@@ -11,7 +11,7 @@ Trois rôles métier:
 - Gestionnaire
 - Technicien
 
-L'application MVP utilise le `CustomUser` de Django. 
+L'application MVP utilise le `CustomUser` de Django.
 ## Client
 ### Données
 Application du principe de minimalisation des données.
@@ -51,12 +51,12 @@ Intervention
 |-- updated_at
 ```
 ### Adresse
-Le stockage d'une autre adresse que celle indiqué dans la fiche du client 
-est possible car l'adresse de l'intervention peut être différente. Si 
-l'intervention archivée utilise le champ `address` du client, son ancienne 
+Le stockage d'une autre adresse que celle indiqué dans la fiche du client
+est possible car l'adresse de l'intervention peut être différente. Si
+l'intervention archivée utilise le champ `address` du client, son ancienne
 adresse serait perdue.
 
-L'interface de l'application pourra pré-remplir l'adresse du client si elle 
+L'interface de l'application pourra pré-remplir l'adresse du client si elle
 correspond à celle de l'intervention.
 ### Statut
 Il y a quatre valeurs fixes:
@@ -67,10 +67,10 @@ Il y a quatre valeurs fixes:
 ### Compte rendu
 Le champ `report` peut être vide tant que l'intervention n'est pas terminée.
 ## Relations
-Une intervention appartient à un client. Un client peut avoir plusieurs 
+Une intervention appartient à un client. Un client peut avoir plusieurs
 interventions.
 
-Une intervention possède au maximum un technicien principal dans le MVP. Une 
+Une intervention possède au maximum un technicien principal dans le MVP. Une
 intervention peut être créée avant l'affectation d'un technicien.
 ## Contraintes métier
 Les contraintes ci-dessous sont garanties par le code et/ou la base.
