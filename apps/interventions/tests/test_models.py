@@ -1,6 +1,7 @@
 import pytest
 from django.core.exceptions import ValidationError
 
+from apps.accounts.models import User
 from apps.clients.models import Client
 from apps.interventions.models import Intervention
 
@@ -262,3 +263,196 @@ def test_completed_or_cancelled_intervention_cannot_be_cancelled(initial_status)
 
     with pytest.raises(ValidationError):
         intervention.cancel()
+
+
+@pytest.mark.django_db
+def test_intervention_can_be_created_without_technician():
+    client = Client.objects.create(
+        name="Entreprise Test",
+    )
+    intervention = Intervention.objects.create(
+        client=client,
+        title="Maintenance du poste de travail",
+    )
+
+    assert intervention.technician is None
+
+
+@pytest.mark.django_db
+def test_technician_can_be_assigned_to_an_intervention():
+    client = Client.objects.create(
+        name="Entreprise Test",
+    )
+    technician = User.objects.create_user(
+        username="technician",
+        password="test-password",
+        role=User.Role.TECHNICIAN,
+    )
+    intervention = Intervention.objects.create(
+        client=client,
+        title="Maintenance du poste de travail",
+        technician=technician,
+    )
+
+    assert intervention.technician == technician
+
+
+@pytest.mark.parametrize(
+    "role",
+    [
+        User.Role.ADMIN,
+        User.Role.MANAGER,
+    ],
+)
+@pytest.mark.django_db
+def test_non_technician_cannot_be_assigned_to_an_intervention(role):
+    client = Client.objects.create(
+        name="Entreprise Test",
+    )
+    user = User.objects.create_user(
+        username=f"user-{role.lower()}",
+        password="test-password",
+        role=role,
+    )
+    intervention = Intervention.objects.create(
+        client=client,
+        title="Maintenance du poste de travail",
+        technician=user,
+    )
+
+    with pytest.raises(ValidationError):
+        intervention.full_clean()
+
+
+@pytest.mark.django_db
+def test_technician_can_ne_assigned_after_intervention_created():
+    client = Client.objects.create(
+        name="Entreprise Test",
+    )
+    technician = User.objects.create_user(
+        username="technician",
+        password="test-password",
+        role=User.Role.TECHNICIAN,
+    )
+    intervention = Intervention.objects.create(
+        client=client,
+        title="Maintenance du poste de travail",
+    )
+
+    intervention.assign_technician(technician)
+    intervention.refresh_from_db()
+
+    assert intervention.technician == technician
+
+
+@pytest.mark.parametrize(
+    "role",
+    [
+        User.Role.ADMIN,
+        User.Role.MANAGER,
+    ],
+)
+@pytest.mark.django_db
+def test_non_technician_cannot_be_assigned_after_intervention_created(role):
+    client = Client.objects.create(
+        name="Entreprise Test",
+    )
+    user = User.objects.create_user(
+        username=f"user-{role.lower()}",
+        password="test-password",
+        role=role,
+    )
+    intervention = Intervention.objects.create(
+        client=client,
+        title="Maintenance du poste de travail",
+        technician=user,
+    )
+
+    with pytest.raises(ValidationError):
+        intervention.assign_technician(user)
+
+
+@pytest.mark.parametrize(
+    "status",
+    [
+        Intervention.Status.PLANNED,
+        Intervention.Status.IN_PROGRESS,
+    ],
+)
+@pytest.mark.django_db
+def test_technician_can_be_unassigned_from_active_intervention(status):
+    client = Client.objects.create(
+        name="Entreprise Test",
+    )
+    technician = User.objects.create_user(
+        username=f"technician-{status.lower()}",
+        password="test-password",
+        role=User.Role.TECHNICIAN,
+    )
+    intervention = Intervention.objects.create(
+        client=client,
+        title="Maintenance du poste de travail",
+        technician=technician,
+        status=status,
+    )
+
+    intervention.unassign_technician()
+    intervention.refresh_from_db()
+
+    assert intervention.technician is None
+
+
+@pytest.mark.parametrize(
+    "status",
+    [
+        Intervention.Status.COMPLETED,
+        Intervention.Status.CANCELLED,
+    ],
+)
+@pytest.mark.django_db
+def test_technician_cannot_be_unassigned_from_final_intervention(status):
+    client = Client.objects.create(
+        name="Entreprise Test",
+    )
+    technician = User.objects.create_user(
+        username=f"technician-{status.lower()}",
+        password="test-password",
+        role=User.Role.TECHNICIAN,
+    )
+    intervention = Intervention.objects.create(
+        client=client,
+        title="Maintenance du poste de travail",
+        technician=technician,
+        status=status,
+    )
+
+    with pytest.raises(ValidationError):
+        intervention.unassign_technician()
+
+
+@pytest.mark.parametrize(
+    "status",
+    [
+        Intervention.Status.COMPLETED,
+        Intervention.Status.CANCELLED,
+    ],
+)
+@pytest.mark.django_db
+def test_technician_cannot_be_assigned_to_finale_intervention(status):
+    client = Client.objects.create(
+        name="Entreprise Test",
+    )
+    technician = User.objects.create_user(
+        username=f"technician-{status.lower()}",
+        password="test-password",
+        role=User.Role.TECHNICIAN,
+    )
+    intervention = Intervention.objects.create(
+        client=client,
+        title="Maintenance du poste de travail",
+        technician=technician,
+        status=status,
+    )
+
+    with pytest.raises(ValidationError):
+        intervention.assign_technician(technician)
