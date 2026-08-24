@@ -43,3 +43,32 @@ class Intervention(models.Model):
                     "client archivé."
                 }
             )
+
+    def start(self):
+        """Start a planned intervention."""
+        if self.status != self.Status.PLANNED:
+            raise ValidationError("Only a planned intervention can be started.")
+
+        self.status = self.Status.IN_PROGRESS
+        self.save(update_fields=["status", "updated_at"])
+
+    def complete(self):
+        """Complete an intervention in progress."""
+        if self.status != self.Status.IN_PROGRESS:
+            raise ValidationError("Only an intervention in progress can be completed.")
+
+        self.status = self.Status.COMPLETED
+        self.save(update_fields=["status", "updated_at"])
+
+    def cancel(self):
+        """Cancel a planned or in-progress intervention."""
+        if self.status not in {
+            self.Status.PLANNED,
+            self.Status.IN_PROGRESS,
+        }:
+            raise ValidationError(
+                "Only a planned or in-progress intervention can be cancelled."
+            )
+
+        self.status = self.Status.CANCELLED
+        self.save(update_fields=["status", "updated_at"])
