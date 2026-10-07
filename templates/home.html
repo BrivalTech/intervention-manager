@@ -1,8 +1,87 @@
 {% extends "base.html" %}
-{% load static %}
+{% block title %}Design System | Gestionnaire d'interventions{% endblock %}
 
-{% block title %}Accueil | Gestionnaire d'interventions{% endblock %}
 {% block content %}
-    <h1>Gestionnaire d'interventions</h1>
-    <p>Fondation du DS</p>
+    <div class="stack stack--large">
+        <header>
+            <h1>Design System</h1>
+            <p>
+                Composants de base du Gestionnaire d'interventions.
+            </p>
+        </header>
+
+        <section class="stack" aria-labelledby="links-title">
+            <h2 id="links-title">Liens</h2>
+            <p>
+                <a href="#cards-title">Exemple de lien</a>
+            </p>
+        </section>
+
+        <section class="stack" aria-labelledby="buttons-title">
+            <h2 id="buttons-title">Boutons</h2>
+            <div class="cluster">
+                <button class="button button--primary" type="button">
+                    Action principale
+                </button>
+
+                <button class="button button--secondary" type="button">
+                    Action secondaire
+                </button>
+
+                <button class="button button--primary" type="button" disabled>
+                    Action indisponible
+                </button>
+            </div>
+        </section>
+
+        <section class="stack" aria-labelledby="messages-title">
+            <h2 id="messages-title">Messages</h2>
+            <div class="message message--info">
+                <p class="message__title">Information</p>
+                <p class="message__content">
+                    Une information complémentaire est disponible.
+                </p>
+            </div>
+
+            <div class="message message--success">
+                <p class="message__title">Succès</p>
+                <p class="message__content">
+                    L'intervention a été enregistrée.
+                </p>
+            </div>
+
+            <div class="message message--warning">
+                <p class="message__title">Attention</p>
+                <p class="message__content">
+                    Certaines informations doivent être vérifiées.
+                </p>
+            </div>
+
+            <div class="message message--error">
+                <p class="message__title">Erreur</p>
+                <p class="message__content">
+                    L'intervention n'a pas pu être enregistrée.
+                </p>
+            </div>
+        </section>
+
+        <section class="stack" aria-labelledby="cards-title">
+            <h2 id="cards-title">Cartes</h2>
+
+            <article class="card">
+                <h3 class="card__title">Intervention #1234</h3>
+                <div class="card__content">
+                    <p>
+                        <strong>Client :</strong>
+                        Dupont SARL
+                    </p>
+
+                    <p>
+                        <strong>Statut :</strong>
+                        Planifiée
+                    </p>
+                </div>
+            </article>
+        </section>
+    </div>
 {% endblock %}
