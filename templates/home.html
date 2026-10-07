@@ -67,21 +67,44 @@
 
         <section class="stack" aria-labelledby="cards-title">
             <h2 id="cards-title">Cartes</h2>
-
             <article class="card">
-                <h3 class="card__title">Intervention #1234</h3>
+                <h3 class="card__title">
+                    <a href="#">Intervention #1234</a>
+                </h3>
+                <div class="card__content">
+                    <dl class="data-list">
+                        <div>
+                            <dt>Client</dt>
+                            <dd>Dupont SARL</dd>
+                        </div>
+                        <div>
+                            <dt>Technicien</dt>
+                            <dd>Jean Martin</dd>
+                        </div>
+                        <div>
+                            <dt>Statut</dt>
+                            <dd>
+                                <span class="status status--planned">
+                                    Planifiée
+                                </span>
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+            </article>
+            <article class="card">
+                <h3 class="card__title">Dupont SARL</h3>
                 <div class="card__content">
                     <p>
-                        <strong>Client :</strong>
-                        Dupont SARL
-                    </p>
-
-                    <p>
-                        <strong>Statut :</strong>
-                        Planifiée
+                        <span class="status">
+                            Archivé
+                        </span>
                     </p>
                 </div>
             </article>
+            <div class="empty-state">
+                <p>Aucune intervention n'est disponible.</p>
+            </div>
         </section>
 
         <section class="stack" aria-labelledby="forms-title">
