@@ -1,3 +1,66 @@
 :root {
+    /* Neutral colors */
+    --color-white: #ffffff;
+    --color-gray-50: #f8f9fa;
+    --color-gray-100: #f1f3f5;
+    --color-gray-300: #ced4da;
+    --color-gray-600: #5c636a;
+    --color-gray-900: #212529;
 
+    /* Brand colors */
+    --color-primary: #005ea8;
+    --color-primary-hover: #004b87;
+
+    /* Semantic colors */
+    --color-success: #247a3c;
+    --color-warning: #8a5a00;
+    --color-danger: #b42318;
+
+    /* Interface colors */
+    --color-background: var(--color-white);
+    --color-surface: var(--color-gray-50);
+    --color-text: var(--color-gray-900);
+    --color-text-muted: var(--color-gray-600);
+    --color-border: var(--color-gray-300);
+    --color-link: var(--color-primary);
+
+    /* Typography */
+    --font-family-base:
+        system-ui,
+        -apple-system,
+        blinkmacsystemfont,
+        "Segoe UI",
+        sans-serif;
+
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.5rem;
+    --font-size-2xl: 2rem;
+
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-bold: 700;
+
+    --line-height-base: 1.5;
+    --line-height-heading: 1.2;
+
+    /* Spacing */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.5rem;
+    --space-6: 2rem;
+    --space-7: 3rem;
+    --space-8: 4rem;
+
+    /* Borders */
+    --border-width: 1px;
+    --border-radius-sm: 0.25rem;
+    --border-radius-md: 0.5rem;
+
+    /* Layout */
+    --content-max-width: 75rem;
+    --content-padding: var(--space-4);
 }

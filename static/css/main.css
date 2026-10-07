@@ -6,4 +6,14 @@
 
 body {
     margin: 0;
+    background-color: var(--color-background);
+    color: var(--color-text);
+    font-family: var(--font-family-base), serif;
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-base);
+}
+
+.container {
+    width: min(100% - (2 * var(--content-padding)), var(--content-max-width));
+    margin-inline: auto;
 }
