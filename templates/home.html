@@ -83,5 +83,42 @@
                 </div>
             </article>
         </section>
+
+        <section class="stack" aria-labelledby="forms-title">
+            <h2 id="forms-title">Formulaires</h2>
+            <form class="stack">
+                <div class="form-field">
+                    <label class="form-label" for="demo-client">
+                        Client
+                    </label>
+                    <input
+                        class="form-control"
+                        id="demo-client"
+                        name="demo-client"
+                        type="text"
+                    >
+                </div>
+
+                <div class="form-field">
+                    <label class="form-label" for="demo-description">
+                        Description
+                    </label>
+                    <textarea
+                        class="form-control"
+                        id="demo-description"
+                        name="demo-description"
+                    ></textarea>
+                </div>
+
+                <div class="cluster">
+                    <button class="button button--primary" type="submit">
+                        Enregistrer
+                    </button>
+                    <button class="button button--secondary" type="button">
+                        Annuler
+                    </button>
+                </div>
+            </form>
+        </section>
     </div>
 {% endblock %}
