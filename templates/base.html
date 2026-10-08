@@ -33,6 +33,16 @@
                                 Accueil
                             </a>
                         </li>
+                        <li>
+                            <a
+                                href="{% url 'core:design-system' %}"
+                                {% if request.resolver_match.url_name == "design-system" %}
+                                    aria-current="page"
+                                {% endif %}
+                            >
+                                Design System
+                            </a>
+                        </li>
                     </ul>
                 </nav>
             </div>
