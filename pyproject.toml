@@ -29,6 +29,7 @@ DJANGO_SETTINGS_MODULE = "config.settings"
 python_files = [
     "test_*.py",
     "*_tests.py",
+    "tests.py"
 ]
 addopts = "-ra"
 

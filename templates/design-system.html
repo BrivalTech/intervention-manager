@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block title %}Design System | Gestionnaire d'interventions{% endblock %}
+
+{% block content %}
+    <div class="stack stack--large">
+        <header>
+            <h1>Design System</h1>
+            <p>
+                Composants de base du Gestionnaire d'interventions.
+            </p>
+        </header>
+
+        <section class="stack" aria-labelledby="links-title">
+            <h2 id="links-title">Liens</h2>
+            <p>
+                <a href="#cards-title">Exemple de lien</a>
+            </p>
+        </section>
+
+        <section class="stack" aria-labelledby="buttons-title">
+            <h2 id="buttons-title">Boutons</h2>
+            <div class="cluster">
+                <button class="button button--primary" type="button">
+                    Action principale
+                </button>
+
+                <button class="button button--secondary" type="button">
+                    Action secondaire
+                </button>
+
+                <button class="button button--primary" type="button" disabled>
+                    Action indisponible
+                </button>
+            </div>
+        </section>
+
+        <section class="stack" aria-labelledby="messages-title">
+            <h2 id="messages-title">Messages</h2>
+            <div class="message message--info">
+                <p class="message__title">Information</p>
+                <p class="message__content">
+                    Une information complémentaire est disponible.
+                </p>
+            </div>
+
+            <div class="message message--success">
+                <p class="message__title">Succès</p>
+                <p class="message__content">
+                    L'intervention a été enregistrée.
+                </p>
+            </div>
+
+            <div class="message message--warning">
+                <p class="message__title">Attention</p>
+                <p class="message__content">
+                    Certaines informations doivent être vérifiées.
+                </p>
+            </div>
+
+            <div class="message message--error">
+                <p class="message__title">Erreur</p>
+                <p class="message__content">
+                    L'intervention n'a pas pu être enregistrée.
+                </p>
+            </div>
+        </section>
+
+        <section class="stack" aria-labelledby="cards-title">
+            <h2 id="cards-title">Cartes</h2>
+            <article class="card">
+                <h3 class="card__title">
+                    <a href="#">Intervention #1234</a>
+                </h3>
+                <div class="card__content">
+                    <dl class="data-list">
+                        <div>
+                            <dt>Client</dt>
+                            <dd>Dupont SARL</dd>
+                        </div>
+                        <div>
+                            <dt>Technicien</dt>
+                            <dd>Jean Martin</dd>
+                        </div>
+                        <div>
+                            <dt>Statut</dt>
+                            <dd>
+                                <span class="status status--planned">
+                                    Planifiée
+                                </span>
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+            </article>
+            <article class="card">
+                <h3 class="card__title">Dupont SARL</h3>
+                <div class="card__content">
+                    <p>
+                        <span class="status">
+                            Archivé
+                        </span>
+                    </p>
+                </div>
+            </article>
+            <div class="empty-state">
+                <p>Aucune intervention n'est disponible.</p>
+            </div>
+        </section>
+
+        <section class="stack" aria-labelledby="forms-title">
+            <h2 id="forms-title">Formulaires</h2>
+            <form class="stack">
+                <div class="form-field">
+                    <label class="form-label" for="demo-client">
+                        Client
+                    </label>
+                    <input
+                        class="form-control"
+                        id="demo-client"
+                        name="demo-client"
+                        type="text"
+                    >
+                </div>
+
+                <div class="form-field">
+                    <label class="form-label" for="demo-description">
+                        Description
+                    </label>
+                    <textarea
+                        class="form-control"
+                        id="demo-description"
+                        name="demo-description"
+                    ></textarea>
+                </div>
+
+                <div class="cluster">
+                    <button class="button button--primary" type="button">
+                        Enregistrer
+                    </button>
+                    <button class="button button--secondary" type="button">
+                        Annuler
+                    </button>
+                </div>
+            </form>
+        </section>
+    </div>
+{% endblock %}
