@@ -43,6 +43,32 @@
                                 Design System
                             </a>
                         </li>
+                        {% if user.is_authenticated %}
+                            <li>
+                                <form
+                                    method="post"
+                                    action="{% url 'accounts:logout' %}"
+                                >
+                                    {% csrf_token %}
+                                    <button class="nav-button"
+                                            type="submit"
+                                    >
+                                        Se déconnecter
+                                    </button>
+                                </form>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a
+                                        href="{% url 'accounts:login' %}"
+                                        {% if request.resolver_match.namespace == "accounts" and request.resolver_match.url_name == "login" %}
+                                            aria-current="page"
+                                        {% endif %}
+                                >
+                                    Se connecter
+                                </a>
+                            </li>
+                        {% endif %}
                     </ul>
                 </nav>
             </div>
