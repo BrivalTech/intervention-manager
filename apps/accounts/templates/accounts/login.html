@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Connexion | Gestionnaire d'interventions{% endblock %}
+
+{% block content %}
+    <section class="stack stack--large" aria-labelledby="login-title">
+        <header>
+            <h1 id="login-title">Connexion</h1>
+            <p>
+                Connectez-vous pour accéder au gestionnaire d'interventions
+            </p>
+        </header>
+
+    {% if form.non_field_errors %}
+        <div class="message message--error" role="alert">
+            <p class="message__title">Connexion impossible</p>
+            {% for error in form.non_field_errors %}
+                <p class="message__content">{{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+        <form method="post" class="stack">
+            {% csrf_token %}
+            <div class="form-field">
+                <label
+                        class="form-label"
+                        for="{{ form.username.id_for_label }}"
+                >
+                    Nom d'utilisateur
+                </label>
+                <input
+                    class="form-control"
+                    type="text"
+                    name="{{ form.username.html_name }}"
+                    id="{{ form.username.id_for_label }}"
+                    autocomplete="username"
+                    required
+                    autofocus
+                    {% if form.username.errors %}
+                        aria-invalid="true"
+                        aria-describedby="username-error"
+                    {% endif %}
+                >
+
+                {% if form.username.errors %}
+                    <div class="form-error" id="username-error">
+                        {% for error in form.username.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-field">
+                <label
+                        class="form-label"
+                        for="{{ form.password.id_for_label }}"
+                >
+                    Mot de passe
+                </label>
+                <input
+                    class="form-control"
+                    type="text"
+                    name="{{ form.password.html_name }}"
+                    id="{{ form.password.id_for_label }}"
+                    autocomplete="current-password"
+                    required
+                    {% if form.password.errors %}
+                        aria-invalid="true"
+                        aria-describedby="password-error"
+                    {% endif %}
+                >
+
+                {% if form.password.errors %}
+                    <div class="form-error" id="password-error">
+                        {% for error in form.password.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            {% if next %}
+                <input type="hidden" name="next" value="{{ next }}" />
+            {% endif %}
+
+            <div class="cluster">
+                <button class="button button--primary" type="submit">
+                    Se connecter
+                </button>
+            </div>
+        </form>
+    </section>
+{% endblock %}
