@@ -132,7 +132,7 @@ python_files = [
 `DJANGO_SETTINGS_MODULE` indique à pytest quels paramètres Django doit
 utiliser lors de l'exécution des tests.
 ### 3.3 Organisation
-Les tests propres à une application sont placés dans un répertoire `tests`.
+Les tests propres à une application sont placés dans un répertoire `tests/`.
 
 Exemple :
 ```text
