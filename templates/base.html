@@ -20,13 +20,15 @@
         </a>
 
         <header class="site-header">
-            <div class="container">
+            <div class="container header-layout">
                 <p class="site-title">Gestionnaire d'interventions</p>
-                <nav aria-label="Navigation principale">
+                <nav class="site-nav" aria-label="Navigation principale">
                     <ul class="nav-list">
                         <li>
-                            <a href="{% url 'core:home' %}"
-                                    {% if request.resolver_match.url_name == "home" %}
+                            <a
+                                    href="{% url 'core:home' %}"
+                                    class="nav-link"
+                                    {% if request.resolver_match.view_name == "core:home" %}
                                         aria-current="page"
                                     {% endif %}
                             >
@@ -36,7 +38,8 @@
                         <li>
                             <a
                                 href="{% url 'core:design-system' %}"
-                                {% if request.resolver_match.url_name == "design-system" %}
+                                class="nav-link"
+                                {% if request.resolver_match.view_name == "core:design-system" %}
                                     aria-current="page"
                                 {% endif %}
                             >
@@ -51,8 +54,7 @@
                                 >
                                     {% csrf_token %}
                                     <button class="nav-button"
-                                            type="submit"
-                                    >
+                                            type="submit">
                                         Se déconnecter
                                     </button>
                                 </form>
@@ -61,6 +63,7 @@
                             <li>
                                 <a
                                         href="{% url 'accounts:login' %}"
+                                        class="nav-link"
                                         {% if request.resolver_match.namespace == "accounts" and request.resolver_match.url_name == "login" %}
                                             aria-current="page"
                                         {% endif %}

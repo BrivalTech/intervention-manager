@@ -1,30 +1,47 @@
 :root {
     /* Neutral colors */
     --color-white: #ffffff;
-    --color-gray-50: #f8f9fa;
-    --color-gray-100: #f1f3f5;
-    --color-gray-300: #ced4da;
-    --color-gray-600: #5c636a;
-    --color-gray-900: #212529;
+    --color-gray-50: #f4f7fa;
+    --color-gray-100: #e9eff3;
+    --color-gray-300: #d8e2ea;
+    --color-gray-600: #526477;
+    --color-gray-900: #243447;
 
     /* Brand colors */
-    --color-primary: #005ea8;
-    --color-primary-hover: #004b87;
+    --color-primary: #087e82;
+    --color-primary-hover: #066569;
+    --color-navy: #14283f;
 
     /* Semantic colors */
-    --color-info: #005ea8;
-    --color-success: #247a3c;
-    --color-warning: #8a5a00;
-    --color-danger: #b42318;
+    --color-info: #205c91;
+    --color-success: #236b46;
+    --color-warning: #895600;
+    --color-danger: #b42332;
 
     /* Interface colors */
-    --color-background: var(--color-white);
-    --color-surface: var(--color-gray-50);
+    --color-background: var(--color-gray-50);
+    --color-surface: var(--color-white);
     --color-text: var(--color-gray-900);
     --color-text-muted: var(--color-gray-600);
     --color-border: var(--color-gray-300);
-    --color-link: var(--color-primary);
-    --color-focus: #005fcc;
+    --color-link: #08676b;
+    --color-focus: #b45309;
+
+    /* Header and navigation */
+    --color-header-background: var(--color-navy);
+    --color-header-text: var(--color-white);
+    --color-header-hover: rgb(255 255 255 / 12%);
+    --color-header-active: rgb(255 255 255 / 20%);
+    --color-header-current: rgb(255 255 255 / 16%);
+    --color-header-border: rgb(255 255 255 / 65%);
+
+    /* Focus */
+    --color-focus-on-dark: #fbbf24;
+
+    /* Skip link */
+    --color-skip-background: var(--color-white);
+    --color-skip-text: var(--color-navy);
+    --color-skip-border: var(--color-navy);
 
     /* Typography */
     --font-family-base:
@@ -59,8 +76,8 @@
 
     /* Borders */
     --border-width: 1px;
-    --border-radius-sm: 0.25rem;
-    --border-radius-md: 0.5rem;
+    --border-radius-sm: 0.375rem;
+    --border-radius-md: 0.75rem;
 
     /* Layout */
     --content-max-width: 75rem;
