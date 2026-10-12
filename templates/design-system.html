@@ -36,32 +36,44 @@
 
         <section class="stack" aria-labelledby="messages-title">
             <h2 id="messages-title">Messages</h2>
-            <div class="message message--info">
-                <p class="message__title">Information</p>
-                <p class="message__content">
-                    Une information complémentaire est disponible.
-                </p>
+            <div class="message message--info" role="status">
+                <span class="message__icon" aria-hidden="true">i</span>
+                <div class="message__body">
+                    <p class="message__title">Information</p>
+                    <p class="message__content">
+                        Une information complémentaire est disponible.
+                    </p>
+                </div>
             </div>
 
-            <div class="message message--success">
-                <p class="message__title">Succès</p>
-                <p class="message__content">
-                    L'intervention a été enregistrée.
-                </p>
+            <div class="message message--success" role="status">
+                <span class="message__icon" aria-hidden="true">/</span>
+                <div class="message__body">
+                    <p class="message__title">Succès</p>
+                    <p class="message__content">
+                        L'intervention a été enregistrée.
+                    </p>
+                </div>
             </div>
 
-            <div class="message message--warning">
-                <p class="message__title">Attention</p>
-                <p class="message__content">
-                    Certaines informations doivent être vérifiées.
-                </p>
+            <div class="message message--warning" role="status">
+                <span class="message__icon" aria-hidden="true">!</span>
+                <div class="message__body">
+                    <p class="message__title">Attention</p>
+                    <p class="message__content">
+                        Certaines informations doivent être vérifiées.
+                    </p>
+                </div>
             </div>
 
-            <div class="message message--error">
-                <p class="message__title">Erreur</p>
-                <p class="message__content">
-                    L'intervention n'a pas pu être enregistrée.
-                </p>
+            <div class="message message--error" role="status">
+                <span class="message__icon" aria-hidden="true">x</span>
+                <div class="message__body">
+                    <p class="message__title">Erreur</p>
+                    <p class="message__content">
+                        L'intervention n'a pas pu être enregistrée.
+                    </p>
+                </div>
             </div>
         </section>
 

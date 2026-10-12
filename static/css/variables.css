@@ -10,7 +10,7 @@
     /* Brand colors */
     --color-primary: #087e82;
     --color-primary-hover: #066569;
-    --color-navy: #14283f;
+    --color-navy: #27445E;
 
     /* Semantic colors */
     --color-info: #205c91;
@@ -50,19 +50,22 @@
         blinkmacsystemfont,
         "Segoe UI",
         sans-serif;
-
     --font-size-sm: 0.875rem;
     --font-size-base: 1rem;
     --font-size-lg: 1.125rem;
     --font-size-xl: 1.5rem;
     --font-size-2xl: 2rem;
-
     --font-weight-normal: 400;
     --font-weight-medium: 500;
     --font-weight-bold: 700;
-
     --line-height-base: 1.5;
     --line-height-heading: 1.2;
+
+    /* Message backgrounds */
+    --color-info-background: #eaf3f9;
+    --color-success-background: #e7f4eb;
+    --color-warning-background: #fff3db;
+    --color-danger-background: #fcebed;
 
     /* Spacing */
     --space-1: 0.25rem;
