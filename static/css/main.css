@@ -117,6 +117,16 @@ h3 {
     margin: 0;
 }
 
+.nav-user-role {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding-inline: var(--space-3);
+    color: var(--color-header-text);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+}
+
 .site-header .nav-link,
 .site-header .nav-button {
     display: inline-flex;

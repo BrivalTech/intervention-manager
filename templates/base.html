@@ -34,17 +34,19 @@
                 </div>
                 <nav class="site-nav" aria-label="Navigation principale">
                     <ul class="nav-list">
-                        <li>
-                            <a
-                                    href="{% url 'core:home' %}"
-                                    class="nav-link"
-                                    {% if request.resolver_match.view_name == "core:home" %}
-                                        aria-current="page"
-                                    {% endif %}
-                            >
-                                Accueil
-                            </a>
-                        </li>
+                        {% if user.is_authenticated %}
+                            <li>
+                                <a
+                                        href="{% url 'core:home' %}"
+                                        class="nav-link"
+                                        {% if request.resolver_match.view_name == "core:home" %}
+                                            aria-current="page"
+                                        {% endif %}
+                                >
+                                    Accueil
+                                </a>
+                            </li>
+                        {% endif %}
                         <li>
                             <a
                                 href="{% url 'core:design-system' %}"
@@ -57,6 +59,11 @@
                             </a>
                         </li>
                         {% if user.is_authenticated %}
+                            <li>
+                                <span class="nav-user-role">
+                                    {{ user.get_role_display }}
+                                </span>
+                            </li>
                             <li>
                                 <form
                                     method="post"
