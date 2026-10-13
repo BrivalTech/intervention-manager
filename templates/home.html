@@ -1,6 +1,59 @@
 {% extends "base.html" %}
-{% block title %}Accueil | Gestionnaire d'interventions{% endblock %}
+{% block title %}Tableau de bord | Gestionnaire d'interventions{% endblock %}
 
 {% block content %}
-    <h1>Page d'accueil</h1>
+    <section class="stack stack--large" aria-labelledby="dashboard-title">
+        {% if user.role == "ADMIN" %}
+            <div class="stack">
+                <h1 id="dashboard-title">Tableau de bord - Administration</h1>
+                <p>Bienvenue dans votre espace d'administration.</p>
+            </div>
+            <div class="card">
+                <h2 class="card__title">Administration de l'application</h2>
+                <div class="card__content">
+                    <p>
+                        Cet espace vous permet de superviser les
+                        utilisateurs, les clients et les interventions.
+                    </p>
+                </div>
+            </div>
+        {% elif user.role == "MANAGER" %}
+            <div class="stack">
+                <h1 id="dashboard-title">Tableau de bord - Gestion</h1>
+                <p>Bienvenue dans votre espace de gestion.</p>
+            </div>
+            <div class="card">
+                <h2 class="card__title">Gestion des activités</h2>
+                <div class="card__content">
+                    <p>
+                        Cet espace vous permet de suivre les clients, de
+                        planifier les interventions et de gérer leurs états
+                        d'avancement.
+                    </p>
+                </div>
+            </div>
+        {% elif user.role == "TECHNICIAN" %}
+            <div class="stack">
+                <h1 id="dashboard-title">Mes interventions</h1>
+                <p>Bienvenue dans votre espace technicien.</p>
+            </div>
+            <div class="card">
+                <h2 class="card__title">Interventions attribuées</h2>
+                <div class="card__content">
+                    <p>
+                        Cet espace vous permet de consulter vos interventions
+                        et de suivre leur état d'avancement.
+                    </p>
+                </div>
+            </div>
+        {% else %}
+            <div class="stack">
+            <h1 id="dashboard-title">Tableau de bord</h1>
+            <p>
+                Aucun rôle valide n'est associé à votre compte.<br>
+                Veuillez contacter un administrateur.
+            </p>
+            </div>
+        {% endif %}
+    </section>
 {% endblock %}
