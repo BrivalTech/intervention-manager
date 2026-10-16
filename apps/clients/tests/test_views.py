@@ -580,3 +580,286 @@ def test_client_create_link_opens_form(client, django_user_model):
     assert response.status_code == 200
     assert "form" in response.context
     assert b"Enregistrer le client" in response.content
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("role", "expected_status"),
+    [
+        (User.Role.ADMIN, 200),
+        (User.Role.MANAGER, 200),
+        (User.Role.TECHNICIAN, 403),
+    ],
+)
+def test_client_detail_access_by_role(
+    client,
+    django_user_model,
+    role,
+    expected_status,
+):
+    user = django_user_model.objects.create_user(
+        username=f"user_{role.lower()}",
+        password="TestPassword123!",
+        role=role,
+    )
+
+    client.force_login(user)
+    client_obj = Client.objects.create(name="Entreprise Allibi")
+    response = client.get(reverse("clients:detail", args=[client_obj.pk]))
+
+    assert response.status_code == expected_status
+
+
+@pytest.mark.django_db
+def test_client_detail_requires_authentication(client):
+    client_obj = Client.objects.create(name="Entreprise Alpha")
+    response = client.get(reverse("clients:detail", args=[client_obj.pk]))
+
+    assert response.status_code == 302
+    assert response.url.startswith(reverse("accounts:login"))
+
+
+@pytest.mark.django_db
+def test_client_detail_displays_information(client, django_user_model):
+    user = django_user_model.objects.create_user(
+        username="manager",
+        password="TestPassword123!",
+        role=User.Role.MANAGER,
+    )
+
+    client.force_login(user)
+    client_obj = Client.objects.create(
+        name="Entreprise Allibi",
+        contact_name="Marie Durand",
+        email="contact@allibi.fr",
+        phone="0102030405",
+        city="Paris",
+    )
+
+    response = client.get(reverse("clients:detail", args=[client_obj.pk]))
+
+    assert response.status_code == 200
+    assert response.context["client_obj"] == client_obj
+    assert "Entreprise Allibi" in response.content.decode()
+    assert "Marie Durand" in response.content.decode()
+    assert "contact@allibi.fr" in response.content.decode()
+    assert "0102030405" in response.content.decode()
+    assert "Paris" in response.content.decode()
+
+
+@pytest.mark.django_db
+def test_client_detail_displays_archived_client(client, django_user_model):
+    user = django_user_model.objects.create_user(
+        username="manager",
+        password="TestPassword123!",
+        role=User.Role.MANAGER,
+    )
+
+    client.force_login(user)
+    client_obj = Client.objects.create(
+        name="Ancien Client",
+        is_active=False,
+    )
+
+    response = client.get(reverse("clients:detail", args=[client_obj.pk]))
+
+    assert response.status_code == 200
+    assert "Client archivé" in response.content.decode()
+
+
+@pytest.mark.django_db
+def test_client_detail_returns_404_for_unknown_client(
+    client,
+    django_user_model,
+):
+    user = django_user_model.objects.create_user(
+        username="manager",
+        password="TestPassword123!",
+        role=User.Role.MANAGER,
+    )
+
+    client.force_login(user)
+    response = client.get(reverse("clients:detail", args=[999999]))
+
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_client_detail_displays_complete_information(
+    client,
+    django_user_model,
+):
+    user = django_user_model.objects.create_user(
+        username="manager",
+        password="TestPassword123!",
+        role=User.Role.MANAGER,
+    )
+    client.force_login(user)
+
+    client_obj = Client.objects.create(
+        name="Entreprise Allibi",
+        contact_name="Marie Durand",
+        email="contact@allibi.fr",
+        phone="0102030405",
+        address="10 rue des Lilas",
+        postal_code="75001",
+        city="Paris",
+        notes="Accès par la cour intérieure.",
+    )
+
+    response = client.get(reverse("clients:detail", args=[client_obj.pk]))
+
+    assert response.status_code == 200
+
+    assert "Entreprise Allibi" in response.content.decode()
+    assert "Marie Durand" in response.content.decode()
+    assert "contact@allibi.fr" in response.content.decode()
+    assert "0102030405" in response.content.decode()
+    assert "10 rue des Lilas" in response.content.decode()
+    assert "75001" in response.content.decode()
+    assert "Paris" in response.content.decode()
+    assert "Accès par la cour intérieure." in response.content.decode()
+
+
+@pytest.mark.django_db
+def test_client_detail_displays_empty_optional_fields(
+    client,
+    django_user_model,
+):
+    user = django_user_model.objects.create_user(
+        username="manager",
+        password="TestPassword123!",
+        role=User.Role.MANAGER,
+    )
+
+    client.force_login(user)
+    client_obj = Client.objects.create(name="Entreprise Allibi")
+    response = client.get(reverse("clients:detail", args=[client_obj.pk]))
+
+    assert response.status_code == 200
+    assert "Non renseigné" in response.content.decode()
+    assert "Non renseignée" in response.content.decode()
+    assert "Aucune note renseignée." in response.content.decode()
+
+
+@pytest.mark.django_db
+def test_client_detail_displays_accessible_links(
+    client,
+    django_user_model,
+):
+    user = django_user_model.objects.create_user(
+        username="manager",
+        password="TestPassword123!",
+        role=User.Role.MANAGER,
+    )
+
+    client.force_login(user)
+    client_obj = Client.objects.create(
+        name="Entreprise Allibi",
+        email="contact@allibi.fr",
+        phone="0102030405",
+    )
+
+    response = client.get(reverse("clients:detail", args=[client_obj.pk]))
+
+    assert response.status_code == 200
+    assert 'href="mailto:contact@allibi.fr"' in response.content.decode()
+    assert 'href="tel:0102030405"' in response.content.decode()
+    assert f'href="{reverse("clients:list")}"' in response.content.decode()
+    assert 'id="client-detail-title"' in response.content.decode()
+
+
+@pytest.mark.django_db
+def test_client_list_displays_detail_links(client, django_user_model):
+    user = django_user_model.objects.create_user(
+        username="manager",
+        password="TestPassword123!",
+        role=User.Role.MANAGER,
+    )
+
+    client.force_login(user)
+    client_allibi = Client.objects.create(name="Entreprise Allibi")
+    client_bonpain = Client.objects.create(name="Entreprise Bon Pain")
+    response = client.get(reverse("clients:list"))
+
+    assert response.status_code == 200
+    assert (
+        f'href="{reverse("clients:detail", args=[client_allibi.pk])}"'
+        in response.content.decode()
+    )
+    assert (
+        f'href="{reverse("clients:detail", args=[client_bonpain.pk])}"'
+        in response.content.decode()
+    )
+
+
+@pytest.mark.django_db
+def test_client_detail_navigation_displays_selected_client(
+    client,
+    django_user_model,
+):
+    user = django_user_model.objects.create_user(
+        username="manager",
+        password="TestPassword123!",
+        role=User.Role.MANAGER,
+    )
+
+    client.force_login(user)
+    client_allibi = Client.objects.create(name="Entreprise Allibi")
+    Client.objects.create(name="Entreprise Bon Pain")
+
+    response = client.get(reverse("clients:detail", args=[client_allibi.pk]))
+
+    assert response.status_code == 200
+    assert response.context["client_obj"] == client_allibi
+    assert "Entreprise Allibi" in response.content.decode()
+
+
+@pytest.mark.django_db
+def test_client_detail_has_back_link(client, django_user_model):
+    user = django_user_model.objects.create_user(
+        username="manager",
+        password="TestPassword123!",
+        role=User.Role.MANAGER,
+    )
+
+    client.force_login(user)
+    client_obj = Client.objects.create(name="Entreprise Allibi")
+
+    response = client.get(reverse("clients:detail", args=[client_obj.pk]))
+
+    assert response.status_code == 200
+    assert f'href="{reverse("clients:list")}"' in response.content.decode()
+    assert "Retour aux clients" in response.content.decode()
+
+
+@pytest.mark.django_db
+def test_client_list_detail_links_respect_pagination(
+    client,
+    django_user_model,
+):
+    user = django_user_model.objects.create_user(
+        username="manager",
+        password="TestPassword123!",
+        role=User.Role.MANAGER,
+    )
+
+    client.force_login(user)
+    clients = [Client.objects.create(name=f"Client {index:02d}") for index in range(15)]
+
+    response = client.get(reverse("clients:list"), {"page": 1})
+
+    assert response.status_code == 200
+    for client_obj in clients[:10]:
+        detail_url = reverse(
+            "clients:detail",
+            args=[client_obj.pk],
+        )
+        assert f'href="{detail_url}"' in response.content.decode()
+
+    for client_obj in clients[10:]:
+        detail_url = reverse(
+            "clients:detail",
+            args=[client_obj.pk],
+        )
+        assert f'href="{detail_url}"' not in response.content.decode()

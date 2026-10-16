@@ -110,24 +110,18 @@
                 {% for client in clients %}
                     <li class="card">
                         <div class="card__content">
-                            <h2>{{ client.name }}</h2>
+                            <h2 class="client-card__title">
+                                <a href="{% url 'clients:detail' client.pk %}"
+                                   class="client-card__link"
+                                >
+                                    {{ client.name }}
+                                </a>
+                            </h2>
                             <dl class="data-list">
                                 {% if client.contact_name %}
                                     <div>
                                         <dt>Contact</dt>
                                         <dd>{{ client.contact_name }}</dd>
-                                    </div>
-                                {% endif %}
-                                {% if client.email %}
-                                    <div>
-                                        <dt>E-mail</dt>
-                                        <dd>{{ client.email }}</dd>
-                                    </div>
-                                {% endif %}
-                                {% if client.phone %}
-                                    <div>
-                                        <dt>Téléphone</dt>
-                                        <dd>{{ client.phone }}</dd>
                                     </div>
                                 {% endif %}
                                 {% if client.city %}
