@@ -1,15 +1,28 @@
 {% extends "base.html" %}
-{% block title %}Créer un client — Gestionnaire d'interventions{% endblock %}
+{% block title %}
+    {% if is_edit %}Modifier un client{% else %}Créer un client{% endif %}
+     | Gestionnaire d'interventions
+{% endblock %}
 
 {% block content %}
     <section aria-labelledby="client-form-title">
-        <h1 id="client-form-title">Créer un client</h1>
-        <p>
-            Renseignez les informations du nouveau client.
-        </p>
-        <p>
-            Les champs marqués d'un astérisque (*) sont obligatoires.
-        </p>
+        <header class="stack">
+            <h1 id="client-form-title">
+                {% if is_edit %}
+                    Modifier un client
+                {% else %}
+                    Créer un client
+                {% endif %}
+            </h1>
+            <p>
+                {% if is_edit %}
+                    Modifier les informations du client {{ client_obj.name }}.
+                {% else %}
+                    Renseignez les informations du nouveau client.
+                {% endif %}
+                <br>Les champs marqués d'un astérisque (*) sont obligatoires.
+            </p>
+        </header>
 
         {% if form.errors %}
             <div class="message message--error" role="alert">
@@ -75,12 +88,20 @@
                         class="button button--primary"
                         type="submit"
                 >
-                    Enregistrer le client
+                    {% if is_edit %}
+                        Enregistrer les modifications
+                    {% else %}
+                        Enregistrer le client
+                    {% endif %}
                 </button>
 
                 <a
                         class="button button--secondary"
-                        href="{% url 'clients:list' %}"
+                        {% if is_edit %}
+                            href="{% url 'clients:detail' client_obj.pk %}"
+                        {% else %}
+                            href="{% url 'clients:list' %}"
+                        {% endif %}
                 >
                     Annuler
                 </a>

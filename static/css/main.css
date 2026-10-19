@@ -447,6 +447,13 @@ a:active {
     overflow-wrap: anywhere;
 }
 
+.client-detail__header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+}
+
 /* Form */
 .form-field {
     display: flex;
@@ -552,6 +559,8 @@ textarea.form-control {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: var(--space-4);
+    padding: var(--space-5) var(--space-0) var(--space-5) var(--space-0) ;
+    border-top: var(--border-width) dashed var(--color-navy);
 }
 
 .client-form__fields .form-field {
@@ -664,6 +673,12 @@ textarea.form-control {
 
     .client-detail__notes {
         grid-column: 1 / -1;
+    }
+
+    .client-detail__header {
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: space-between;
     }
 }
 

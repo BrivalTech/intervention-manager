@@ -74,7 +74,10 @@ def client_create(request):
     return render(
         request,
         "clients/client_form.html",
-        {"form": form},
+        {
+            "form": form,
+            "is_edit": False,
+        },
     )
 
 
@@ -91,5 +94,37 @@ def client_detail(request, pk):
         "clients/client_detail.html",
         {
             "client_obj": client_obj,
+            "can_edit_client": can_manage_clients(request.user),
+        },
+    )
+
+
+@login_required
+def client_update(request, pk):
+    """Update an existing client"""
+    if not can_manage_clients(request.user):
+        raise PermissionDenied
+
+    client_obj = get_object_or_404(Client, pk=pk)
+
+    if request.method == "POST":
+        form = ClientForm(request.POST, instance=client_obj)
+
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Les informations du client on été mises à jour.")
+
+            return redirect("clients:detail", pk=client_obj.pk)
+
+    else:
+        form = ClientForm(instance=client_obj)
+
+    return render(
+        request,
+        "clients/client_form.html",
+        {
+            "form": form,
+            "client_obj": client_obj,
+            "is_edit": True,
         },
     )

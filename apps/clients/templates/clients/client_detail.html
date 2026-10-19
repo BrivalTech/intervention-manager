@@ -19,6 +19,14 @@
                     {% endif %}
                 </p>
             </div>
+            {% if can_edit_client %}
+                <a
+                        href="{% url "clients:update" client_obj.pk %}"
+                        class="button button--primary"
+                >
+                    Modifier le client
+                </a>
+            {% endif %}
         </header>
 
         <div class="client-detail__grid">
