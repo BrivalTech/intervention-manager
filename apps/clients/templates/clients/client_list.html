@@ -13,12 +13,15 @@
                </div>
 
                {% if can_create_client %}
-                   <a
-                           href="{% url 'clients:create' %}"
-                           class="button button--primary"
-                   >
-                       Créer un client
-                   </a>
+                   <div class="client-detail__actions">
+                       <a
+                               href="{% url 'clients:create' %}"
+                               class="button button--primary"
+                       >
+                           Créer un client
+                       </a>
+                   </div>
+
                {% endif %}
            </div>
         </header>

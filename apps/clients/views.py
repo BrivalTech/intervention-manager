@@ -7,7 +7,11 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from apps.clients.forms import ClientForm
 from apps.clients.models import Client
-from apps.clients.permissions import can_manage_clients, can_view_clients
+from apps.clients.permissions import (
+    can_archive_client,
+    can_manage_clients,
+    can_view_clients,
+)
 
 
 @login_required
@@ -95,6 +99,8 @@ def client_detail(request, pk):
         {
             "client_obj": client_obj,
             "can_edit_client": can_manage_clients(request.user),
+            "can_archive_client": can_archive_client(request.user)
+            and client_obj.is_active,
         },
     )
 
@@ -126,5 +132,40 @@ def client_update(request, pk):
             "form": form,
             "client_obj": client_obj,
             "is_edit": True,
+        },
+    )
+
+
+@login_required
+def client_archive(request, pk):
+    """Archive a client"""
+    if not can_archive_client(request.user):
+        raise PermissionDenied
+
+    client_obj = get_object_or_404(Client, pk=pk)
+
+    if not client_obj.is_active:
+        messages.info(
+            request,
+            "Ce client est déjà archivé.",
+        )
+
+        return redirect("clients:detail", pk=client_obj.pk)
+
+    if request.method == "POST":
+        client_obj.archive()
+
+        messages.success(
+            request,
+            "Le client a été archivé avec succès.",
+        )
+
+        return redirect("clients:detail", pk=client_obj.pk)
+
+    return render(
+        request,
+        "clients/client_confirm_archive.html",
+        {
+            "client_obj": client_obj,
         },
     )

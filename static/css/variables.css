@@ -17,6 +17,7 @@
     --color-success: #236b46;
     --color-warning: #895600;
     --color-danger: #b42332;
+    --color-danger-hover: #dd505f;
 
     /* Interface colors */
     --color-background: var(--color-gray-50);

@@ -6,7 +6,7 @@
         <header class="client-detail__header">
             <div class="stack">
                 <a href="{% url 'clients:list' %}" class="link">
-                    ← Retour aux clients
+                    Retour aux clients
                 </a>
                 <h1 id="client-detail-title">{{ client_obj.name }}</h1>
                 <p>
@@ -19,13 +19,23 @@
                     {% endif %}
                 </p>
             </div>
-            {% if can_edit_client %}
-                <a
-                        href="{% url "clients:update" client_obj.pk %}"
-                        class="button button--primary"
-                >
-                    Modifier le client
-                </a>
+            {% if can_edit_client or can_archive_client %}
+                <div class="client-detail__actions cluster">
+                    {% if can_edit_client %}
+                        <a href="{% url "clients:update" client_obj.pk %}"
+                           class="button button--primary"
+                        >
+                            Modifier le client
+                        </a>
+                    {% endif %}
+                    {% if can_archive_client %}
+                        <a href="{% url "clients:archive" client_obj.pk %}"
+                           class="button button--danger"
+                        >
+                            Archiver le client
+                        </a>
+                    {% endif %}
+                </div>
             {% endif %}
         </header>
 

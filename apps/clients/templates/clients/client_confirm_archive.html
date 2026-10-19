@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Archiver un client | Gestionnaire d'interventions{% endblock %}
+
+{% block content %}
+    <section class="client-archive stack stack--large"
+             aria-labelledby="archive-title">
+        <header class="stack">
+            <a href="{% url 'clients:detail' client_obj.pk %}" class="link">
+                Retour à la fiche client
+            </a>
+            <h1 id="archive-title">Archiver un client</h1>
+            <p>
+                Voulez-vous vraiment archiver le client {{ client_obj.name }}
+            </p>
+        </header>
+        <div class="client-archive__notice"
+             aria-labelledby="archive-warning-title">
+            <h2 id="archive-warning-title">Conséquences de l'archivage</h2>
+            <p>
+                Le client ne sera pas supprimé. Ses informations resteront
+                enregistrées et consultables dans l'application.
+                <br>
+                Il apparaitra dans la liste des clients archivés.
+            </p>
+        </div>
+
+        <form method="post" class="client-archive__form">
+            {% csrf_token %}
+            <div class="cluster">
+                <button type="submit" class="button button--danger">
+                    Confirmer l'archivage
+                </button>
+                <a href="{% url "clients:detail" client_obj.pk %}"
+                   class="button button--secondary"
+                >
+                    Annuler
+                </a>
+            </div>
+        </form>
+    </section>
+{% endblock %}
