@@ -1,0 +1,149 @@
+{%  extends 'base.html' %}
+{% block title %}Clients - Gestionnaire d'interventiosn{% endblock %}
+
+{% block content %}
+    <section aria-labelledby="clients-title">
+        <header>
+           <div class="client-list__header">
+               <div>
+                   <h1 id="clients-title">Clients</h1>
+                   <p>
+                       Consultez et gérez les clients enregistrés.
+                   </p>
+               </div>
+
+               {% if can_create_client %}
+                   <div class="client-detail__actions">
+                       <a
+                               href="{% url 'clients:create' %}"
+                               class="button button--primary"
+                       >
+                           Créer un client
+                       </a>
+                   </div>
+
+               {% endif %}
+           </div>
+        </header>
+
+        <form
+                method="get"
+                action="{% url 'clients:list'%}"
+                role="search"
+                class="client-filters">
+
+            <div class="client-filters__field">
+                <label for="client-search">Rechercher un client</label>
+                <input
+                    type="search"
+                    id="client-search"
+                    name="q"
+                    value="{{ query }}"
+                    placeholder="Nom, contact, e-mail ou ville"
+                >
+            </div>
+            <div class="client-filters__field">
+                <label for="client-status">Statut</label>
+                <select id="client-status" name="status">
+                    <option value="active"
+                            {% if status == "active" %}selected{% endif %}>
+                        Actifs
+                    </option>
+                    <option value="archived"
+                            {% if status == "archived" %}selected{% endif %}>
+                        Archivés
+                    </option>
+                    <option value="all"
+                            {% if status == "all" %}selected{% endif %}>
+                        Tous
+                    </option>
+                </select>
+            </div>
+            <div class="client-filters__actions">
+                <button type="submit" class="button button--primary">
+                    Rechercher
+                </button>
+
+                <a href="{% url 'clients:list' %}" class="button
+                button--secondary">
+                    Réinitialiser
+                </a>
+            </div>
+        </form>
+
+        <p id="clients-results-count" class="client-results-count">
+          {{ result_count }}
+          client{{ result_count|pluralize }}
+          trouvé{{ result_count|pluralize }}.
+        </p>
+
+        {% if page_obj.paginator.num_pages > 1 %}
+            <nav class="pagination" aria-label="Pagination des clients">
+                <ul class="pagination__list">
+                    {% if page_obj.has_previous %}
+                        <li>
+                            <a href="?q={{ query|urlencode }}&amp;status={{ status|urlencode }}&amp;page={{ page_obj.previous_page_number }}"
+                               class="pagination__link"
+                            >
+                                Précédent
+                            </a>
+                        </li>
+                    {% endif %}
+                    <li>
+                        <span class="pagination__current">
+                            Page {{ page_obj.number }}
+                            sur {{ page_obj.paginator.num_pages }}
+                        </span>
+                    </li>
+                    {% if page_obj.has_next %}
+                        <li>
+                            <a href="?q={{ query|urlencode }}&amp;status={{ status|urlencode }}&amp;page={{ page_obj.next_page_number }}"
+                               class="pagination__link"
+                            >
+                                Suivant
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+
+        {% if clients %}
+            <ul class="client-list" aria-label="Résultats de la recherche">
+                {% for client in clients %}
+                    <li class="card">
+                        <div class="card__content">
+                            <h2 class="client-card__title">
+                                <a href="{% url 'clients:detail' client.pk %}"
+                                   class="client-card__link"
+                                >
+                                    {{ client.name }}
+                                </a>
+                            </h2>
+                            <dl class="data-list">
+                                {% if client.contact_name %}
+                                    <div>
+                                        <dt>Contact</dt>
+                                        <dd>{{ client.contact_name }}</dd>
+                                    </div>
+                                {% endif %}
+                                {% if client.city %}
+                                    <div>
+                                        <dt>Ville</dt>
+                                        <dd>{{ client.city }}</dd>
+                                    </div>
+                                {% endif %}
+                            </dl>
+                        </div>
+                    </li>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <p>Aucun client actif pour le moment.</p>
+                </div>
+            </ul>
+        {% endif %}
+
+
+    </section>
+{% endblock%}

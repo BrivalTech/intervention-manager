@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %} {{ client_obj.name }} | Gestionnaire d'interventions{% endblock %}
+
+{% block content %}
+    <section aria-labelledby="client-detail-title">
+        <header class="client-detail__header">
+            <div class="stack">
+                <a href="{% url 'clients:list' %}" class="link">
+                    Retour aux clients
+                </a>
+                <h1 id="client-detail-title">{{ client_obj.name }}</h1>
+                <p>
+                    {% if client_obj.is_active %}
+                        <span class="status status--active">Client actif</span>
+                    {% else %}
+                        <span class="status status--archived">
+                            Client archivé
+                        </span>
+                    {% endif %}
+                </p>
+            </div>
+            {% if can_edit_client or can_archive_client or can_restore_client %}
+                <div class="client-detail__actions cluster">
+                    {% if can_edit_client %}
+                        <a href="{% url "clients:update" client_obj.pk %}"
+                           class="button button--primary"
+                        >
+                            Modifier le client
+                        </a>
+                    {% endif %}
+                    {% if can_archive_client %}
+                        <a href="{% url "clients:archive" client_obj.pk %}"
+                           class="button button--danger"
+                        >
+                            Archiver le client
+                        </a>
+                    {% endif %}
+                    {% if can_restore_client %}
+                        <a href="{% url "clients:restore" client_obj.pk %}"
+                           class="button button--primary"
+                        >
+                            Réactiver le client
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </header>
+
+        <div class="client-detail__grid">
+            <section class="card stack" aria-labelledby="client-contact-title">
+                <h2 id="client-contact-title">Coordonnées</h2>
+                <dl class="client-detail__info">
+                    <div>
+                        <dt>Nom du contact</dt>
+                        <dd>
+                            {{ client_obj.contact_name|default:"Non renseigné" }}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Adresse e-mail</dt>
+                        <dd>
+                            {% if client_obj.email %}
+                                <a href="mailto:{{ client_obj.email }}">
+                                    {{ client_obj.email }}
+                                </a>
+                            {% else %}
+                                Non renseignée
+                            {% endif %}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Téléphone</dt>
+                        <dd>
+                            {% if client_obj.phone %}
+                                <a href="tel:{{ client_obj.phone }}">
+                                    {{ client_obj.phone }}
+                                </a>
+                            {% else %}
+                                Non renseigné
+                            {% endif %}
+                        </dd>
+                    </div>
+                </dl>
+            </section>
+
+            <section class="card stack" aria-labelledby="client-address-title">
+                <h2 id="client-address-title">Adresse</h2>
+                {% if client_obj.address or client_obj.postal_code or client_obj.city %}
+                    <address class="client-detail__address">
+                        {% if client_obj.address %}
+                            <span>{{ client_obj.address }}</span>
+                        {% endif %}
+
+                        {% if client_obj.postal_code or client_obj.city %}
+                            <span>
+                                {{ client_obj.postal_code }}
+                                {{ client_obj.city }}
+                            </span>
+                        {% endif %}
+                    </address>
+                {% else %}
+                    <p>Non renseignée</p>
+                {% endif %}
+            </section>
+
+            <section
+                    class="card stack client-detail__notes"
+                    aria-labelledby="client-notes-title"
+            >
+                <h2 id="client-notes-title">Notes</h2>
+                {% if client_obj.notes %}
+                    <p class="client-detail__notes-content">
+                        {{ client_obj.notes }}
+                    </p>
+                {% else %}
+                    <p>Aucune note renseignée.</p>
+                {% endif %}
+            </section>
+        </div>
+    </section>
+{% endblock %}

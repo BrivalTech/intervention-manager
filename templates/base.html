@@ -47,6 +47,19 @@
                                 </a>
                             </li>
                         {% endif %}
+                        {% if user.is_authenticated %}
+                            <li>
+                                <a
+                                        href="{% url 'clients:list' %}"
+                                        class="nav-link"
+                                        {% if request.resolver_match.view_name == "clients:list" %}
+                                            aria-current="page"
+                                        {% endif %}
+                                >
+                                    Clients
+                                </a>
+                            </li>
+                        {% endif %}
                         <li>
                             <a
                                 href="{% url 'core:design-system' %}"

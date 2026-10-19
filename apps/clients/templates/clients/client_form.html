@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}
+    {% if is_edit %}Modifier un client{% else %}Créer un client{% endif %}
+     | Gestionnaire d'interventions
+{% endblock %}
+
+{% block content %}
+    <section aria-labelledby="client-form-title">
+        <header class="stack">
+            <h1 id="client-form-title">
+                {% if is_edit %}
+                    Modifier un client
+                {% else %}
+                    Créer un client
+                {% endif %}
+            </h1>
+            <p>
+                {% if is_edit %}
+                    Modifier les informations du client {{ client_obj.name }}.
+                {% else %}
+                    Renseignez les informations du nouveau client.
+                {% endif %}
+                <br>Les champs marqués d'un astérisque (*) sont obligatoires.
+            </p>
+        </header>
+
+        {% if form.errors %}
+            <div class="message message--error" role="alert">
+                <span class="message__icon" aria-hidden="true">×</span>
+                <div class="message__body">
+                    <p class="message__title">
+                        Le formulaire contient des erreurs
+                    </p>
+                    <p class="message__content">
+                        Vérifiez les champs signalés ci-dessous.
+                    </p>
+                </div>
+            </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            {% for error in form.non_field_errors %}
+                <p class="form-error">{{ error }}</p>
+            {% endfor %}
+
+            <div class="client-form__fields">
+                {% for field in form %}
+                    <div class="form-field">
+                        <label
+                                class="form-label"
+                                for="{{ field.id_for_label }}"
+                        >
+                            {{ field.label }}
+                            {% if field.field.required %}
+                                <span aria-hidden="true">*</span>
+                            {% endif %}
+                        </label>
+
+                        {{ field }}
+
+                        {% if field.errors %}
+                            <div
+                                    class="form-error"
+                                    id="{{ field.auto_id }}_error"
+                            >
+                                {% for error in field.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        {% if field.help_text %}
+                            <p
+                                    class="form-help"
+                                    id="{{ field.auto_id }}_help"
+                            >
+                                {{ field.help_text }}
+                            </p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="client-detail__actions cluster">
+                <button
+                        class="button button--primary"
+                        type="submit"
+                >
+                    {% if is_edit %}
+                        Enregistrer les modifications
+                    {% else %}
+                        Enregistrer le client
+                    {% endif %}
+                </button>
+
+                <a
+                        class="button button--secondary"
+                        {% if is_edit %}
+                            href="{% url 'clients:detail' client_obj.pk %}"
+                        {% else %}
+                            href="{% url 'clients:list' %}"
+                        {% endif %}
+                >
+                    Annuler
+                </a>
+            </div>
+        </form>
+    </section>
+{% endblock %}

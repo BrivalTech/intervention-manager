@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Réactiver un client | Gestionnaire d'intervention
+    s{% endblock %}
+
+{% block content %}
+    <section class="client-archive stack stack--large"
+             aria-labelledby="restore-title">
+        <header class="stack">
+            <a href="{% url 'clients:detail' client_obj.pk %}" class="link">
+                Retour à la fiche client
+            </a>
+            <h1 id="restore-title">Réactiver un client</h1>
+            <p>
+                Vous êtes sur le point de réactiver le client {{ client_obj.name }}
+            </p>
+        </header>
+        <div class="client-archive__notice"
+             aria-labelledby="restore-information-title">
+            <h2 id="restore-information-title">Conséquences de la réactivation</h2>
+            <p>
+                Le client apparaîtra de nouveau dans la liste des clients
+                actifs.
+            </p>
+        </div>
+
+        <form method="post" class="client-archive__form">
+            {% csrf_token %}
+            <div class="cluster">
+                <button type="submit" class="button button--primary">
+                    Confirmer la réactivation
+                </button>
+                <a href="{% url "clients:detail" client_obj.pk %}"
+                   class="button button--secondary"
+                >
+                    Annuler
+                </a>
+            </div>
+        </form>
+    </section>
+{% endblock %}
