@@ -19,7 +19,7 @@
                     {% endif %}
                 </p>
             </div>
-            {% if can_edit_client or can_archive_client %}
+            {% if can_edit_client or can_archive_client or can_restore_client %}
                 <div class="client-detail__actions cluster">
                     {% if can_edit_client %}
                         <a href="{% url "clients:update" client_obj.pk %}"
@@ -33,6 +33,13 @@
                            class="button button--danger"
                         >
                             Archiver le client
+                        </a>
+                    {% endif %}
+                    {% if can_restore_client %}
+                        <a href="{% url "clients:restore" client_obj.pk %}"
+                           class="button button--primary"
+                        >
+                            Réactiver le client
                         </a>
                     {% endif %}
                 </div>

@@ -888,7 +888,7 @@ def test_client_update_access_by_role(
     )
 
     client.force_login(user)
-    client_obj = Client.objects.create(name="Entreprise Allibi")
+    client_obj = Client.objects.create(name="Entreprise Allibi", is_active=True)
     response = client.get(reverse("clients:update", args=[client_obj.pk]))
 
     assert response.status_code == expected_status
@@ -896,7 +896,10 @@ def test_client_update_access_by_role(
 
 @pytest.mark.django_db
 def test_client_update_requires_authentication(client):
-    client_obj = Client.objects.create(name="Entreprise Allibi")
+    client_obj = Client.objects.create(
+        name="Entreprise Allibi",
+        is_active=True,
+    )
     response = client.get(reverse("clients:update", args=[client_obj.pk]))
 
     assert response.status_code == 302
@@ -919,6 +922,7 @@ def test_client_update_form_is_prefilled(
         name="Entreprise Allibi",
         email="contact@allibi.fr",
         city="Paris",
+        is_active=True,
     )
 
     response = client.get(reverse("clients:update", args=[client_obj.pk]))
@@ -944,6 +948,7 @@ def test_client_update_success(client, django_user_model):
     client_obj = Client.objects.create(
         name="Entreprise Allibi",
         city="Paris",
+        is_active=True,
     )
 
     response = client.post(
@@ -979,6 +984,7 @@ def test_client_update_invalid_data(client, django_user_model):
     client_obj = Client.objects.create(
         name="Entreprise Allibi",
         email="contact@allibi.fr",
+        is_active=True,
     )
 
     response = client.post(
@@ -1038,6 +1044,7 @@ def test_client_update_displays_correct_form_labels(
     client_obj = Client.objects.create(
         name="Entreprise Allibi",
         email="contact@allibi.fr",
+        is_active=True,
     )
 
     response = client.get(reverse("clients:update", args=[client_obj.pk]))
@@ -1244,4 +1251,4 @@ def test_archived_client_has_no_archive_link(client, django_user_model):
     )
 
     assert f'href="{archive_url}"' not in response.content.decode()
-    assert "Modifier le client" in response.content.decode()
+    assert "Modifier le client" not in response.content.decode()

@@ -22,3 +22,8 @@ def can_manage_clients(user):
 def can_archive_client(user):
     """Check whether a user can archive a client"""
     return user.is_authenticated and user.is_active and user.role == User.Role.ADMIN
+
+
+def can_restore_client(user):
+    """Check whether a user can restore a client"""
+    return user.is_authenticated and user.is_active and user.role == User.Role.ADMIN

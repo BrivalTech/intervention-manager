@@ -10,6 +10,7 @@ from apps.clients.models import Client
 from apps.clients.permissions import (
     can_archive_client,
     can_manage_clients,
+    can_restore_client,
     can_view_clients,
 )
 
@@ -98,9 +99,15 @@ def client_detail(request, pk):
         "clients/client_detail.html",
         {
             "client_obj": client_obj,
-            "can_edit_client": can_manage_clients(request.user),
-            "can_archive_client": can_archive_client(request.user)
-            and client_obj.is_active,
+            "can_edit_client": (
+                can_manage_clients(request.user) and client_obj.is_active
+            ),
+            "can_archive_client": (
+                can_archive_client(request.user) and client_obj.is_active
+            ),
+            "can_restore_client": (
+                can_archive_client(request.user) and not client_obj.is_active
+            ),
         },
     )
 
@@ -112,6 +119,11 @@ def client_update(request, pk):
         raise PermissionDenied
 
     client_obj = get_object_or_404(Client, pk=pk)
+
+    if not client_obj.is_active:
+        raise PermissionDenied(
+            "Un client archivé doit être réactivé avant modification."
+        )
 
     if request.method == "POST":
         form = ClientForm(request.POST, instance=client_obj)
@@ -165,6 +177,41 @@ def client_archive(request, pk):
     return render(
         request,
         "clients/client_confirm_archive.html",
+        {
+            "client_obj": client_obj,
+        },
+    )
+
+
+@login_required
+def client_restore(request, pk):
+    """Restore an archived client"""
+    if not can_restore_client(request.user):
+        raise PermissionDenied
+
+    client_obj = get_object_or_404(Client, pk=pk)
+
+    if client_obj.is_active:
+        messages.info(
+            request,
+            "Ce client est déjà actif.",
+        )
+
+        return redirect("clients:detail", pk=client_obj.pk)
+
+    if request.method == "POST":
+        client_obj.restore()
+
+        messages.success(
+            request,
+            "Le client a été réactivé avec succès.",
+        )
+
+        return redirect("clients:detail", pk=client_obj.pk)
+
+    return render(
+        request,
+        "clients/client_confirm_restore.html",
         {
             "client_obj": client_obj,
         },

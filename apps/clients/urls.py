@@ -10,4 +10,5 @@ urlpatterns = [
     path("<int:pk>/", views.client_detail, name="detail"),
     path("<int:pk>/edit/", views.client_update, name="update"),
     path("<int:pk>/archive/", views.client_archive, name="archive"),
+    path("<int:pk>/restore/", views.client_restore, name="restore"),
 ]
