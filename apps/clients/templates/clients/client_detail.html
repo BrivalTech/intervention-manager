@@ -3,7 +3,7 @@
 
 {% block content %}
     <section aria-labelledby="client-detail-title">
-        <header class="client-detail__header">
+        <header class="entity-detail__header">
             <div class="stack">
                 <a href="{% url 'clients:list' %}" class="link">
                     Retour aux clients
@@ -20,7 +20,7 @@
                 </p>
             </div>
             {% if can_edit_client or can_archive_client or can_restore_client %}
-                <div class="client-detail__actions cluster">
+                <div class="entity-detail__actions cluster">
                     {% if can_edit_client %}
                         <a href="{% url "clients:update" client_obj.pk %}"
                            class="button button--primary"
@@ -46,10 +46,10 @@
             {% endif %}
         </header>
 
-        <div class="client-detail__grid">
+        <div class="entity-detail__grid">
             <section class="card stack" aria-labelledby="client-contact-title">
                 <h2 id="client-contact-title">Coordonnées</h2>
-                <dl class="client-detail__info">
+                <dl class="entity-detail__info">
                     <div>
                         <dt>Nom du contact</dt>
                         <dd>
@@ -104,12 +104,12 @@
             </section>
 
             <section
-                    class="card stack client-detail__notes"
+                    class="card stack entity-detail__notes"
                     aria-labelledby="client-notes-title"
             >
                 <h2 id="client-notes-title">Notes</h2>
                 {% if client_obj.notes %}
-                    <p class="client-detail__notes-content">
+                    <p class="entity-detail__notes-content">
                         {{ client_obj.notes }}
                     </p>
                 {% else %}

@@ -2,7 +2,7 @@
 {% block title %}Archiver un client | Gestionnaire d'interventions{% endblock %}
 
 {% block content %}
-    <section class="client-archive stack stack--large"
+    <section class="entity-archive stack stack--large"
              aria-labelledby="archive-title">
         <header class="stack">
             <a href="{% url 'clients:detail' client_obj.pk %}" class="link">
@@ -13,7 +13,7 @@
                 Voulez-vous vraiment archiver le client {{ client_obj.name }}
             </p>
         </header>
-        <div class="client-archive__notice"
+        <div class="entity-archive__notice"
              aria-labelledby="archive-warning-title">
             <h2 id="archive-warning-title">Conséquences de l'archivage</h2>
             <p>
@@ -24,7 +24,7 @@
             </p>
         </div>
 
-        <form method="post" class="client-archive__form">
+        <form method="post" class="entity-archive__form">
             {% csrf_token %}
             <div class="cluster">
                 <button type="submit" class="button button--danger">

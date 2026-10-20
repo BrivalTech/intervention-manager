@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% block title %}Techniciens | Gestionnaire d'interventions{% endblock %}
+
+{% block content %}
+    <section aria-labelledby="technicians-title">
+        <header class="entity-list__header">
+            <div>
+                <h1 id="technicians-title">Techniciens</h1>
+                <p>
+                    Consultez les techniciens enregistrés dans l'application.
+                </p>
+            </div>
+        </header>
+
+        <form
+            method="get"
+            action="{% url 'accounts:technician_list' %}"
+            role="search"
+            class="entity-filters"
+        >
+            <div class="entity-filters__field">
+                <label for="technician-search">Rechercher un technicien</label>
+                <input
+                    type="search"
+                    id="technician-search"
+                    name="q"
+                    value="{{ query }}"
+                    placeholder="Nom, prénom, identifiant ou e-mail"
+                >
+            </div>
+            <div class="entity-filters__field">
+                <label for="technician-status">Statut</label>
+                <select id="technician-status" name="status">
+                    <option value="active"
+                        {% if status == "active" %}selected{% endif %}>
+                        Actifs
+                    </option>
+                    <option value="inactive"
+                        {% if status == "inactive" %}selected{% endif %}>
+                        Inactifs
+                    </option>
+                    <option value="all"
+                        {% if status == "all" %}selected{% endif %}>
+                        Tous
+                    </option>
+                </select>
+            </div>
+            <div class="entity-filters__actions">
+                <button type="submit" class="button button--primary">
+                    Rechercher
+                </button>
+                <a
+                    href="{% url 'accounts:technician_list' %}"
+                    class="button button--secondary"
+                >
+                    Réinitialiser
+                </a>
+            </div>
+        </form>
+        <p id="technicians-results-count" class="entity-results-count">
+            {{ result_count }}
+            technicien{{ result_count|pluralize }}
+            trouvé{{ result_count|pluralize }}.
+        </p>
+
+        {% if page_obj.paginator.num_pages > 1 %}
+            <nav
+                class="pagination"
+                aria-label="Pagination des techniciens"
+            >
+                <ul class="pagination__list">
+                    {% if page_obj.has_previous %}
+                        <li>
+                            <a
+                                href="?q={{ query|urlencode }}&amp;status={{ status|urlencode }}&amp;page={{ page_obj.previous_page_number }}"
+                                class="pagination__link"
+                            >
+                                Précédent
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    <li>
+                        <span class="pagination__current" aria-current="page">
+                            Page {{ page_obj.number }}
+                            sur {{ page_obj.paginator.num_pages }}
+                        </span>
+                    </li>
+
+                    {% if page_obj.has_next %}
+                        <li>
+                            <a
+                                href="?q={{ query|urlencode }}&amp;status={{ status|urlencode }}&amp;page={{ page_obj.next_page_number }}"
+                                class="pagination__link"
+                            >
+                                Suivant
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+
+        {% if technicians %}
+            <ul class="entity-list" aria-label="Liste des techniciens">
+                {% for technician in technicians %}
+                    <li  class="card">
+                        <div class="card__content">
+                            <h2 class="card__title">
+                                {{ technician.get_full_name|default:technician.username }}
+                            </h2>
+
+                            <dl class="data-list">
+                                {% if technician.email %}
+                                    <div>
+                                        <dt>E-mail</dt>
+                                        <dd>{{ technician.email }}</dd>
+                                    </div>
+                                {% endif %}
+
+                                <div>
+                                    <dt>Statut</dt>
+                                    <dd>
+                                        {% if technician.is_active %}
+                                            Actif
+                                        {% else %}
+                                            Inactif
+                                        {% endif %}
+                                    </dd>
+                                </div>
+                            </dl>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="empty-state">
+                {% if query %}
+                    <p>Aucun technicien ne correspond à votre recherche.</p>
+                {% elif status == "inactive" %}
+                    <p>Aucun technicien inactif.</p>
+                {% elif status == "all" %}
+                    <p>Aucun technicien enregistré.</p>
+                {% else %}
+                    <p>Aucun technicien actif.</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    </section>
+{% endblock %}
