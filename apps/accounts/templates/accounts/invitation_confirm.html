@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Définir mon mot de passe | Gestionnaire d'interventions{% endblock %}
+
+{% block content %}
+    <section class="stack stack--large" aria-labelledby="invitation-title">
+        <header class="stack">
+            <h1 id="invitation-title">Définir mon mot de passe</h1>
+        </header>
+
+        {% if validlink %}
+            <p>
+                Votre invitation est valide.
+                Choisissez un mot de passe pour accéder à l'application.
+            </p>
+
+            <form method="post" class="stack">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="message message--error" role="alert">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                {% for field in form %}
+                    <div class="form-field">
+                        <label class="form-label" for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                        </label>
+
+                        {{ field }}
+
+                        {% if field.help_text %}
+                            <div class="form-help">{{ field.help_text }}</div>
+                        {% endif %}
+
+                        {% if field.errors %}
+                            <div class="form-error" role="alert">
+                                {{ field.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                <button type="submit" class="button button--primary">
+                    Enregistrer mon mot de passe
+                </button>
+            </form>
+
+        {% else %}
+            <div class="message message--error" role="alert">
+                <p>
+                    Ce lien d'invitation est invalide ou a expiré.
+                    Contactez votre administrateur pour obtenir
+                    une nouvelle invitation.
+                </p>
+            </div>
+        {% endif %}
+    </section>
+{% endblock %}

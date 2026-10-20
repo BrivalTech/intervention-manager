@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Ajouter un technicien | Gestionnaire d'interventions{% endblock %}
+
+{% block content %}
+    <section class="stack stack--large" aria-labelledby="technician-form-title">
+        <header class="stack">
+            <a href="{% url 'accounts:technician_list' %}" class="link">
+                Retour aux techniciens
+            </a>
+            <h1 id="technician-form-title">Ajouter un technicien</h1>
+            <p>
+                Renseignez les informations du technicien.
+                Une invitation lui sera envoyée par e-mail pour lui permettre
+                de définir son mot de passe.
+            </p>
+        </header>
+
+        <form method="post" class="stack stack--large">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="form-errors" role="alert">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            {% for field in form %}
+                <div class="form-field">
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                        {% if field.field.required %}
+                            <span aria-hidden="true">*</span>
+                        {% endif %}
+                    </label>
+
+                    {{ field }}
+
+                    {% if field.help_text %}
+                        <p id="{{ field.auto_id }}_help" class="form-help">
+                            {{ field.help_text }}
+                        </p>
+                    {% endif %}
+
+                    {% if field.errors %}
+                        <div id="{{ field.auto_id }}_error" class="form-error">
+                            {{ field.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <p>Les champs marqués d'un astérisque sont obligatoires.</p>
+
+            <div class="cluster">
+                <button type="submit" class="button button--primary">
+                    Créer le technicien
+                </button>
+                <a
+                    href="{% url 'accounts:technician_list' %}"
+                    class="button button--secondary"
+                >
+                    Annuler
+                </a>
+            </div>
+        </form>
+    </section>
+{% endblock %}

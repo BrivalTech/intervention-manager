@@ -10,6 +10,14 @@
                     Consultez les techniciens enregistrés dans l'application.
                 </p>
             </div>
+            {% if can_create_technician %}
+                <a
+                    href="{% url 'accounts:technician_create' %}"
+                    class="button button--primary"
+                >
+                    Ajouter un technicien
+                </a>
+            {% endif %}
         </header>
 
         <form
@@ -128,6 +136,22 @@
                                         {% endif %}
                                     </dd>
                                 </div>
+                                {% if can_create_technician and technician.is_active and not technician.has_usable_password %}
+                                    <form
+                                            method="post"
+                                            action="{% url 'accounts:technician_resend_invitation' technician.pk %}"
+                                    >
+                                        {% csrf_token %}
+
+                                        <button
+                                                type="submit"
+                                                class="button button--secondary"
+                                                aria-label="Renvoyer une invitation à {{ technician.get_full_name|default:technician.username }}"
+                                        >
+                                            Renvoyer l'invitation
+                                        </button>
+                                    </form>
+                                {% endif %}
                             </dl>
                         </div>
                     </li>
