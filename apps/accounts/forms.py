@@ -1,9 +1,32 @@
 from django import forms
+from django.contrib.auth.forms import SetPasswordForm
 
 from apps.accounts.models import User
 
 
-class TechnicianForm(forms.ModelForm):
+class FormControlMixin:
+    """Apply design system and accessibility attributes to form fields."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for name, field in self.fields.items():
+            field.widget.attrs["class"] = "form-control"
+
+            described_by = []
+
+            if field.help_text:
+                described_by.append(f"id_{name}_help")
+
+            if self.is_bound and self.errors.get(name):
+                field.widget.attrs["aria-invalid"] = "true"
+                described_by.append(f"id_{name}_error")
+
+            if described_by:
+                field.widget.attrs["aria-describedby"] = " ".join(described_by)
+
+
+class TechnicianCreatingForm(FormControlMixin, forms.ModelForm):
     """Form for creating a Technician account"""
 
     email = forms.EmailField(
@@ -36,21 +59,8 @@ class TechnicianForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        for name, field in self.fields.items():
+        for field in self.fields.values():
             field.required = True
-            field.widget.attrs["class"] = "form-control"
-
-            described_by = []
-
-            if field.help_text:
-                described_by.append(f"id_{name}_help")
-
-            if self.is_bound and self.errors.get(name):
-                field.widget.attrs["aria-invalid"] = "true"
-                described_by.append(f"id_{name}_error")
-
-            if described_by:
-                field.widget.attrs["aria-describedby"] = " ".join(described_by)
 
     def clean_email(self):
         """Reject an email already used by another account."""
@@ -90,3 +100,42 @@ class TechnicianForm(forms.ModelForm):
             user.save()
 
         return user
+
+
+class TechnicianUpdateForm(TechnicianCreatingForm):
+    """Form for updating a technician account."""
+
+    def clean_email(self):
+        """Reject an email used by another account."""
+        email = self.cleaned_data["email"].strip().lower()
+
+        if (
+            User.objects.filter(email__iexact=email)
+            .exclude(pk=self.instance.pk)
+            .exists()
+        ):
+            raise forms.ValidationError("Cette adresse e-mail est déjà utilisée.")
+
+        return email
+
+    def save(self, commit=True):
+        """Update information without changing credentials."""
+        user = forms.ModelForm.save(self, commit=False)
+
+        if commit:
+            user.save(
+                update_fields=[
+                    "first_name",
+                    "last_name",
+                    "username",
+                    "email",
+                ]
+            )
+
+        return user
+
+
+class TechnicianSetPasswordForm(FormControlMixin, SetPasswordForm):
+    """Set a technician password using the application design system."""
+
+    pass

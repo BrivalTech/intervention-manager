@@ -150,7 +150,7 @@ def test_technician_list_pagination(client, django_user_model):
     assert len(response.context["technicians"]) == 5
 
 
-# TechnicianForm
+# TechnicianCreationForm
 @pytest.mark.django_db
 @pytest.mark.parametrize(
     ("role", "expected_status"),

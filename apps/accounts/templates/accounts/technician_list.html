@@ -136,6 +136,17 @@
                                         {% endif %}
                                     </dd>
                                 </div>
+                                {% if can_create_technician %}
+                                    <div class="entity-detail__actions cluster">
+                                        <a
+                                            href="{% url 'accounts:technician_update' technician.pk %}"
+                                            class="button button--secondary"
+                                            aria-label="Modifier {{ technician.get_full_name|default:technician.username }}"
+                                        >
+                                            Modifier
+                                        </a>
+                                    </div>
+                                {% endif %}
                                 {% if can_create_technician and technician.is_active and not technician.has_usable_password %}
                                     <form
                                             method="post"

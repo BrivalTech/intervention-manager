@@ -1,6 +1,6 @@
 import pytest
 
-from apps.accounts.forms import TechnicianForm
+from apps.accounts.forms import TechnicianCreatingForm
 from apps.accounts.models import User
 
 
@@ -16,7 +16,7 @@ def valid_technician_data():
 
 @pytest.mark.django_db
 def test_technician_creation_form_valid(valid_technician_data):
-    form = TechnicianForm(data=valid_technician_data)
+    form = TechnicianCreatingForm(data=valid_technician_data)
 
     assert form.is_valid(), form.errors
 
@@ -25,7 +25,7 @@ def test_technician_creation_form_valid(valid_technician_data):
 def test_technician_creation_sets_role_and_unusable_password(
     valid_technician_data,
 ):
-    form = TechnicianForm(data=valid_technician_data)
+    form = TechnicianCreatingForm(data=valid_technician_data)
 
     assert form.is_valid(), form.errors
 
@@ -42,7 +42,7 @@ def test_technician_creation_requires_email(valid_technician_data):
     valid_technician_data["email"] = ""
 
     print(valid_technician_data)
-    form = TechnicianForm(data=valid_technician_data)
+    form = TechnicianCreatingForm(data=valid_technician_data)
 
     assert not form.is_valid()
     assert "email" in form.errors
@@ -60,7 +60,7 @@ def test_technician_creation_rejects_duplicate_email(
     )
 
     valid_technician_data["email"] = "ALICE@example.com"
-    form = TechnicianForm(data=valid_technician_data)
+    form = TechnicianCreatingForm(data=valid_technician_data)
 
     assert not form.is_valid()
     assert "email" in form.errors
@@ -76,7 +76,7 @@ def test_technician_creation_rejects_duplicate_username(
         role=User.Role.MANAGER,
     )
 
-    form = TechnicianForm(data=valid_technician_data)
+    form = TechnicianCreatingForm(data=valid_technician_data)
 
     assert not form.is_valid()
     assert "username" in form.errors
@@ -88,7 +88,7 @@ def test_technician_creation_requires_first_and_last_name(
 ):
     valid_technician_data["first_name"] = "   "
     valid_technician_data["last_name"] = "   "
-    form = TechnicianForm(data=valid_technician_data)
+    form = TechnicianCreatingForm(data=valid_technician_data)
 
     assert not form.is_valid()
     assert "first_name" in form.errors

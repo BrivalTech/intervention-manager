@@ -10,7 +10,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
-from apps.accounts.forms import TechnicianForm
+from apps.accounts.forms import TechnicianCreatingForm, TechnicianUpdateForm
 from apps.accounts.models import User
 from apps.accounts.permissions import can_manage_technicians, can_view_technicians
 from apps.accounts.services import send_technician_invitation
@@ -72,7 +72,7 @@ def technician_create(request):
         raise PermissionDenied
 
     if request.method == "POST":
-        form = TechnicianForm(request.POST)
+        form = TechnicianCreatingForm(request.POST)
 
         if form.is_valid():
             technician = form.save()
@@ -104,13 +104,49 @@ def technician_create(request):
 
             return redirect("accounts:technician_list")
     else:
-        form = TechnicianForm()
+        form = TechnicianCreatingForm()
 
     return render(
         request,
         "accounts/technician_form.html",
         {
             "form": form,
+        },
+    )
+
+
+@login_required
+def technician_update(request, pk):
+    """Update a technician's information."""
+    if not can_manage_technicians(request.user):
+        raise PermissionDenied
+
+    technician = get_object_or_404(
+        User,
+        pk=pk,
+        role=User.Role.TECHNICIAN,
+    )
+
+    if request.method == "POST":
+        form = TechnicianUpdateForm(request.POST, instance=technician)
+
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request,
+                "Les informations du technicien ont été mises à jour.",
+            )
+            return redirect("accounts:technician_list")
+    else:
+        form = TechnicianUpdateForm(instance=technician)
+
+    return render(
+        request,
+        "accounts/technician_form.html",
+        {
+            "form": form,
+            "is_edit": True,
+            "technician": technician,
         },
     )
 
