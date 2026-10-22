@@ -1,10 +1,10 @@
 {%  extends 'base.html' %}
-{% block title %}Clients - Gestionnaire d'interventiosn{% endblock %}
+{% block title %}Clients | Gestionnaire d'interventiosn{% endblock %}
 
 {% block content %}
     <section aria-labelledby="clients-title">
         <header>
-           <div class="client-list__header">
+           <div class="entity-list__header">
                <div>
                    <h1 id="clients-title">Clients</h1>
                    <p>
@@ -13,7 +13,7 @@
                </div>
 
                {% if can_create_client %}
-                   <div class="client-detail__actions">
+                   <div class="entity-detail__actions">
                        <a
                                href="{% url 'clients:create' %}"
                                class="button button--primary"
@@ -30,9 +30,9 @@
                 method="get"
                 action="{% url 'clients:list'%}"
                 role="search"
-                class="client-filters">
+                class="entity-filters">
 
-            <div class="client-filters__field">
+            <div class="entity-filters__field">
                 <label for="client-search">Rechercher un client</label>
                 <input
                     type="search"
@@ -42,7 +42,7 @@
                     placeholder="Nom, contact, e-mail ou ville"
                 >
             </div>
-            <div class="client-filters__field">
+            <div class="entity-filters__field">
                 <label for="client-status">Statut</label>
                 <select id="client-status" name="status">
                     <option value="active"
@@ -59,7 +59,7 @@
                     </option>
                 </select>
             </div>
-            <div class="client-filters__actions">
+            <div class="entity-filters__actions">
                 <button type="submit" class="button button--primary">
                     Rechercher
                 </button>
@@ -71,7 +71,7 @@
             </div>
         </form>
 
-        <p id="clients-results-count" class="client-results-count">
+        <p id="clients-results-count" class="entity-results-count">
           {{ result_count }}
           client{{ result_count|pluralize }}
           trouvé{{ result_count|pluralize }}.
@@ -90,7 +90,7 @@
                         </li>
                     {% endif %}
                     <li>
-                        <span class="pagination__current">
+                        <span class="pagination__current" aria-current="page">
                             Page {{ page_obj.number }}
                             sur {{ page_obj.paginator.num_pages }}
                         </span>
@@ -109,13 +109,13 @@
         {% endif %}
 
         {% if clients %}
-            <ul class="client-list" aria-label="Résultats de la recherche">
+            <ul class="entity-list" aria-label="Liste des clients">
                 {% for client in clients %}
                     <li class="card">
                         <div class="card__content">
-                            <h2 class="client-card__title">
+                            <h2 class="card__title">
                                 <a href="{% url 'clients:detail' client.pk %}"
-                                   class="client-card__link"
+                                   class="entity-card__link"
                                 >
                                     {{ client.name }}
                                 </a>
@@ -137,11 +137,19 @@
                         </div>
                     </li>
                 {% endfor %}
+            </ul>
             {% else %}
                 <div class="empty-state">
-                    <p>Aucun client actif pour le moment.</p>
+                    {% if query %}
+                        <p>Aucun client ne correspond à votre recherche.</p>
+                    {% elif status == "archived" %}
+                        <p>Aucun client archivé.</p>
+                    {% elif status == "all" %}
+                        <p>Aucun client enregistré.</p>
+                    {% else %}
+                        <p>Aucun client actif.</p>
+                    {% endif %}
                 </div>
-            </ul>
         {% endif %}
 
 

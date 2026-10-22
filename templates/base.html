@@ -47,16 +47,29 @@
                                 </a>
                             </li>
                         {% endif %}
-                        {% if user.is_authenticated %}
+                        {% if nav_can_view_clients %}
                             <li>
                                 <a
                                         href="{% url 'clients:list' %}"
                                         class="nav-link"
-                                        {% if request.resolver_match.view_name == "clients:list" %}
+                                        {% if request.resolver_match.namespace == "clients" %}
                                             aria-current="page"
                                         {% endif %}
                                 >
                                     Clients
+                                </a>
+                            </li>
+                        {% endif %}
+                        {% if nav_can_view_technicians %}
+                            <li>
+                                <a
+                                        href="{% url 'accounts:technician_list' %}"
+                                        class="nav-link"
+                                        {% if request.resolver_match.namespace == "accounts" %}
+                                            aria-current="page"
+                                        {% endif %}
+                                >
+                                    Techniciens
                                 </a>
                             </li>
                         {% endif %}
