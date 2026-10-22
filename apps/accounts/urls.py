@@ -38,4 +38,14 @@ urlpatterns = [
         views.technician_resend_invitation,
         name="technician_resend_invitation",
     ),
+    path(
+        "technicians/<int:pk>/deactivate",
+        views.technician_deactivate,
+        name="technician_deactivate",
+    ),
+    path(
+        "technicians/<int:pk>/reactivate",
+        views.technician_reactivate,
+        name="technician_reactivate",
+    ),
 ]

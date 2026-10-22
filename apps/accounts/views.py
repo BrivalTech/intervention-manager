@@ -205,3 +205,49 @@ def technician_resend_invitation(request, pk):
         )
 
     return redirect("accounts:technician_list")
+
+
+@login_required
+@require_POST
+def technician_deactivate(request, pk):
+    """Deactivate a technician account."""
+    if not can_manage_technicians(request.user):
+        raise PermissionDenied
+
+    technician = get_object_or_404(
+        User,
+        pk=pk,
+        role=User.Role.TECHNICIAN,
+    )
+
+    if technician.is_active:
+        technician.is_active = False
+        technician.save(update_fields=["is_active"])
+        messages.success(request, "Le technicien a été désactivé.")
+    else:
+        messages.info(request, "Ce technicien est déjà désactivé.")
+
+    return redirect("accounts:technician_list")
+
+
+@login_required
+@require_POST
+def technician_reactivate(request, pk):
+    """Reactivate a technician account."""
+    if not can_manage_technicians(request.user):
+        raise PermissionDenied
+
+    technician = get_object_or_404(
+        User,
+        pk=pk,
+        role=User.Role.TECHNICIAN,
+    )
+
+    if not technician.is_active:
+        technician.is_active = True
+        technician.save(update_fields=["is_active"])
+        messages.success(request, "Le technicien a été réactivé.")
+    else:
+        messages.info(request, "Ce technicien est déjà actif.")
+
+    return redirect("accounts:technician_list")
