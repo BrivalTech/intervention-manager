@@ -17,16 +17,6 @@ def authenticated_user(client, django_user_model, request):
 
 
 @pytest.mark.django_db
-def test_anonymous_navigation(client):
-    response = client.get(reverse("accounts:login"))
-
-    assert response.status_code == 200
-    assert "Se connecter" in response.content.decode()
-    assert "Se déconnecter" not in response.content.decode()
-    assert "Accueil" not in response.content.decode()
-
-
-@pytest.mark.django_db
 @pytest.mark.parametrize(
     "authenticated_user",
     [

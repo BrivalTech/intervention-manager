@@ -103,33 +103,6 @@ def test_session_persists_after_login(client, django_user_model):
     assert response.wsgi_request.user.pk == user.pk
 
 
-@pytest.mark.django_db
-@pytest.mark.parametrize(
-    ("role", "label"),
-    [
-        ("ADMIN", "Administrateur"),
-        ("MANAGER", "Gestionnaire"),
-        ("TECHNICIAN", "Technicien"),
-    ],
-)
-def test_navigation_displays_authenticated_user_role(
-    client, django_user_model, role, label
-):
-    user = django_user_model.objects.create_user(
-        username=f"user_{role.lower()}",
-        password="TestPassword123",
-        role=role,
-    )
-
-    client.force_login(user)
-    response = client.get(reverse("core:home"))
-
-    assert response.status_code == 200
-    assert label in response.content.decode()
-    assert "Se déconnecter" in response.content.decode()
-    assert "Se connecter" not in response.content.decode()
-
-
 def test_navigation_for_anonymous_user(client):
     response = client.get(reverse("accounts:login"))
 
