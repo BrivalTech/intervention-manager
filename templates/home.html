@@ -3,13 +3,23 @@
 
 {% block content %}
     <section class="stack stack--large" aria-labelledby="dashboard-title">
+        <div class="dashboard-welcome">
+            <h1 id="dashboard-title">
+                Bonjour,
+                {% if user.first_name %}
+                    {{ user.first_name }}
+                {% else %}
+                    {{ user.get_username }}
+                {% endif %}
+            </h1>
+        </div>
         {% if user.role == "ADMIN" %}
             <div class="stack">
-                <h1 id="dashboard-title">Tableau de bord - Administration</h1>
+                <h2>Tableau de bord - Administration</h2>
                 <p>Bienvenue dans votre espace d'administration.</p>
             </div>
             <div class="card">
-                <h2 class="card__title">Administration de l'application</h2>
+                <h3 class="card__title">Administration de l'application</h3>
                 <div class="card__content">
                     <p>
                         Cet espace vous permet de superviser les
@@ -19,11 +29,11 @@
             </div>
         {% elif user.role == "MANAGER" %}
             <div class="stack">
-                <h1 id="dashboard-title">Tableau de bord - Gestion</h1>
+                <h2>Tableau de bord - Gestion</h2>
                 <p>Bienvenue dans votre espace de gestion.</p>
             </div>
             <div class="card">
-                <h2 class="card__title">Gestion des activités</h2>
+                <h3 class="card__title">Gestion des activités</h3>
                 <div class="card__content">
                     <p>
                         Cet espace vous permet de suivre les clients, de
@@ -34,11 +44,11 @@
             </div>
         {% elif user.role == "TECHNICIAN" %}
             <div class="stack">
-                <h1 id="dashboard-title">Mes interventions</h1>
+                <h2>Mes interventions</h2>
                 <p>Bienvenue dans votre espace technicien.</p>
             </div>
             <div class="card">
-                <h2 class="card__title">Interventions attribuées</h2>
+                <h3 class="card__title">Interventions attribuées</h3>
                 <div class="card__content">
                     <p>
                         Cet espace vous permet de consulter vos interventions
@@ -48,7 +58,7 @@
             </div>
         {% else %}
             <div class="stack">
-            <h1 id="dashboard-title">Tableau de bord</h1>
+            <h2>Tableau de bord</h2>
             <p>
                 Aucun rôle valide n'est associé à votre compte.<br>
                 Veuillez contacter un administrateur.

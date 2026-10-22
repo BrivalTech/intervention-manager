@@ -6,10 +6,30 @@ from django.urls import reverse
 from apps.accounts.models import User
 
 
+@pytest.mark.django_db
 def test_design_system_page(client):
     response = client.get(reverse("core:design-system"))
-    assert response.status_code == 200
-    assert "design-system.html" in [t.name for t in response.templates]
+
+    assert response.status_code == 302
+    assert response.url.startswith(reverse("accounts:login"))
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "role",
+    [User.Role.MANAGER, User.Role.TECHNICIAN],
+)
+def test_design_system_restricted_to_admin(client, django_user_model, role):
+    user = django_user_model.objects.create_user(
+        username=f"user-{role.lower()}",
+        password="TestPassword123!",
+        role=role,
+    )
+
+    client.force_login(user)
+    response = client.get(reverse("core:design-system"))
+
+    assert response.status_code == 403
 
 
 def test_home_requires_authentication(client):
@@ -197,3 +217,109 @@ def test_invalid_login_displays_accessible_error(client, django_user_model):
     assert 'class="message message--error"' in content
     assert 'role="alert"' in content
     assert "Connexion impossible" in content
+
+
+@pytest.mark.django_db
+def test_home_displays_first_name(client, django_user_model):
+    user = django_user_model.objects.create_user(
+        username="alice",
+        first_name="Alice",
+        password="TestPassword123!",
+        role=User.Role.MANAGER,
+    )
+    client.force_login(user)
+
+    response = client.get(reverse("core:home"))
+
+    assert response.status_code == 200
+    assert "Bonjour," in response.content.decode()
+    assert "Alice" in response.content.decode()
+
+
+@pytest.mark.django_db
+def test_home_uses_username_when_first_name_is_empty(client, django_user_model):
+    user = django_user_model.objects.create_user(
+        username="alice",
+        first_name="",
+        password="TestPassword123!",
+        role=User.Role.MANAGER,
+    )
+    client.force_login(user)
+
+    response = client.get(reverse("core:home"))
+
+    assert response.status_code == 200
+    assert "alice" in response.content.decode()
+
+
+@pytest.mark.django_db
+def test_home_has_unique_dashboard_title(client, django_user_model):
+    user = django_user_model.objects.create_user(
+        username="alice",
+        password="TestPassword123!",
+        role=User.Role.MANAGER,
+    )
+
+    client.force_login(user)
+    response = client.get(reverse("core:home"))
+
+    assert response.status_code == 200
+    assert response.content.decode().count('id="dashboard-title"') == 1
+
+
+@pytest.mark.django_db
+def test_logo_links_to_home(client, django_user_model):
+    user = django_user_model.objects.create_user(
+        username="admin",
+        password="TestPassword123!",
+        role=User.Role.ADMIN,
+    )
+    client.force_login(user)
+
+    response = client.get(reverse("core:home"))
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert 'class="site-brand"' in content
+    assert f'href="{reverse("core:home")}"' in content
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("role", "expected"),
+    [
+        (User.Role.ADMIN, True),
+        (User.Role.MANAGER, False),
+        (User.Role.TECHNICIAN, False),
+    ],
+)
+def test_design_system_footer_visibility(client, django_user_model, role, expected):
+    user = django_user_model.objects.create_user(
+        username=f"user-{role.lower()}",
+        password="TestPassword123!",
+        role=role,
+    )
+
+    client.force_login(user)
+    response = client.get(reverse("core:home"))
+    content = response.content.decode()
+
+    design_system_link = f'href="{reverse("core:design-system")}"'
+    assert (design_system_link in content) is expected
+
+
+@pytest.mark.django_db
+def test_navigation_uses_post_logout(client, django_user_model):
+    user = django_user_model.objects.create_user(
+        username="admin",
+        password="TestPassword123!",
+        role=User.Role.ADMIN,
+    )
+
+    client.force_login(user)
+    response = client.get(reverse("core:home"))
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert 'method="post"' in content
+    assert f'action="{reverse("accounts:logout")}"' in content

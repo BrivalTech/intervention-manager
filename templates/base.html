@@ -21,18 +21,27 @@
 
         <header class="site-header">
             <div class="container header-layout">
-                <div class="site-brand">
+                <a
+                        href="{% url 'core:home' %}"
+                        class="site-brand"
+                        aria-label="Gestionnaire d'interventions — Accueil"
+                >
                     <span class="site-brand__icon" aria-hidden="true">
                         <img
-                            src="{% static 'icons/wrench.svg' %}"
-                            alt=""
-                            width="24"
-                            height="24"
+                                src="{% static 'icons/wrench.svg' %}"
+                                alt=""
+                                width="24"
+                                height="24"
                         >
                     </span>
-                    <p class="site-title">Gestionnaire d'interventions</p>
-                </div>
-                <nav class="site-nav" aria-label="Navigation principale">
+                    <span class="site-title">Gestionnaire d'interventions</span>
+                </a>
+
+                <nav
+                        id="primary-navigation"
+                        class="site-nav"
+                        aria-label="Navigation principale"
+                >
                     <ul class="nav-list">
                         {% if user.is_authenticated %}
                             <li>
@@ -40,13 +49,14 @@
                                         href="{% url 'core:home' %}"
                                         class="nav-link"
                                         {% if request.resolver_match.view_name == "core:home" %}
-                                            aria-current="page"
+                                        aria-current="page"
                                         {% endif %}
                                 >
                                     Accueil
                                 </a>
                             </li>
                         {% endif %}
+
                         {% if nav_can_view_clients %}
                             <li>
                                 <a
@@ -60,44 +70,30 @@
                                 </a>
                             </li>
                         {% endif %}
+
                         {% if nav_can_view_technicians %}
                             <li>
                                 <a
                                         href="{% url 'accounts:technician_list' %}"
                                         class="nav-link"
                                         {% if request.resolver_match.namespace == "accounts" %}
-                                            aria-current="page"
+                                        aria-current="page"
                                         {% endif %}
                                 >
                                     Techniciens
                                 </a>
                             </li>
                         {% endif %}
-                        <li>
-                            <a
-                                href="{% url 'core:design-system' %}"
-                                class="nav-link"
-                                {% if request.resolver_match.view_name == "core:design-system" %}
-                                    aria-current="page"
-                                {% endif %}
-                            >
-                                Design System
-                            </a>
-                        </li>
+
                         {% if user.is_authenticated %}
                             <li>
-                                <span class="nav-user-role">
-                                    {{ user.get_role_display }}
-                                </span>
-                            </li>
-                            <li>
                                 <form
-                                    method="post"
-                                    action="{% url 'accounts:logout' %}"
+                                        method="post"
+                                        action="{% url 'accounts:logout' %}"
                                 >
                                     {% csrf_token %}
-                                    <button class="nav-button"
-                                            type="submit">
+
+                                    <button class="nav-button" type="submit">
                                         Se déconnecter
                                     </button>
                                 </form>
@@ -107,7 +103,7 @@
                                 <a
                                         href="{% url 'accounts:login' %}"
                                         class="nav-link"
-                                        {% if request.resolver_match.namespace == "accounts" and request.resolver_match.url_name == "login" %}
+                                        {% if request.resolver_match.view_name == "accounts:login" %}
                                             aria-current="page"
                                         {% endif %}
                                 >
@@ -127,8 +123,20 @@
         </main>
 
         <footer class="site-footer">
-            <div class="container">
+            <div class="container site-footer__inner">
                 <p>Gestionnaire d'interventions</p>
+
+                {% if user.is_authenticated and user.role == "ADMIN" %}
+                    <a
+                            href="{% url 'core:design-system' %}"
+                            class="site-footer__link"
+                            {% if request.resolver_match.view_name == "core:design-system" %}
+                                aria-current="page"
+                            {% endif %}
+                    >
+                        Design System
+                    </a>
+                {% endif %}
             </div>
         </footer>
     </body>
