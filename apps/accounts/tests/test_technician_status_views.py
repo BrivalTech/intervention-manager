@@ -119,3 +119,18 @@ def test_inactive_technician_cannot_log_in(client, technician):
     )
 
     assert logged_in is False
+
+
+@pytest.mark.django_db
+def test_deactivated_technician_loses_access(client, technician):
+    technician_client = client
+    technician_client.force_login(technician)
+    response = technician_client.get(reverse("accounts:login"))
+
+    assert response.wsgi_request.user.is_authenticated
+
+    technician.is_active = False
+    technician.save(update_fields=["is_active"])
+    response = technician_client.get(reverse("accounts:login"))
+
+    assert not response.wsgi_request.user.is_authenticated

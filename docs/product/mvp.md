@@ -177,13 +177,12 @@ nécessaires ?
 | **Won't V2.0** | calendrier complexe, cartes, fichiers, graphiques, temps réel, SPA                  |
 ## Backlog fonctionnel initial
 ```text
-EPIC 1 - Authentification
-EPIC 2 - Utilisateurs et rôles
+EPIC 1 - Utilisateurs et rôles
+EPIC 2 - Authentification
 EPIC 3 - Clients
-EPIC 4 - Interventions
-EPIC 5 - Affectation
-EPIC 6 - Suivi des statuts
+EPIC 4 - Techniciens
+EPIC 5 - Interventions
+EPIC 6 - Tableau de bord
 EPIC 7 - Compte rendu
 EPIC 8 - Recherche et filtre
-EPICE 9 - Tableau de bord opérationnel
 ```

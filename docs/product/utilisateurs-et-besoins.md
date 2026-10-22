@@ -6,7 +6,8 @@ globale de l'application.
 
 Ses objectifs:
 - gérer les comptes utilisateurs
-- gérer les techniciens
+- gérer les techniciens, avec renvois d'invitation de définition du mot de
+  passe
 - gérer les clients
 - consulter toutes les interventions
 - corriger une information si nécessaire
@@ -60,7 +61,7 @@ Il doit pouvoir:
 | Consulter les clients              | oui            | oui          | limité     |
 | créer un client                    | oui            | oui          | non        |
 | modifier un client                 | oui            | oui          | non        |
-| supprimer / archiver un client     | oui            | à définir    | non        |
+| archiver un client                 | oui            | non          | non        |
 | consulter toutes les interventions | oui            | oui          | non        |
 | consulter ses interventions        | oui            | oui          | oui        |
 | créer une intervention             | oui            | oui          | non        |
@@ -120,10 +121,6 @@ Dépannage
 Les détails ne seront chargés que lorsque l'utilisateur ouvrira l'intervention.
 ## Gestion des droits
 Un utilisateur ne doit accéder qu'aux informations nécessaires à son rôle.
-
-Un technicien n'a aucune raison de pouvoir parcourir l'ensemble de la base
-clients. Il doit pouvoir accéder aux informations du client nécessaire à
-l'intervention qui lui est affectée.
 
 Ce qui améliore simultanément:
 - la sécurité
