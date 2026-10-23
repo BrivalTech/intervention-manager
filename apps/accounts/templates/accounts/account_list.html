@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+{% block title %}
+    {{ account_config.plural_label|capfirst }} | Gestionnaire d'interventions
+{% endblock %}
+
+{% block content %}
+    <section aria-labelledby="accounts-title">
+        <header class="entity-list__header">
+            <div>
+                <h1 id="accounts-title">
+                    {{ account_config.plural_label|capfirst }}
+                </h1>
+                <p>
+                    Consultez les {{ account_config.plural_label }}
+                    enregistrés dans l'application.
+                </p>
+            </div>
+
+            {% if can_manage_accounts %}
+                <a href="{% url account_config.create_url %}"
+                   class="button button--primary">
+                    Ajouter un {{ account_config.label }}
+                </a>
+            {% endif %}
+        </header>
+
+        <form method="get"
+              action="{% url account_config.list_url %}"
+              role="search"
+              class="entity-filters">
+
+            <div class="entity-filters__field">
+                <label for="account-search">
+                    Rechercher un {{ account_config.label }}
+                </label>
+                <input type="search"
+                       id="account-search"
+                       name="q"
+                       value="{{ query }}"
+                       placeholder="Nom, prénom, identifiant ou e-mail">
+            </div>
+
+            <div class="entity-filters__field">
+                <label for="account-status">Statut</label>
+                <select id="account-status" name="status">
+                    <option value="active"
+                            {% if status == "active" %}selected{% endif %}
+                    >
+                        Actifs
+                    </option>
+                    <option value="inactive"
+                            {% if status == "inactive" %}selected{% endif %}
+                    >
+                        Inactifs
+                    </option>
+                    <option value="all"
+                            {% if status == "all" %}selected{% endif %}
+                    >
+                        Tous
+                    </option>
+                </select>
+            </div>
+
+            <div class="entity-filters__actions">
+                <button type="submit" class="button button--primary">
+                    Rechercher
+                </button>
+                <a href="{% url account_config.list_url %}"
+                   class="button button--secondary"
+                >
+                    Réinitialiser
+                </a>
+            </div>
+        </form>
+
+        <p class="entity-results-count" aria-live="polite">
+            {{ result_count }}
+            compte{{ result_count|pluralize }}
+            trouvé{{ result_count|pluralize }}.
+        </p>
+
+        {% if page_obj.paginator.num_pages > 1 %}
+            <nav class="pagination"
+                 aria-label="Pagination des {{ account_config.plural_label }}">
+                <ul class="pagination__list">
+                    {% if page_obj.has_previous %}
+                        <li>
+                            <a class="pagination__link"
+                               href="?q={{ query|urlencode }}&amp;status={{ status|urlencode }}&amp;page={{ page_obj.previous_page_number }}">
+                                Précédent
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    <li>
+                        <span class="pagination__current" aria-current="page">
+                            Page {{ page_obj.number }}
+                            sur {{ page_obj.paginator.num_pages }}
+                        </span>
+                    </li>
+
+                    {% if page_obj.has_next %}
+                        <li>
+                            <a class="pagination__link"
+                               href="?q={{ query|urlencode }}&amp;status={{ status|urlencode }}&amp;page={{ page_obj.next_page_number }}">
+                                Suivant
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+
+        {% if accounts %}
+            <ul class="entity-list"
+                aria-label="Liste des {{ account_config.plural_label }}">
+                {% for account in accounts %}
+                    <li class="card">
+                        <div class="card__content">
+                            <h2 class="card__title">
+                                {{ account.get_full_name|default:account.username }}
+                            </h2>
+
+                            <dl class="data-list">
+                                {% if account.email %}
+                                    <div>
+                                        <dt>E-mail</dt>
+                                        <dd>{{ account.email }}</dd>
+                                    </div>
+                                {% endif %}
+
+                                <div>
+                                    <dt>Statut</dt>
+                                    <dd>
+                                        {% if account.is_active %}
+                                            Actif
+                                        {% else %}
+                                            Inactif
+                                        {% endif %}
+                                    </dd>
+                                </div>
+                            </dl>
+
+                            {% if can_manage_accounts %}
+                                <div class="technician-card__actions">
+                                    <a href="{% url account_config.update_url account.pk %}"
+                                       class="button button--secondary"
+                                       aria-label="Modifier {{ account.get_full_name|default:account.username }}">
+                                        Modifier
+                                    </a>
+
+                                    {% if account.is_active %}
+                                        <form method="post"
+                                              action="{% url account_config.deactivate_url account.pk %}">
+                                            {% csrf_token %}
+                                            <button type="submit"
+                                                    class="button button--secondary"
+                                                    aria-label="Désactiver {{ account.get_full_name|default:account.username }}">
+                                                Désactiver
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <form method="post"
+                                              action="{% url account_config.reactivate_url account.pk %}">
+                                            {% csrf_token %}
+                                            <button type="submit"
+                                                    class="button button--secondary"
+                                                    aria-label="Réactiver {{ account.get_full_name|default:account.username }}">
+                                                Réactiver
+                                            </button>
+                                        </form>
+                                    {% endif %}
+
+                                    {% if account.is_active and not account.has_usable_password %}
+                                        <form method="post"
+                                              action="{% url account_config.resend_url account.pk %}">
+                                            {% csrf_token %}
+                                            <button type="submit"
+                                                    class="button button--secondary"
+                                                    aria-label="Renvoyer une invitation à {{ account.get_full_name|default:account.username }}">
+                                                Renvoyer l'invitation
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="empty-state">
+                {% if query %}
+                    <p>Aucun compte ne correspond à votre recherche.</p>
+                {% elif status == "inactive" %}
+                    <p>Aucun compte inactif.</p>
+                {% elif status == "all" %}
+                    <p>Aucun compte enregistré.</p>
+                {% else %}
+                    <p>Aucun compte actif.</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    </section>
+{% endblock %}

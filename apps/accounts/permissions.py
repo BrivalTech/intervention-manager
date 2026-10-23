@@ -17,3 +17,13 @@ def can_view_technicians(user):
 def can_manage_technicians(user):
     """Check whether a user can create, update or deactivate technicians"""
     return user.is_authenticated and user.is_active and user.role == User.Role.ADMIN
+
+
+def can_view_managers(user):
+    """Check whether a user can view manager accounts."""
+    return can_manage_technicians(user)
+
+
+def can_manage_managers(user):
+    """Check whether a user can manage manager accounts."""
+    return can_manage_technicians(user)

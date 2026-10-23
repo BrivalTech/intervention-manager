@@ -57,6 +57,34 @@
                             </li>
                         {% endif %}
 
+                        {% if nav_can_view_managers %}
+                            <li>
+                                <a
+                                        href="{% url 'accounts:manager_list' %}"
+                                        class="nav-link"
+                                        {% if request.resolver_match.url_name == "manager_list" %}
+                                            aria-current="page"
+                                        {% endif %}
+                                >
+                                    Gestionnaires
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        {% if nav_can_view_technicians %}
+                            <li>
+                                <a
+                                        href="{% url 'accounts:technician_list' %}"
+                                        class="nav-link"
+                                        {% if request.resolver_match.url_name == "technician_list" %}
+                                            aria-current="page"
+                                        {% endif %}
+                                >
+                                    Techniciens
+                                </a>
+                            </li>
+                        {% endif %}
+
                         {% if nav_can_view_clients %}
                             <li>
                                 <a
@@ -67,20 +95,6 @@
                                         {% endif %}
                                 >
                                     Clients
-                                </a>
-                            </li>
-                        {% endif %}
-
-                        {% if nav_can_view_technicians %}
-                            <li>
-                                <a
-                                        href="{% url 'accounts:technician_list' %}"
-                                        class="nav-link"
-                                        {% if request.resolver_match.namespace == "accounts" %}
-                                        aria-current="page"
-                                        {% endif %}
-                                >
-                                    Techniciens
                                 </a>
                             </li>
                         {% endif %}

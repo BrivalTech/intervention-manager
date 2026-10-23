@@ -2,7 +2,7 @@ from smtplib import SMTPException
 from unittest.mock import patch
 
 import pytest
-from django.contrib.messages import get_messages
+from django.contrib.messages import WARNING, get_messages
 from django.core import mail
 from django.test import override_settings
 from django.urls import reverse
@@ -278,7 +278,7 @@ def test_technician_create_keeps_account_when_email_fails(
     client.force_login(admin)
 
     with patch(
-        "apps.accounts.views.send_technician_invitation",
+        "apps.accounts.account_views.send_account_invitation",
         side_effect=SMTPException("SMTP unavailable"),
     ):
         response = client.post(
@@ -298,10 +298,16 @@ def test_technician_create_keeps_account_when_email_fails(
     assert technician.role == User.Role.TECHNICIAN
     assert technician.has_usable_password() is False
 
-    messages = [str(message) for message in get_messages(response.wsgi_request)]
+    messages_list = list(get_messages(response.wsgi_request))
 
     assert any(
-        "l'invitation n'a pas pu être envoyée" in message for message in messages
+        message.level == WARNING
+        and (
+            "Le compte technicien a été créé, mais "
+            "l'invitation n'a pas pu être envoyée."
+        )
+        in str(message)
+        for message in messages_list
     )
 
 
@@ -317,7 +323,7 @@ def test_invalid_technician_form_does_not_send_invitation(
 
     client.force_login(admin)
 
-    with patch("apps.accounts.views.send_technician_invitation") as send_invitation:
+    with patch("apps.accounts.services.send_technician_invitation") as send_invitation:
         response = client.post(
             reverse("accounts:technician_create"),
             {
