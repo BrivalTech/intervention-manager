@@ -92,17 +92,13 @@ def test_non_admin_cannot_resend_invitation(
 
 
 @pytest.mark.django_db
-def test_cannot_invite_activated_technician(
-    client,
-    admin,
-    technician,
-):
+def test_cannot_invite_activated_technician(client, admin, technician):
     technician.set_password("SecureTestPassword123!")
     technician.save(update_fields=["password"])
 
     client.force_login(admin)
 
-    with patch("apps.accounts.views.send_technician_invitation") as send_invitation:
+    with patch("apps.accounts.services.send_technician_invitation") as send_invitation:
         response = client.post(
             reverse(
                 "accounts:technician_resend_invitation",
@@ -121,7 +117,7 @@ def test_cannot_invite_inactive_technician(client, admin, technician):
 
     client.force_login(admin)
 
-    with patch("apps.accounts.views.send_technician_invitation") as send_invitation:
+    with patch("apps.accounts.services.send_technician_invitation") as send_invitation:
         response = client.post(
             reverse(
                 "accounts:technician_resend_invitation",

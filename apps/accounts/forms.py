@@ -26,8 +26,8 @@ class FormControlMixin:
                 field.widget.attrs["aria-describedby"] = " ".join(described_by)
 
 
-class TechnicianCreatingForm(FormControlMixin, forms.ModelForm):
-    """Form for creating a Technician account"""
+class AccountCreatingForm(FormControlMixin, forms.ModelForm):
+    """Common form for creating a user account."""
 
     email = forms.EmailField(
         label="Adresse e-mail",
@@ -37,12 +37,7 @@ class TechnicianCreatingForm(FormControlMixin, forms.ModelForm):
 
     class Meta:
         model = User
-        fields = [
-            "first_name",
-            "last_name",
-            "username",
-            "email",
-        ]
+        fields = ["first_name", "last_name", "username", "email"]
         labels = {
             "first_name": "Prénom",
             "last_name": "Nom",
@@ -56,6 +51,8 @@ class TechnicianCreatingForm(FormControlMixin, forms.ModelForm):
             "email": forms.EmailInput(attrs={"autocomplete": "email"}),
         }
 
+    account_role = None
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -63,16 +60,19 @@ class TechnicianCreatingForm(FormControlMixin, forms.ModelForm):
             field.required = True
 
     def clean_email(self):
-        """Reject an email already used by another account."""
         email = self.cleaned_data["email"].strip().lower()
 
-        if User.objects.filter(email__iexact=email).exists():
+        existing_users = User.objects.filter(email__iexact=email)
+
+        if self.instance.pk:
+            existing_users = existing_users.exclude(pk=self.instance.pk)
+
+        if existing_users.exists():
             raise forms.ValidationError("Cette adresse e-mail est déjà utilisée.")
 
         return email
 
     def clean_first_name(self):
-        """Reject an empty first name."""
         first_name = self.cleaned_data["first_name"].strip()
 
         if not first_name:
@@ -81,7 +81,6 @@ class TechnicianCreatingForm(FormControlMixin, forms.ModelForm):
         return first_name
 
     def clean_last_name(self):
-        """Reject an empty last name."""
         last_name = self.cleaned_data["last_name"].strip()
 
         if not last_name:
@@ -90,10 +89,11 @@ class TechnicianCreatingForm(FormControlMixin, forms.ModelForm):
         return last_name
 
     def save(self, commit=True):
-        """Create a technician without an initial password."""
-        user = super().save(commit=False)
+        if self.account_role is None:
+            raise ValueError("Le rôle du compte doit être défini.")
 
-        user.role = User.Role.TECHNICIAN
+        user = super().save(commit=False)
+        user.role = self.account_role
         user.set_unusable_password()
 
         if commit:
@@ -102,24 +102,10 @@ class TechnicianCreatingForm(FormControlMixin, forms.ModelForm):
         return user
 
 
-class TechnicianUpdateForm(TechnicianCreatingForm):
-    """Form for updating a technician account."""
-
-    def clean_email(self):
-        """Reject an email used by another account."""
-        email = self.cleaned_data["email"].strip().lower()
-
-        if (
-            User.objects.filter(email__iexact=email)
-            .exclude(pk=self.instance.pk)
-            .exists()
-        ):
-            raise forms.ValidationError("Cette adresse e-mail est déjà utilisée.")
-
-        return email
+class AccountUpdateForm(AccountCreatingForm):
+    """Update account details without changing credentials."""
 
     def save(self, commit=True):
-        """Update information without changing credentials."""
         user = forms.ModelForm.save(self, commit=False)
 
         if commit:
@@ -133,6 +119,30 @@ class TechnicianUpdateForm(TechnicianCreatingForm):
             )
 
         return user
+
+
+class TechnicianCreatingForm(AccountCreatingForm):
+    """Create a new Technician account."""
+
+    account_role = User.Role.TECHNICIAN
+
+
+class TechnicianUpdateForm(AccountUpdateForm):
+    """Update a Technician account."""
+
+    account_role = User.Role.TECHNICIAN
+
+
+class ManagerCreatingForm(AccountCreatingForm):
+    """Create a new Manager account."""
+
+    account_role = User.Role.MANAGER
+
+
+class ManagerUpdateForm(AccountUpdateForm):
+    """Update a Manager account."""
+
+    account_role = User.Role.MANAGER
 
 
 class TechnicianSetPasswordForm(FormControlMixin, SetPasswordForm):

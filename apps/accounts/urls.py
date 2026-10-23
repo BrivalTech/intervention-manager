@@ -48,4 +48,26 @@ urlpatterns = [
         views.technician_reactivate,
         name="technician_reactivate",
     ),
+    path("managers/", views.manager_list, name="manager_list"),
+    path("managers/create/", views.manager_create, name="manager_create"),
+    path(
+        "managers/<int:pk>/edit/",
+        views.manager_update,
+        name="manager_update",
+    ),
+    path(
+        "managers/<int:pk>/resend-invitation/",
+        views.manager_resend_invitation,
+        name="manager_resend_invitation",
+    ),
+    path(
+        "managers/<int:pk>/deactivate/",
+        views.manager_deactivate,
+        name="manager_deactivate",
+    ),
+    path(
+        "managers/<int:pk>/reactivate/",
+        views.manager_reactivate,
+        name="manager_reactivate",
+    ),
 ]
