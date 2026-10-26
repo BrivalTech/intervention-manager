@@ -10,6 +10,45 @@
             </div>
         </header>
 
+        <form method="get" action="{% url 'interventions:list' %}"
+              role="search" class="entity-filters">
+
+            <div class="entity-filters__field">
+                <label for="intervention-search">Rechercher une intervention</label>
+                <input
+                    type="search"
+                    id="intervention-search"
+                    name="q"
+                    value="{{ search_query }}"
+                    placeholder="Titre, description ou client"
+                >
+            </div>
+
+            <div class="entity-filters__field">
+                <label for="intervention-status">Statut</label>
+                <select id="intervention-status" name="status">
+                    <option value="">Tous les statuts</option>
+                    {% for value, label in status_choices %}
+                        <option value="{{ value }}"
+                            {% if status_filter == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="entity-filters__actions">
+                <button type="submit" class="button button--primary">
+                    Rechercher
+                </button>
+
+                <a href="{% url 'interventions:list' %}"
+                   class="button button--secondary">
+                    Réinitialiser
+                </a>
+            </div>
+        </form>
+
         {% if interventions %}
             <ul class="entity-list" aria-label="Liste des interventions">
                 {% for intervention in interventions %}
@@ -57,9 +96,11 @@
                 {% endfor %}
             </ul>
         {% else %}
-            <div class="empty-state">
+            {% if search_query or status_filter %}
+                <p>Aucune intervention ne correspond à vos critères.</p>
+            {% else %}
                 <p>Aucune intervention enregistrée.</p>
-            </div>
+            {% endif %}
         {% endif %}
     </section>
 {% endblock %}
