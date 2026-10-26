@@ -5,25 +5,27 @@ from apps.interventions.permissions import can_manage_assignment, can_update_sta
 def create_intervention(
     *,
     client,
-    title,
     created_by,
+    title,
     description="",
     address="",
     postal_code="",
     city="",
-    scheduled_at=None,
+    starts_at=None,
+    ends_at=None,
     technician=None,
 ):
     """Create and validate an intervention before saving it."""
     intervention = Intervention(
         client=client,
-        title=title,
         created_by=created_by,
+        title=title,
         description=description,
         address=address,
         postal_code=postal_code,
         city=city,
-        scheduled_at=scheduled_at,
+        starts_at=starts_at,
+        ends_at=ends_at,
         technician=technician,
     )
 

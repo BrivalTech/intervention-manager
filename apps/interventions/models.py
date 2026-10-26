@@ -34,7 +34,16 @@ class Intervention(models.Model):
     address = models.CharField(max_length=255, blank=True)
     postal_code = models.CharField(max_length=20, blank=True)
     city = models.CharField(max_length=100, blank=True)
-    scheduled_at = models.DateTimeField(null=True, blank=True)
+    starts_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Date et heure de début",
+    )
+    ends_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Date et heure de fin",
+    )
     technician = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT,
@@ -44,6 +53,20 @@ class Intervention(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=(
+                    models.Q(starts_at__isnull=True, ends_at__isnull=True)
+                    | (
+                        models.Q(starts_at__isnull=False, ends_at__isnull=False)
+                        & models.Q(ends_at__gt=models.F("starts_at"))
+                    )
+                ),
+                name="intervention_valid_schedule",
+            ),
+        ]
 
     def __str__(self):
         return self.title
@@ -66,6 +89,20 @@ class Intervention(models.Model):
             errors["technician"] = (
                 "Seul un utilisateur ayant le rôle de technicien peut être "
                 "affecté à une intervention."
+            )
+
+        if (self.starts_at is None) != (self.ends_at is None):
+            errors["ends_at"] = (
+                "Les dates de début et de fin doivent être renseignées ensemble."
+            )
+
+        elif (
+            self.starts_at is not None
+            and self.ends_at is not None
+            and self.ends_at <= self.starts_at
+        ):
+            errors["ends_at"] = (
+                "La date de fin doit être postérieure à la date de début."
             )
 
         if errors:

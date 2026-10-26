@@ -1,3 +1,6 @@
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
 import pytest
 from django.core.exceptions import ValidationError
 
@@ -8,24 +11,26 @@ from apps.interventions.models import Intervention
 
 @pytest.mark.django_db
 def test_intervention_can_be_created_for_active_client(intervention_author):
-    client = Client.objects.create(
-        name="Entreprise Test",
-    )
+    client = Client.objects.create(name="Entreprise Test")
+    starts_at = datetime(2026, 11, 10, 9, tzinfo=ZoneInfo("Europe/Paris"))
+    ends_at = datetime(2026, 11, 10, 11, tzinfo=ZoneInfo("Europe/Paris"))
     intervention = Intervention.objects.create(
         created_by=intervention_author,
         client=client,
         title="Maintenance du poste de travail",
+        starts_at=starts_at,
+        ends_at=ends_at,
     )
 
     assert intervention.client == client
     assert intervention.title == "Maintenance du poste de travail"
+    assert intervention.starts_at == starts_at
+    assert intervention.ends_at == ends_at
 
 
 @pytest.mark.django_db
 def test_intervention_is_planned_by_default(intervention_author):
-    client = Client.objects.create(
-        name="Entreprise Test",
-    )
+    client = Client.objects.create(name="Entreprise Test")
     intervention = Intervention.objects.create(
         created_by=intervention_author,
         client=client,
@@ -36,10 +41,8 @@ def test_intervention_is_planned_by_default(intervention_author):
 
 
 @pytest.mark.django_db
-def test_intervention_can_be_created_without_scheduled(intervention_author):
-    client = Client.objects.create(
-        name="Entreprise Test",
-    )
+def test_intervention_can_be_created_without_schedule(intervention_author):
+    client = Client.objects.create(name="Entreprise Test")
     intervention = Intervention.objects.create(
         created_by=intervention_author,
         client=client,
@@ -48,14 +51,12 @@ def test_intervention_can_be_created_without_scheduled(intervention_author):
     )
 
     assert intervention.description == "Vérifier le poste utilisateur."
-    assert intervention.scheduled_at is None
+    assert intervention.starts_at is None
 
 
 @pytest.mark.django_db
 def test_intervention_title_is_required(intervention_author):
-    client = Client.objects.create(
-        name="Entreprise Test",
-    )
+    client = Client.objects.create(name="Entreprise Test")
     intervention = Intervention.objects.create(
         created_by=intervention_author,
         client=client,
@@ -79,10 +80,7 @@ def test_intervention_client_is_required(intervention_author):
 
 @pytest.mark.django_db
 def test_intervention_cannot_be_created_for_archived_client(intervention_author):
-    client = Client.objects.create(
-        name="Entreprise Test",
-        is_active=False,
-    )
+    client = Client.objects.create(name="Entreprise Test", is_active=False)
     intervention = Intervention.objects.create(
         created_by=intervention_author,
         client=client,
@@ -95,9 +93,7 @@ def test_intervention_cannot_be_created_for_archived_client(intervention_author)
 
 @pytest.mark.django_db
 def test_intervention_string_representation_is_title(intervention_author):
-    client = Client.objects.create(
-        name="Entreprise Test",
-    )
+    client = Client.objects.create(name="Entreprise Test")
     intervention = Intervention.objects.create(
         created_by=intervention_author,
         client=client,
@@ -109,9 +105,7 @@ def test_intervention_string_representation_is_title(intervention_author):
 
 @pytest.mark.django_db
 def test_intervention_status_must_be_valid(intervention_author):
-    client = Client.objects.create(
-        name="Entreprise Test",
-    )
+    client = Client.objects.create(name="Entreprise Test")
     intervention = Intervention.objects.create(
         created_by=intervention_author,
         client=client,
@@ -134,9 +128,7 @@ def test_intervention_status_must_be_valid(intervention_author):
 )
 @pytest.mark.django_db
 def test_intervention_accepts_valid_satus(status, intervention_author):
-    client = Client.objects.create(
-        name="Entreprise Test",
-    )
+    client = Client.objects.create(name="Entreprise Test")
     intervention = Intervention.objects.create(
         created_by=intervention_author,
         client=client,
@@ -149,9 +141,7 @@ def test_intervention_accepts_valid_satus(status, intervention_author):
 
 @pytest.mark.django_db
 def test_planned_intervention_can_be_started(intervention_author):
-    client = Client.objects.create(
-        name="Entreprise Test",
-    )
+    client = Client.objects.create(name="Entreprise Test")
     intervention = Intervention.objects.create(
         created_by=intervention_author,
         client=client,
@@ -166,9 +156,7 @@ def test_planned_intervention_can_be_started(intervention_author):
 
 @pytest.mark.django_db
 def test_in_progress_intervention_can_be_completed(intervention_author):
-    client = Client.objects.create(
-        name="Entreprise Test",
-    )
+    client = Client.objects.create(name="Entreprise Test")
     intervention = Intervention.objects.create(
         created_by=intervention_author,
         client=client,
@@ -191,9 +179,7 @@ def test_in_progress_intervention_can_be_completed(intervention_author):
 )
 @pytest.mark.django_db
 def test_intervention_can_be_cancelled(status, intervention_author):
-    client = Client.objects.create(
-        name="Entreprise Test",
-    )
+    client = Client.objects.create(name="Entreprise Test")
     intervention = Intervention.objects.create(
         created_by=intervention_author,
         client=client,
@@ -217,9 +203,7 @@ def test_intervention_can_be_cancelled(status, intervention_author):
 )
 @pytest.mark.django_db
 def test_only_planned_intervention_can_be_started(status, intervention_author):
-    client = Client.objects.create(
-        name="Entreprise Test",
-    )
+    client = Client.objects.create(name="Entreprise Test")
     intervention = Intervention.objects.create(
         created_by=intervention_author,
         client=client,
@@ -241,9 +225,7 @@ def test_only_planned_intervention_can_be_started(status, intervention_author):
 )
 @pytest.mark.django_db
 def test_only_in_progress_intervention_can_be_completed(status, intervention_author):
-    client = Client.objects.create(
-        name="Entreprise Test",
-    )
+    client = Client.objects.create(name="Entreprise Test")
     intervention = Intervention.objects.create(
         created_by=intervention_author,
         client=client,
@@ -266,9 +248,7 @@ def test_only_in_progress_intervention_can_be_completed(status, intervention_aut
 def test_completed_or_cancelled_intervention_cannot_be_cancelled(
     initial_status, intervention_author
 ):
-    client = Client.objects.create(
-        name="Entreprise Test",
-    )
+    client = Client.objects.create(name="Entreprise Test")
     intervention = Intervention.objects.create(
         created_by=intervention_author,
         client=client,
@@ -282,9 +262,7 @@ def test_completed_or_cancelled_intervention_cannot_be_cancelled(
 
 @pytest.mark.django_db
 def test_intervention_can_be_created_without_technician(intervention_author):
-    client = Client.objects.create(
-        name="Entreprise Test",
-    )
+    client = Client.objects.create(name="Entreprise Test")
     intervention = Intervention.objects.create(
         created_by=intervention_author,
         client=client,
@@ -296,9 +274,7 @@ def test_intervention_can_be_created_without_technician(intervention_author):
 
 @pytest.mark.django_db
 def test_technician_can_be_assigned_to_an_intervention(intervention_author):
-    client = Client.objects.create(
-        name="Entreprise Test",
-    )
+    client = Client.objects.create(name="Entreprise Test")
     technician = User.objects.create_user(
         username="technician",
         password="test-password",
@@ -325,9 +301,7 @@ def test_technician_can_be_assigned_to_an_intervention(intervention_author):
 def test_non_technician_cannot_be_assigned_to_an_intervention(
     role, intervention_author
 ):
-    client = Client.objects.create(
-        name="Entreprise Test",
-    )
+    client = Client.objects.create(name="Entreprise Test")
     user = User.objects.create_user(
         username=f"user-{role.lower()}",
         password="test-password",
@@ -346,9 +320,7 @@ def test_non_technician_cannot_be_assigned_to_an_intervention(
 
 @pytest.mark.django_db
 def test_technician_can_ne_assigned_after_intervention_created(intervention_author):
-    client = Client.objects.create(
-        name="Entreprise Test",
-    )
+    client = Client.objects.create(name="Entreprise Test")
     technician = User.objects.create_user(
         username="technician",
         password="test-password",
@@ -377,9 +349,7 @@ def test_technician_can_ne_assigned_after_intervention_created(intervention_auth
 def test_non_technician_cannot_be_assigned_after_intervention_created(
     role, intervention_author
 ):
-    client = Client.objects.create(
-        name="Entreprise Test",
-    )
+    client = Client.objects.create(name="Entreprise Test")
     user = User.objects.create_user(
         username=f"user-{role.lower()}",
         password="test-password",
@@ -407,9 +377,7 @@ def test_non_technician_cannot_be_assigned_after_intervention_created(
 def test_technician_can_be_unassigned_from_active_intervention(
     status, intervention_author
 ):
-    client = Client.objects.create(
-        name="Entreprise Test",
-    )
+    client = Client.objects.create(name="Entreprise Test")
     technician = User.objects.create_user(
         username=f"technician-{status.lower()}",
         password="test-password",
@@ -440,9 +408,7 @@ def test_technician_can_be_unassigned_from_active_intervention(
 def test_technician_cannot_be_unassigned_from_final_intervention(
     status, intervention_author
 ):
-    client = Client.objects.create(
-        name="Entreprise Test",
-    )
+    client = Client.objects.create(name="Entreprise Test")
     technician = User.objects.create_user(
         username=f"technician-{status.lower()}",
         password="test-password",
@@ -471,9 +437,7 @@ def test_technician_cannot_be_unassigned_from_final_intervention(
 def test_technician_cannot_be_assigned_to_finale_intervention(
     status, intervention_author
 ):
-    client = Client.objects.create(
-        name="Entreprise Test",
-    )
+    client = Client.objects.create(name="Entreprise Test")
     technician = User.objects.create_user(
         username=f"technician-{status.lower()}",
         password="test-password",
@@ -493,9 +457,7 @@ def test_technician_cannot_be_assigned_to_finale_intervention(
 
 @pytest.mark.django_db
 def test_technician_can_be_reassigned_on_active_intervention(intervention_author):
-    client = Client.objects.create(
-        name="Entreprise Test",
-    )
+    client = Client.objects.create(name="Entreprise Test")
     first_technician = User.objects.create_user(
         username="first-technician",
         password="test-password",
@@ -521,9 +483,7 @@ def test_technician_can_be_reassigned_on_active_intervention(intervention_author
 
 @pytest.mark.django_db
 def test_intervention_without_technician_can_be_unassigned(intervention_author):
-    client = Client.objects.create(
-        name="Entreprise Test",
-    )
+    client = Client.objects.create(name="Entreprise Test")
     intervention = Intervention.objects.create(
         created_by=intervention_author,
         client=client,
@@ -534,3 +494,62 @@ def test_intervention_without_technician_can_be_unassigned(intervention_author):
     intervention.refresh_from_db()
 
     assert intervention.technician is None
+
+
+@pytest.mark.parametrize(
+    ("starts_at", "ends_at", "is_valid"),
+    [
+        (None, None, True),
+        (
+            datetime(2026, 11, 10, 9, tzinfo=ZoneInfo("Europe/Paris")),
+            datetime(2026, 11, 10, 11, tzinfo=ZoneInfo("Europe/Paris")),
+            True,
+        ),
+        (
+            datetime(2026, 11, 10, 9, tzinfo=ZoneInfo("Europe/Paris")),
+            None,
+            False,
+        ),
+        (
+            None,
+            datetime(2026, 11, 10, 11, tzinfo=ZoneInfo("Europe/Paris")),
+            False,
+        ),
+        (
+            datetime(2026, 11, 10, 9, tzinfo=ZoneInfo("Europe/Paris")),
+            datetime(2026, 11, 10, 9, tzinfo=ZoneInfo("Europe/Paris")),
+            False,
+        ),
+        (
+            datetime(2026, 11, 10, 11, tzinfo=ZoneInfo("Europe/Paris")),
+            datetime(2026, 11, 10, 9, tzinfo=ZoneInfo("Europe/Paris")),
+            False,
+        ),
+    ],
+)
+@pytest.mark.django_db
+def test_intervention_schedule_validation(
+    starts_at,
+    ends_at,
+    is_valid,
+    intervention_author,
+):
+    client = Client.objects.create(
+        name="Entreprise Test",
+    )
+
+    intervention = Intervention(
+        created_by=intervention_author,
+        client=client,
+        title="Maintenance du poste de travail",
+        starts_at=starts_at,
+        ends_at=ends_at,
+    )
+
+    if is_valid:
+        intervention.full_clean()
+    else:
+        with pytest.raises(ValidationError) as exc_info:
+            intervention.full_clean()
+
+        assert "ends_at" in exc_info.value.message_dict
