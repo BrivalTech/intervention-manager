@@ -99,6 +99,20 @@
                             </li>
                         {% endif %}
 
+                        {% if nav_can_view_interventions %}
+                            <li>
+                                <a
+                                    href="{% url 'interventions:list' %}"
+                                    class="nav-link"
+                                    {% if request.resolver_match.namespace == "interventions" %}
+                                        aria-current="page"
+                                    {% endif %}
+                                >
+                                    Interventions
+                                </a>
+                            </li>
+                        {% endif %}
+
                         {% if user.is_authenticated %}
                             <li>
                                 <form

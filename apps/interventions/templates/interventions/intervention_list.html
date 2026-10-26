@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Interventions | Gestionnaire d'interventions{% endblock %}
+
+{% block content %}
+    <section aria-labelledby="interventions-title">
+        <header class="entity-list__header">
+            <div>
+                <h1 id="interventions-title">Interventions</h1>
+                <p>Consultez les interventions enregistrées.</p>
+            </div>
+        </header>
+
+        {% if interventions %}
+            <ul class="entity-list" aria-label="Liste des interventions">
+                {% for intervention in interventions %}
+                    <li class="card">
+                        <div class="card__content">
+                            <h2 class="card__title">{{ intervention.title }}</h2>
+                            <dl class="data-list">
+                                <div>
+                                    <dt>Client</dt>
+                                    <dd>{{ intervention.client.name }}</dd>
+                                </div>
+                                <div>
+                                    <dt>Statut</dt>
+                                    <dd>{{ intervention.get_status_display }}</dd>
+                                </div>
+                                <div>
+                                    <dt>Technicien</dt>
+                                    <dd>
+                                        {% if intervention.technician %}
+                                            {{ intervention.technician.get_full_name|default:intervention.technician.username }}
+                                        {% else %}
+                                            Non affecté
+                                        {% endif %}
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt>Planification</dt>
+                                    <dd>
+                                        {% if intervention.starts_at %}
+                                            <time datetime="{{ intervention.starts_at|date:'c' }}">
+                                                {{ intervention.starts_at|date:"d/m/Y H:i" }}
+                                            </time>
+                                            –
+                                            <time datetime="{{ intervention.ends_at|date:'c' }}">
+                                                {{ intervention.ends_at|date:"d/m/Y H:i" }}
+                                            </time>
+                                        {% else %}
+                                            Non planifiée
+                                        {% endif %}
+                                    </dd>
+                                </div>
+                            </dl>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="empty-state">
+                <p>Aucune intervention enregistrée.</p>
+            </div>
+        {% endif %}
+    </section>
+{% endblock %}
