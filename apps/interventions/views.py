@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import render
 
@@ -41,16 +42,18 @@ def intervention_list(request):
     else:
         status_filter = ""
 
-    interventions = interventions.order_by(
-        "starts_at",
-        "pk",
-    )
+    interventions = interventions.order_by("starts_at", "pk")
+
+    paginator = Paginator(interventions, 10)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
 
     return render(
         request,
         "interventions/intervention_list.html",
         {
-            "interventions": interventions,
+            "interventions": page_obj,
+            "page_obj": page_obj,
             "search_query": search_query,
             "status_filter": status_filter,
             "status_choices": Intervention.Status.choices,

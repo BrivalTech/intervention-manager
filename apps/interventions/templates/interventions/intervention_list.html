@@ -49,6 +49,56 @@
             </div>
         </form>
 
+        {% if page_obj.has_other_pages %}
+            <nav class="pagination" aria-label="Pagination des interventions">
+                <ul class="pagination__list">
+                    {% if page_obj.has_previous %}
+                        <li>
+                            <a
+                                href="?page=1&amp;q={{ search_query|urlencode }}&amp;status={{ status_filter|urlencode }}"
+                                class="pagination__link"
+                            >
+                                Première
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                                href="?page={{ page_obj.previous_page_number }}&amp;q={{ search_query|urlencode }}&amp;status={{ status_filter|urlencode }}"
+                                class="pagination__link"
+                            >
+                                Précédente
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    <li>
+                        <span class="pagination__current" aria-current="page">
+                            Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
+                        </span>
+                    </li>
+
+                    {% if page_obj.has_next %}
+                        <li>
+                            <a
+                                href="?page={{ page_obj.next_page_number }}&amp;q={{ search_query|urlencode }}&amp;status={{ status_filter|urlencode }}"
+                                class="pagination__link"
+                            >
+                                Suivante
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                                href="?page={{ page_obj.paginator.num_pages }}&amp;q={{ search_query|urlencode }}&amp;status={{ status_filter|urlencode }}"
+                                class="pagination__link"
+                            >
+                                Dernière
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+
         {% if interventions %}
             <ul class="entity-list" aria-label="Liste des interventions">
                 {% for intervention in interventions %}
