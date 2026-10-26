@@ -313,6 +313,7 @@ def test_technician_can_complete_own_intervention(intervention_author):
         user=technician,
         intervention=intervention,
         action="complete",
+        report="Intervention terminée et vérifiée.",
     )
 
     intervention.refresh_from_db()
@@ -396,7 +397,7 @@ def test_status_service_preserves_final_intervention_state(
 
     if final_status == Intervention.Status.COMPLETED:
         intervention.start()
-        intervention.complete()
+        intervention.complete("Intervention terminée et vérifiée.")
     else:
         intervention.cancel()
 

@@ -19,12 +19,12 @@ def at(hour, minute=0):
 
 
 @pytest.fixture
-def client_account(db):
+def client_account():
     return Client.objects.create(name="Client planning")
 
 
 @pytest.fixture
-def technician(db):
+def technician():
     return User.objects.create_user(
         username="technician_planning",
         role=User.Role.TECHNICIAN,
@@ -32,7 +32,7 @@ def technician(db):
 
 
 @pytest.fixture
-def other_technician(db):
+def other_technician():
     return User.objects.create_user(
         username="other_technician_planning",
         role=User.Role.TECHNICIAN,
@@ -234,7 +234,7 @@ def test_completed_intervention_blocks_schedule(
     intervention_author,
 ):
     existing_intervention.start()
-    existing_intervention.complete()
+    existing_intervention.complete("Intervention terminée et vérifiée.")
 
     with pytest.raises(ValidationError) as exc_info:
         create_intervention(

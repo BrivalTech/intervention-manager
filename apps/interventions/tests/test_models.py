@@ -127,14 +127,27 @@ def test_intervention_status_must_be_valid(intervention_author):
     ],
 )
 @pytest.mark.django_db
-def test_intervention_accepts_valid_satus(status, intervention_author):
+def test_intervention_accepts_valid_status(status, intervention_author):
     client = Client.objects.create(name="Entreprise Test")
     intervention = Intervention.objects.create(
         created_by=intervention_author,
         client=client,
         title="Maintenance du poste de travail",
-        status=status,
     )
+
+    if status == Intervention.Status.IN_PROGRESS:
+        intervention.start()
+
+    elif status == Intervention.Status.COMPLETED:
+        intervention.start()
+        intervention.complete("Intervention terminée et vérifiée.")
+
+    elif status == Intervention.Status.CANCELLED:
+        intervention.cancel()
+
+    intervention.refresh_from_db()
+
+    assert intervention.status == status
 
     intervention.full_clean()
 
@@ -164,7 +177,7 @@ def test_in_progress_intervention_can_be_completed(intervention_author):
         status=Intervention.Status.IN_PROGRESS,
     )
 
-    intervention.complete()
+    intervention.complete("Intervention terminée et vérifiée.")
     intervention.refresh_from_db()
 
     assert intervention.status == Intervention.Status.COMPLETED
@@ -234,7 +247,7 @@ def test_only_in_progress_intervention_can_be_completed(status, intervention_aut
     )
 
     with pytest.raises(ValidationError):
-        intervention.complete()
+        intervention.complete("Intervention terminée et vérifiée.")
 
 
 @pytest.mark.parametrize(

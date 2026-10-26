@@ -31,6 +31,10 @@ class Intervention(models.Model):
         default=Status.PLANNED,
     )
     description = models.TextField(blank=True)
+    report = models.TextField(
+        blank=True,
+        verbose_name="Compte rendu d'intervention",
+    )
     address = models.CharField(max_length=255, blank=True)
     postal_code = models.CharField(max_length=20, blank=True)
     city = models.CharField(max_length=100, blank=True)
@@ -129,6 +133,11 @@ class Intervention(models.Model):
                     "sur cette plage horaire."
                 )
 
+        if self.status == self.Status.COMPLETED and not self.report.strip():
+            errors["report"] = (
+                "Un compte rendu est obligatoire pour terminer une intervention."
+            )
+
         if errors:
             raise ValidationError(errors)
 
@@ -140,13 +149,33 @@ class Intervention(models.Model):
         self.status = self.Status.IN_PROGRESS
         self.save(update_fields=["status", "updated_at"])
 
-    def complete(self):
-        """Complete an intervention in progress."""
+    def complete(self, report):
+        """Complete an intervention with a mandatory report."""
         if self.status != self.Status.IN_PROGRESS:
             raise ValidationError("Only an intervention in progress can be completed.")
 
+        if not isinstance(report, str) or not report.strip():
+            raise ValidationError(
+                {
+                    "report": "Un compte rendu est obligatoire pour"
+                    "terminer l'intervention."
+                }
+            )
+
+        previous_status = self.status
+        previous_report = self.report
+
+        self.report = report.strip()
         self.status = self.Status.COMPLETED
-        self.save(update_fields=["status", "updated_at"])
+
+        try:
+            self.full_clean()
+        except ValidationError:
+            self.status = previous_status
+            self.report = previous_report
+            raise
+
+        self.save(update_fields=["report", "status", "updated_at"])
 
     def cancel(self):
         """Cancel a planned or in-progress intervention."""

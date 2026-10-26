@@ -65,19 +65,26 @@ def unassign_technician(*, user, intervention):
     return intervention
 
 
-def update_intervention_status(*, user, intervention, action):
-    """Perform an authorized status actions on an intervention."""
+def update_intervention_status(
+    *,
+    user,
+    intervention,
+    action,
+    report=None,
+):
+    """Perform an authorized status action on an intervention."""
     if not can_update_status(user, intervention, action):
         raise PermissionError(
             "You do not have permission to update this intervention status."
         )
 
-    actions = {
-        "start": intervention.start,
-        "complete": intervention.complete,
-        "cancel": intervention.cancel,
-    }
-
-    actions[action]()
+    if action == "complete":
+        intervention.complete(report)
+    elif action == "start":
+        intervention.start()
+    elif action == "cancel":
+        intervention.cancel()
+    else:
+        raise ValueError("Unknown intervention status action.")
 
     return intervention
