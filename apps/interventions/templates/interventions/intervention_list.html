@@ -14,19 +14,24 @@
               role="search" class="entity-filters">
 
             <div class="entity-filters__field">
-                <label for="intervention-search">Rechercher une intervention</label>
+                <label for="intervention-search"  class="form-label">
+                    Rechercher une intervention
+                </label>
                 <input
-                    type="search"
-                    id="intervention-search"
-                    name="q"
-                    value="{{ search_query }}"
-                    placeholder="Titre, description ou client"
+                        class="form-control"
+                        type="search"
+                        id="intervention-search"
+                        name="q"
+                        value="{{ search_query }}"
+                        placeholder="Titre, description ou client"
                 >
             </div>
 
             <div class="entity-filters__field">
-                <label for="intervention-status">Statut</label>
-                <select id="intervention-status" name="status">
+                <label for="intervention-status" class="form-label">
+                    Statut
+                </label>
+                <select id="intervention-status" name="status" class="form-control">
                     <option value="">Tous les statuts</option>
                     {% for value, label in status_choices %}
                         <option value="{{ value }}"
@@ -49,56 +54,6 @@
             </div>
         </form>
 
-        {% if page_obj.has_other_pages %}
-            <nav class="pagination" aria-label="Pagination des interventions">
-                <ul class="pagination__list">
-                    {% if page_obj.has_previous %}
-                        <li>
-                            <a
-                                href="?page=1&amp;q={{ search_query|urlencode }}&amp;status={{ status_filter|urlencode }}"
-                                class="pagination__link"
-                            >
-                                Première
-                            </a>
-                        </li>
-                        <li>
-                            <a
-                                href="?page={{ page_obj.previous_page_number }}&amp;q={{ search_query|urlencode }}&amp;status={{ status_filter|urlencode }}"
-                                class="pagination__link"
-                            >
-                                Précédente
-                            </a>
-                        </li>
-                    {% endif %}
-
-                    <li>
-                        <span class="pagination__current" aria-current="page">
-                            Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
-                        </span>
-                    </li>
-
-                    {% if page_obj.has_next %}
-                        <li>
-                            <a
-                                href="?page={{ page_obj.next_page_number }}&amp;q={{ search_query|urlencode }}&amp;status={{ status_filter|urlencode }}"
-                                class="pagination__link"
-                            >
-                                Suivante
-                            </a>
-                        </li>
-                        <li>
-                            <a
-                                href="?page={{ page_obj.paginator.num_pages }}&amp;q={{ search_query|urlencode }}&amp;status={{ status_filter|urlencode }}"
-                                class="pagination__link"
-                            >
-                                Dernière
-                            </a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </nav>
-        {% endif %}
-
         {% if interventions %}
             <ul class="entity-list" aria-label="Liste des interventions">
                 {% for intervention in interventions %}
@@ -112,7 +67,11 @@
                                 </div>
                                 <div>
                                     <dt>Statut</dt>
-                                    <dd>{{ intervention.get_status_display }}</dd>
+                                    <dd>
+                                        <span class="status status--{{ intervention.status|lower }}">
+                                            {{ intervention.get_status_display }}
+                                        </span>
+                                    </dd>
                                 </div>
                                 <div>
                                     <dt>Technicien</dt>
@@ -145,12 +104,70 @@
                     </li>
                 {% endfor %}
             </ul>
-        {% else %}
-            {% if search_query or status_filter %}
-                <p>Aucune intervention ne correspond à vos critères.</p>
-            {% else %}
-                <p>Aucune intervention enregistrée.</p>
+
+            {% if page_obj.has_other_pages %}
+                <nav class="pagination" aria-label="Pagination des interventions">
+                    <ul class="pagination__list">
+                        {% if page_obj.has_previous %}
+                            <li>
+                                <a
+                                    href="?page=1&amp;q={{ search_query|urlencode }}&amp;status={{ status_filter|urlencode }}"
+                                    class="pagination__link"
+                                >
+                                    Première
+                                </a>
+                            </li>
+                            <li>
+                                <a
+                                    href="?page={{ page_obj.previous_page_number }}&amp;q={{ search_query|urlencode }}&amp;status={{ status_filter|urlencode }}"
+                                    class="pagination__link"
+                                >
+                                    Précédente
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        <li>
+                           <span class="pagination__current">
+                               Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
+                           </span>
+                        </li>
+
+                        {% if page_obj.has_next %}
+                            <li>
+                                <a
+                                    href="?page={{ page_obj.next_page_number }}&amp;q={{ search_query|urlencode }}&amp;status={{ status_filter|urlencode }}"
+                                    class="pagination__link"
+                                >
+                                    Suivante
+                                </a>
+                            </li>
+                            <li>
+                                <a
+                                    href="?page={{ page_obj.paginator.num_pages }}&amp;q={{ search_query|urlencode }}&amp;status={{ status_filter|urlencode }}"
+                                    class="pagination__link"
+                                >
+                                    Dernière
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
             {% endif %}
+        {% else %}
+            <div class="empty-state" role="status">
+                {% if search_query or status_filter %}
+                    <p>Aucune intervention ne correspond à vos critères.</p>
+                    <a
+                        href="{% url 'interventions:list' %}"
+                        class="button button--secondary"
+                    >
+                        Effacer les filtres
+                    </a>
+                {% else %}
+                    <p>Aucune intervention enregistrée.</p>
+                {% endif %}
+            </div>
         {% endif %}
     </section>
 {% endblock %}
