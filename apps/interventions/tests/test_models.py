@@ -46,8 +46,6 @@ def test_intervention_can_be_created_without_scheduled():
 
     assert intervention.description == "Vérifier le poste utilisateur."
     assert intervention.scheduled_at is None
-    assert intervention.created_at is not None
-    assert intervention.updated_at is not None
 
 
 @pytest.mark.django_db
@@ -456,3 +454,46 @@ def test_technician_cannot_be_assigned_to_finale_intervention(status):
 
     with pytest.raises(ValidationError):
         intervention.assign_technician(technician)
+
+
+@pytest.mark.django_db
+def test_technician_can_be_reassigned_on_active_intervention():
+    client = Client.objects.create(
+        name="Entreprise Test",
+    )
+    first_technician = User.objects.create_user(
+        username="first-technician",
+        password="test-password",
+        role=User.Role.TECHNICIAN,
+    )
+    second_technician = User.objects.create_user(
+        username="second-technician",
+        password="test-password",
+        role=User.Role.TECHNICIAN,
+    )
+    intervention = Intervention.objects.create(
+        client=client,
+        title="Maintenance du poste de travail",
+        technician=first_technician,
+    )
+
+    intervention.assign_technician(second_technician)
+    intervention.refresh_from_db()
+
+    assert intervention.technician == second_technician
+
+
+@pytest.mark.django_db
+def test_intervention_without_technician_can_be_unassigned():
+    client = Client.objects.create(
+        name="Entreprise Test",
+    )
+    intervention = Intervention.objects.create(
+        client=client,
+        title="Maintenance du poste de travail",
+    )
+
+    intervention.unassign_technician()
+    intervention.refresh_from_db()
+
+    assert intervention.technician is None

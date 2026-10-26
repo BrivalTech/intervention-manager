@@ -1,9 +1,7 @@
-import pytest
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 
-from apps.accounts.models import User
 from apps.clients.models import Client
 
 
@@ -126,44 +124,3 @@ class Intervention(models.Model):
 
         self.technician = None
         self.save(update_fields=["technician", "updated_at"])
-
-    @pytest.mark.django_db
-    def test_technician_can_be_reassigned_on_active_intervention():
-        client = Client.objects.create(
-            naùe="Entreprise Test",
-        )
-        first_technician = User.objects.create_user(
-            username="first-technician",
-            password="test-password",
-            role=User.Role.TECHNICIAN,
-        )
-        second_technician = User.objects.create_user(
-            username="second-technician",
-            password="test-password",
-            role=User.Role.TECHNICIAN,
-        )
-        intervention = Intervention.objects.create(
-            client=client,
-            title="Maintenance du poste de travail",
-            technician=first_technician,
-        )
-
-        intervention.assign_technician(second_technician)
-        intervention.refresh_from_db()
-
-        assert intervention.technician == second_technician
-
-    @pytest.mark.django_db
-    def test_intervention_without__technician_can_be_unassigned():
-        client = Client.objects.create(
-            name="Entreprise Test",
-        )
-        intervention = Intervention.objects.create(
-            client=client,
-            title="Maintenance du poste de travail",
-        )
-
-        intervention.unassign_technician()
-        intervention.refresh_from_db()
-
-        assert intervention.technician is None
