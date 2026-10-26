@@ -105,6 +105,30 @@ class Intervention(models.Model):
                 "La date de fin doit être postérieure à la date de début."
             )
 
+        if (
+            self.technician_id is not None
+            and self.starts_at is not None
+            and self.ends_at is not None
+            and self.ends_at > self.starts_at
+            and self.status != self.Status.CANCELLED
+        ):
+            overlapping = Intervention.objects.filter(
+                technician_id=self.technician_id,
+                starts_at__lt=self.ends_at,
+                ends_at__gt=self.starts_at,
+            ).exclude(
+                status=self.Status.CANCELLED,
+            )
+
+            if self.pk is not None:
+                overlapping = overlapping.exclude(pk=self.pk)
+
+            if overlapping.exists():
+                errors["technician"] = (
+                    "Ce technicien possède déjà une intervention "
+                    "sur cette plage horaire."
+                )
+
         if errors:
             raise ValidationError(errors)
 
@@ -153,7 +177,16 @@ class Intervention(models.Model):
                 "Only a user with a technician role can be assigned to an intervention."
             )
 
+        previous_technician = self.technician
+
         self.technician = technician
+
+        try:
+            self.full_clean()
+        except ValidationError:
+            self.technician = previous_technician
+            raise
+
         self.save(update_fields=["technician", "updated_at"])
 
     def unassign_technician(self):
