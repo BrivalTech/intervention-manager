@@ -44,7 +44,7 @@ def test_user_can_manage_intervention_assignment_based_on_role(role, expected):
     ],
 )
 @pytest.mark.django_db
-def test_admin_and_manager_can_update_intervention(role, action):
+def test_admin_and_manager_can_update_intervention(role, action, intervention_author):
     user = User.objects.create_user(
         username=f"user-{role.lower()}-{action}",
         password="test-password",
@@ -52,6 +52,7 @@ def test_admin_and_manager_can_update_intervention(role, action):
     )
     client = Client.objects.create(name="Entreprise Test")
     intervention = Intervention.objects.create(
+        created_by=intervention_author,
         client=client,
         title="Maintenance du poste de travail",
     )
@@ -68,7 +69,9 @@ def test_admin_and_manager_can_update_intervention(role, action):
     ],
 )
 @pytest.mark.django_db
-def test_technician_can_only_start_or_complete_own_intervention(action, expected):
+def test_technician_can_only_start_or_complete_own_intervention(
+    action, expected, intervention_author
+):
     technician = User.objects.create_user(
         username=f"technician-{action}",
         password="test-password",
@@ -76,6 +79,7 @@ def test_technician_can_only_start_or_complete_own_intervention(action, expected
     )
     client = Client.objects.create(name="Entreprise Test")
     intervention = Intervention.objects.create(
+        created_by=intervention_author,
         client=client,
         title="Maintenance du poste de travail",
         technician=technician,
@@ -93,7 +97,9 @@ def test_technician_can_only_start_or_complete_own_intervention(action, expected
     ],
 )
 @pytest.mark.django_db
-def test_technician_cannot_update_other_technician_intervention(action):
+def test_technician_cannot_update_other_technician_intervention(
+    action, intervention_author
+):
     technician = User.objects.create_user(
         username=f"technician-{action}",
         password="test-password",
@@ -106,6 +112,7 @@ def test_technician_cannot_update_other_technician_intervention(action):
     )
     client = Client.objects.create(name="Entreprise Test")
     intervention = Intervention.objects.create(
+        created_by=intervention_author,
         client=client,
         title="Maintenance du poste de travail",
         technician=other_technician,
@@ -123,7 +130,7 @@ def test_technician_cannot_update_other_technician_intervention(action):
     ],
 )
 @pytest.mark.django_db
-def test_technician_cannot_update_unassigned_intervention(action):
+def test_technician_cannot_update_unassigned_intervention(action, intervention_author):
     technician = User.objects.create_user(
         username=f"technician-{action}",
         password="test-password",
@@ -131,6 +138,7 @@ def test_technician_cannot_update_unassigned_intervention(action):
     )
     client = Client.objects.create(name="Entreprise Test")
     intervention = Intervention.objects.create(
+        created_by=intervention_author,
         client=client,
         title="Maintenance du poste de travail",
     )
@@ -147,7 +155,7 @@ def test_technician_cannot_update_unassigned_intervention(action):
     ],
 )
 @pytest.mark.django_db
-def test_unknown_status_action_is_denied(role):
+def test_unknown_status_action_is_denied(role, intervention_author):
     user = User.objects.create_user(
         username=f"user-{role.lower()}",
         password="test-password",
@@ -155,6 +163,7 @@ def test_unknown_status_action_is_denied(role):
     )
     client = Client.objects.create(name="Entreprise Test")
     intervention = Intervention.objects.create(
+        created_by=intervention_author,
         client=client,
         title="Maintenance du poste de travail",
         technician=user if role == User.Role.TECHNICIAN else None,

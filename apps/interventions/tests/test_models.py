@@ -7,11 +7,12 @@ from apps.interventions.models import Intervention
 
 
 @pytest.mark.django_db
-def test_intervention_can_be_created_for_active_client():
+def test_intervention_can_be_created_for_active_client(intervention_author):
     client = Client.objects.create(
         name="Entreprise Test",
     )
     intervention = Intervention.objects.create(
+        created_by=intervention_author,
         client=client,
         title="Maintenance du poste de travail",
     )
@@ -21,11 +22,12 @@ def test_intervention_can_be_created_for_active_client():
 
 
 @pytest.mark.django_db
-def test_intervention_is_planned_by_default():
+def test_intervention_is_planned_by_default(intervention_author):
     client = Client.objects.create(
         name="Entreprise Test",
     )
     intervention = Intervention.objects.create(
+        created_by=intervention_author,
         client=client,
         title="Maintenance du poste de travail",
     )
@@ -34,11 +36,12 @@ def test_intervention_is_planned_by_default():
 
 
 @pytest.mark.django_db
-def test_intervention_can_be_created_without_scheduled():
+def test_intervention_can_be_created_without_scheduled(intervention_author):
     client = Client.objects.create(
         name="Entreprise Test",
     )
     intervention = Intervention.objects.create(
+        created_by=intervention_author,
         client=client,
         title="Maintenance du poste de travail",
         description="Vérifier le poste utilisateur.",
@@ -49,11 +52,12 @@ def test_intervention_can_be_created_without_scheduled():
 
 
 @pytest.mark.django_db
-def test_intervention_title_is_required():
+def test_intervention_title_is_required(intervention_author):
     client = Client.objects.create(
         name="Entreprise Test",
     )
     intervention = Intervention.objects.create(
+        created_by=intervention_author,
         client=client,
         title="",
     )
@@ -63,8 +67,9 @@ def test_intervention_title_is_required():
 
 
 @pytest.mark.django_db
-def test_intervention_client_is_required():
+def test_intervention_client_is_required(intervention_author):
     intervention = Intervention(
+        created_by=intervention_author,
         title="Maintenance du poste de travail",
     )
 
@@ -73,12 +78,13 @@ def test_intervention_client_is_required():
 
 
 @pytest.mark.django_db
-def test_intervention_cannot_be_created_for_archived_client():
+def test_intervention_cannot_be_created_for_archived_client(intervention_author):
     client = Client.objects.create(
         name="Entreprise Test",
         is_active=False,
     )
     intervention = Intervention.objects.create(
+        created_by=intervention_author,
         client=client,
         title="Maintenance du poste de travail",
     )
@@ -88,11 +94,12 @@ def test_intervention_cannot_be_created_for_archived_client():
 
 
 @pytest.mark.django_db
-def test_intervention_string_representation_is_title():
+def test_intervention_string_representation_is_title(intervention_author):
     client = Client.objects.create(
         name="Entreprise Test",
     )
     intervention = Intervention.objects.create(
+        created_by=intervention_author,
         client=client,
         title="Maintenance du poste de travail",
     )
@@ -101,11 +108,12 @@ def test_intervention_string_representation_is_title():
 
 
 @pytest.mark.django_db
-def test_intervention_status_must_be_valid():
+def test_intervention_status_must_be_valid(intervention_author):
     client = Client.objects.create(
         name="Entreprise Test",
     )
     intervention = Intervention.objects.create(
+        created_by=intervention_author,
         client=client,
         title="Maintenance du poste de travail",
         status="INVALID",
@@ -125,11 +133,12 @@ def test_intervention_status_must_be_valid():
     ],
 )
 @pytest.mark.django_db
-def test_intervention_accepts_valid_satus(status):
+def test_intervention_accepts_valid_satus(status, intervention_author):
     client = Client.objects.create(
         name="Entreprise Test",
     )
     intervention = Intervention.objects.create(
+        created_by=intervention_author,
         client=client,
         title="Maintenance du poste de travail",
         status=status,
@@ -139,11 +148,12 @@ def test_intervention_accepts_valid_satus(status):
 
 
 @pytest.mark.django_db
-def test_planned_intervention_can_be_started():
+def test_planned_intervention_can_be_started(intervention_author):
     client = Client.objects.create(
         name="Entreprise Test",
     )
     intervention = Intervention.objects.create(
+        created_by=intervention_author,
         client=client,
         title="Maintenance du poste de travail",
     )
@@ -155,11 +165,12 @@ def test_planned_intervention_can_be_started():
 
 
 @pytest.mark.django_db
-def test_in_progress_intervention_can_be_completed():
+def test_in_progress_intervention_can_be_completed(intervention_author):
     client = Client.objects.create(
         name="Entreprise Test",
     )
     intervention = Intervention.objects.create(
+        created_by=intervention_author,
         client=client,
         title="Maintenance du poste de travail",
         status=Intervention.Status.IN_PROGRESS,
@@ -179,11 +190,12 @@ def test_in_progress_intervention_can_be_completed():
     ],
 )
 @pytest.mark.django_db
-def test_intervention_can_be_cancelled(status):
+def test_intervention_can_be_cancelled(status, intervention_author):
     client = Client.objects.create(
         name="Entreprise Test",
     )
     intervention = Intervention.objects.create(
+        created_by=intervention_author,
         client=client,
         title="Maintenance du poste de travail",
         status=status,
@@ -204,11 +216,12 @@ def test_intervention_can_be_cancelled(status):
     ],
 )
 @pytest.mark.django_db
-def test_only_planned_intervention_can_be_started(status):
+def test_only_planned_intervention_can_be_started(status, intervention_author):
     client = Client.objects.create(
         name="Entreprise Test",
     )
     intervention = Intervention.objects.create(
+        created_by=intervention_author,
         client=client,
         title="Maintenance du poste de travail",
         status=status,
@@ -227,11 +240,12 @@ def test_only_planned_intervention_can_be_started(status):
     ],
 )
 @pytest.mark.django_db
-def test_only_in_progress_intervention_can_be_completed(status):
+def test_only_in_progress_intervention_can_be_completed(status, intervention_author):
     client = Client.objects.create(
         name="Entreprise Test",
     )
     intervention = Intervention.objects.create(
+        created_by=intervention_author,
         client=client,
         title="Maintenance du poste de travail",
         status=status,
@@ -249,11 +263,14 @@ def test_only_in_progress_intervention_can_be_completed(status):
     ],
 )
 @pytest.mark.django_db
-def test_completed_or_cancelled_intervention_cannot_be_cancelled(initial_status):
+def test_completed_or_cancelled_intervention_cannot_be_cancelled(
+    initial_status, intervention_author
+):
     client = Client.objects.create(
         name="Entreprise Test",
     )
     intervention = Intervention.objects.create(
+        created_by=intervention_author,
         client=client,
         title="Maintenance du poste de travail",
         status=initial_status,
@@ -264,11 +281,12 @@ def test_completed_or_cancelled_intervention_cannot_be_cancelled(initial_status)
 
 
 @pytest.mark.django_db
-def test_intervention_can_be_created_without_technician():
+def test_intervention_can_be_created_without_technician(intervention_author):
     client = Client.objects.create(
         name="Entreprise Test",
     )
     intervention = Intervention.objects.create(
+        created_by=intervention_author,
         client=client,
         title="Maintenance du poste de travail",
     )
@@ -277,7 +295,7 @@ def test_intervention_can_be_created_without_technician():
 
 
 @pytest.mark.django_db
-def test_technician_can_be_assigned_to_an_intervention():
+def test_technician_can_be_assigned_to_an_intervention(intervention_author):
     client = Client.objects.create(
         name="Entreprise Test",
     )
@@ -287,6 +305,7 @@ def test_technician_can_be_assigned_to_an_intervention():
         role=User.Role.TECHNICIAN,
     )
     intervention = Intervention.objects.create(
+        created_by=intervention_author,
         client=client,
         title="Maintenance du poste de travail",
         technician=technician,
@@ -303,7 +322,9 @@ def test_technician_can_be_assigned_to_an_intervention():
     ],
 )
 @pytest.mark.django_db
-def test_non_technician_cannot_be_assigned_to_an_intervention(role):
+def test_non_technician_cannot_be_assigned_to_an_intervention(
+    role, intervention_author
+):
     client = Client.objects.create(
         name="Entreprise Test",
     )
@@ -313,6 +334,7 @@ def test_non_technician_cannot_be_assigned_to_an_intervention(role):
         role=role,
     )
     intervention = Intervention.objects.create(
+        created_by=intervention_author,
         client=client,
         title="Maintenance du poste de travail",
         technician=user,
@@ -323,7 +345,7 @@ def test_non_technician_cannot_be_assigned_to_an_intervention(role):
 
 
 @pytest.mark.django_db
-def test_technician_can_ne_assigned_after_intervention_created():
+def test_technician_can_ne_assigned_after_intervention_created(intervention_author):
     client = Client.objects.create(
         name="Entreprise Test",
     )
@@ -333,6 +355,7 @@ def test_technician_can_ne_assigned_after_intervention_created():
         role=User.Role.TECHNICIAN,
     )
     intervention = Intervention.objects.create(
+        created_by=intervention_author,
         client=client,
         title="Maintenance du poste de travail",
     )
@@ -351,7 +374,9 @@ def test_technician_can_ne_assigned_after_intervention_created():
     ],
 )
 @pytest.mark.django_db
-def test_non_technician_cannot_be_assigned_after_intervention_created(role):
+def test_non_technician_cannot_be_assigned_after_intervention_created(
+    role, intervention_author
+):
     client = Client.objects.create(
         name="Entreprise Test",
     )
@@ -361,6 +386,7 @@ def test_non_technician_cannot_be_assigned_after_intervention_created(role):
         role=role,
     )
     intervention = Intervention.objects.create(
+        created_by=intervention_author,
         client=client,
         title="Maintenance du poste de travail",
         technician=user,
@@ -378,7 +404,9 @@ def test_non_technician_cannot_be_assigned_after_intervention_created(role):
     ],
 )
 @pytest.mark.django_db
-def test_technician_can_be_unassigned_from_active_intervention(status):
+def test_technician_can_be_unassigned_from_active_intervention(
+    status, intervention_author
+):
     client = Client.objects.create(
         name="Entreprise Test",
     )
@@ -388,6 +416,7 @@ def test_technician_can_be_unassigned_from_active_intervention(status):
         role=User.Role.TECHNICIAN,
     )
     intervention = Intervention.objects.create(
+        created_by=intervention_author,
         client=client,
         title="Maintenance du poste de travail",
         technician=technician,
@@ -408,7 +437,9 @@ def test_technician_can_be_unassigned_from_active_intervention(status):
     ],
 )
 @pytest.mark.django_db
-def test_technician_cannot_be_unassigned_from_final_intervention(status):
+def test_technician_cannot_be_unassigned_from_final_intervention(
+    status, intervention_author
+):
     client = Client.objects.create(
         name="Entreprise Test",
     )
@@ -418,6 +449,7 @@ def test_technician_cannot_be_unassigned_from_final_intervention(status):
         role=User.Role.TECHNICIAN,
     )
     intervention = Intervention.objects.create(
+        created_by=intervention_author,
         client=client,
         title="Maintenance du poste de travail",
         technician=technician,
@@ -436,7 +468,9 @@ def test_technician_cannot_be_unassigned_from_final_intervention(status):
     ],
 )
 @pytest.mark.django_db
-def test_technician_cannot_be_assigned_to_finale_intervention(status):
+def test_technician_cannot_be_assigned_to_finale_intervention(
+    status, intervention_author
+):
     client = Client.objects.create(
         name="Entreprise Test",
     )
@@ -446,6 +480,7 @@ def test_technician_cannot_be_assigned_to_finale_intervention(status):
         role=User.Role.TECHNICIAN,
     )
     intervention = Intervention.objects.create(
+        created_by=intervention_author,
         client=client,
         title="Maintenance du poste de travail",
         technician=technician,
@@ -457,7 +492,7 @@ def test_technician_cannot_be_assigned_to_finale_intervention(status):
 
 
 @pytest.mark.django_db
-def test_technician_can_be_reassigned_on_active_intervention():
+def test_technician_can_be_reassigned_on_active_intervention(intervention_author):
     client = Client.objects.create(
         name="Entreprise Test",
     )
@@ -472,6 +507,7 @@ def test_technician_can_be_reassigned_on_active_intervention():
         role=User.Role.TECHNICIAN,
     )
     intervention = Intervention.objects.create(
+        created_by=intervention_author,
         client=client,
         title="Maintenance du poste de travail",
         technician=first_technician,
@@ -484,11 +520,12 @@ def test_technician_can_be_reassigned_on_active_intervention():
 
 
 @pytest.mark.django_db
-def test_intervention_without_technician_can_be_unassigned():
+def test_intervention_without_technician_can_be_unassigned(intervention_author):
     client = Client.objects.create(
         name="Entreprise Test",
     )
     intervention = Intervention.objects.create(
+        created_by=intervention_author,
         client=client,
         title="Maintenance du poste de travail",
     )

@@ -6,7 +6,11 @@ def create_intervention(
     *,
     client,
     title,
+    created_by,
     description="",
+    address="",
+    postal_code="",
+    city="",
     scheduled_at=None,
     technician=None,
 ):
@@ -14,7 +18,11 @@ def create_intervention(
     intervention = Intervention(
         client=client,
         title=title,
+        created_by=created_by,
         description=description,
+        address=address,
+        postal_code=postal_code,
+        city=city,
         scheduled_at=scheduled_at,
         technician=technician,
     )

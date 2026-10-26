@@ -19,6 +19,11 @@ class Intervention(models.Model):
         on_delete=models.PROTECT,
         related_name="interventions",
     )
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="created_interventions",
+    )
     title = models.CharField(max_length=255)
     status = models.CharField(
         max_length=20,
@@ -26,6 +31,9 @@ class Intervention(models.Model):
         default=Status.PLANNED,
     )
     description = models.TextField(blank=True)
+    address = models.CharField(max_length=255, blank=True)
+    postal_code = models.CharField(max_length=20, blank=True)
+    city = models.CharField(max_length=100, blank=True)
     scheduled_at = models.DateTimeField(null=True, blank=True)
     technician = models.ForeignKey(
         settings.AUTH_USER_MODEL,
