@@ -414,12 +414,15 @@ def test_status_service_preserves_final_intervention_state(
     else:
         intervention.cancel()
 
-        with pytest.raises(ValidationError):
-            update_intervention_status(
-                user=manager,
-                intervention=intervention,
-                action="start",
-            )
+    with pytest.raises(PermissionError):
+        update_intervention_status(
+            user=manager,
+            intervention=intervention,
+            action="start",
+        )
+
+    intervention.refresh_from_db()
+    assert intervention.status == final_status
 
 
 @pytest.mark.django_db
