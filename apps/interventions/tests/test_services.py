@@ -1,5 +1,8 @@
+from datetime import timedelta
+
 import pytest
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 from apps.accounts.models import User
 from apps.clients.models import Client
@@ -274,10 +277,13 @@ def test_manager_can_start_intervention(intervention_author):
         password="test-password",
         role=User.Role.MANAGER,
     )
+    start = timezone.now() + timedelta(days=1)
     intervention = create_intervention(
         created_by=intervention_author,
         client=client,
         title="Maintenance du poste de travail",
+        starts_at=start,
+        ends_at=start + timedelta(hours=2),
     )
 
     update_intervention_status(
@@ -301,11 +307,14 @@ def test_technician_can_complete_own_intervention(intervention_author):
         password="test-password",
         role=User.Role.TECHNICIAN,
     )
+    start = timezone.now() + timedelta(days=1)
     intervention = create_intervention(
         created_by=intervention_author,
         client=client,
         title="Maintenance du poste de travail",
         technician=technician,
+        starts_at=start,
+        ends_at=start + timedelta(hours=2),
     )
 
     intervention.start()
@@ -389,10 +398,13 @@ def test_status_service_preserves_final_intervention_state(
         password="test-password",
         role=User.Role.MANAGER,
     )
+    start = timezone.now() + timedelta(days=1)
     intervention = create_intervention(
         created_by=intervention_author,
         client=client,
         title="Maintenance du poste de travail",
+        starts_at=start,
+        ends_at=start + timedelta(hours=2),
     )
 
     if final_status == Intervention.Status.COMPLETED:
@@ -407,3 +419,32 @@ def test_status_service_preserves_final_intervention_state(
                 intervention=intervention,
                 action="start",
             )
+
+
+@pytest.mark.django_db
+def test_create_intervention_without_dates_is_to_plan(intervention_author):
+    client = Client.objects.create(name="Client à planifier")
+    intervention = create_intervention(
+        client=client,
+        created_by=intervention_author,
+        title="Intervention à planifier",
+    )
+
+    assert intervention.status == Intervention.Status.TO_PLAN
+    assert intervention.starts_at is None
+    assert intervention.ends_at is None
+
+
+@pytest.mark.django_db
+def test_create_intervention_with_dates_is_planned(intervention_author):
+    client = Client.objects.create(name="Client planifié")
+    start = timezone.now() + timedelta(days=1)
+    intervention = create_intervention(
+        client=client,
+        created_by=intervention_author,
+        title="Intervention planifiée",
+        starts_at=start,
+        ends_at=start + timedelta(hours=2),
+    )
+
+    assert intervention.status == Intervention.Status.PLANNED

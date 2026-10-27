@@ -714,6 +714,10 @@ textarea.form-control {
     margin-bottom: var(--space-2);
 }
 
+.status--to_plan {
+    color: var(--color-text-muted);
+}
+
 .status--planned {
     color: var(--color-info);
 }

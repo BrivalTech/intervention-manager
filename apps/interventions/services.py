@@ -27,6 +27,11 @@ def create_intervention(
         starts_at=starts_at,
         ends_at=ends_at,
         technician=technician,
+        status=(
+            Intervention.Status.PLANNED
+            if starts_at is not None and ends_at is not None
+            else Intervention.Status.TO_PLAN
+        ),
     )
 
     intervention.full_clean()

@@ -9,6 +9,7 @@ class Intervention(models.Model):
     """Represent an intervention performed for a client."""
 
     class Status(models.TextChoices):
+        TO_PLAN = "TO_PLAN", "À planifier"
         PLANNED = "PLANNED", "Planifiée"
         IN_PROGRESS = "IN_PROGRESS", "En cours"
         COMPLETED = "COMPLETED", "Terminée"
@@ -28,7 +29,7 @@ class Intervention(models.Model):
     status = models.CharField(
         max_length=20,
         choices=Status.choices,
-        default=Status.PLANNED,
+        default=Status.TO_PLAN,
     )
     description = models.TextField(blank=True)
     report = models.TextField(
@@ -180,6 +181,7 @@ class Intervention(models.Model):
     def cancel(self):
         """Cancel a planned or in-progress intervention."""
         if self.status not in {
+            self.Status.TO_PLAN,
             self.Status.PLANNED,
             self.Status.IN_PROGRESS,
         }:

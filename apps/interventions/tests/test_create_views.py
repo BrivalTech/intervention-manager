@@ -74,7 +74,7 @@ def test_authorized_user_can_create_intervention(
         args=[intervention.pk],
     )
     assert intervention.created_by == intervention_author
-    assert intervention.status == Intervention.Status.PLANNED
+    assert intervention.status == Intervention.Status.TO_PLAN
 
 
 @pytest.mark.django_db

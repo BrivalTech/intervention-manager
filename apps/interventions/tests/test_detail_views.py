@@ -1,5 +1,8 @@
+from datetime import timedelta
+
 import pytest
 from django.urls import reverse
+from django.utils import timezone
 
 from apps.accounts.models import User
 from apps.clients.models import Client
@@ -158,6 +161,12 @@ def test_completed_intervention_displays_report(
     intervention_author,
     intervention,
 ):
+    start = timezone.now() + timedelta(days=1)
+    intervention.starts_at = start
+    intervention.ends_at = start + timedelta(hours=2)
+    intervention.status = Intervention.Status.PLANNED
+    intervention.full_clean()
+    intervention.save(update_fields=["starts_at", "ends_at", "status", "updated_at"])
     intervention.start()
     intervention.complete("Maintenance effectuée.\nTests de fonctionnement réussis.")
 
@@ -165,12 +174,9 @@ def test_completed_intervention_displays_report(
     response = client.get(reverse("interventions:detail", args=[intervention.pk]))
 
     assert response.status_code == 200
-
-    content = response.content.decode()
-
-    assert "Compte rendu d'intervention" in content
-    assert "Maintenance effectuée." in content
-    assert "Tests de fonctionnement réussis." in content
+    assert "Compte rendu d'intervention" in response.content.decode()
+    assert "Maintenance effectuée." in response.content.decode()
+    assert "Tests de fonctionnement réussis." in response.content.decode()
 
 
 @pytest.mark.django_db
@@ -212,14 +218,14 @@ def test_intervention_detail_preserves_list_filters(
         reverse("interventions:detail", args=[intervention.pk]),
         {
             "q": "maintenance serveur",
-            "status": Intervention.Status.PLANNED,
+            "status": Intervention.Status.TO_PLAN,
             "page": "2",
         },
     )
 
     assert response.status_code == 200
 
-    expected_query = "q=maintenance+serveur&amp;status=PLANNED&amp;page=2"
+    expected_query = "q=maintenance+serveur&amp;status=TO_PLAN&amp;page=2"
 
     assert expected_query in response.content.decode()
     assert reverse("interventions:list") in response.content.decode()
@@ -251,7 +257,7 @@ def test_intervention_list_preserves_filters_in_detail_link(
         reverse("interventions:list"),
         {
             "q": "Maintenance",
-            "status": Intervention.Status.PLANNED,
+            "status": Intervention.Status.TO_PLAN,
         },
     )
 
@@ -262,5 +268,5 @@ def test_intervention_list_preserves_filters_in_detail_link(
         args=[intervention.pk],
     )
     assert (
-        f"{expected_url}?q=Maintenance&amp;status=PLANNED" in response.content.decode()
+        f"{expected_url}?q=Maintenance&amp;status=TO_PLAN" in response.content.decode()
     )
