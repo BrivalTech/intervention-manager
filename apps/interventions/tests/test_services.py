@@ -569,3 +569,55 @@ def test_technician_cannot_update_intervention(intervention_author):
 
     intervention.refresh_from_db()
     assert intervention.title == "Intervention protégée"
+
+
+@pytest.mark.django_db
+def test_update_intervention_keeps_data_on_validation_error(
+    intervention_author,
+):
+    customer = Client.objects.create(name="Client validation")
+    intervention = create_intervention(
+        client=customer,
+        created_by=intervention_author,
+        title="Titre initial",
+    )
+
+    with pytest.raises(ValidationError):
+        update_intervention(
+            user=intervention_author,
+            intervention=intervention,
+            title="Titre modifié",
+            starts_at=timezone.now() + timedelta(days=1),
+        )
+
+    intervention.refresh_from_db()
+
+    assert intervention.title == "Titre initial"
+    assert intervention.starts_at is None
+    assert intervention.status == Intervention.Status.TO_PLAN
+
+
+@pytest.mark.django_db
+def test_cannot_update_completed_intervention(
+    intervention_author,
+):
+    customer = Client.objects.create(name="Client terminé")
+    intervention = create_intervention(
+        client=customer,
+        created_by=intervention_author,
+        title="Intervention terminée",
+    )
+
+    intervention.status = Intervention.Status.COMPLETED
+    intervention.report = "Intervention réalisée."
+    intervention.save(update_fields=["status", "report"])
+
+    with pytest.raises(PermissionError):
+        update_intervention(
+            user=intervention_author,
+            intervention=intervention,
+            title="Modification interdite",
+        )
+
+    intervention.refresh_from_db()
+    assert intervention.title == "Intervention terminée"
