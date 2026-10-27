@@ -227,39 +227,31 @@ def intervention_edit(request, pk):
 @login_required
 @require_POST
 def intervention_status_update(request, pk, action):
-    """Perform an authorized intervention status transition."""
+    """Start or cancel an intervention when authorized."""
     intervention = get_object_or_404(Intervention, pk=pk)
+
+    if action not in {"start", "cancel"}:
+        raise PermissionDenied
 
     if not can_update_status(request.user, intervention, action):
         raise PermissionDenied
-
-    report = request.POST.get("report") if action == "complete" else None
 
     try:
         update_intervention_status(
             user=request.user,
             intervention=intervention,
             action=action,
-            report=report,
         )
     except ValidationError as exc:
-        messages.error(
-            request,
-            "; ".join(exc.messages),
-        )
+        messages.error(request, "; ".join(exc.messages))
     else:
         success_messages = {
             "start": "L'intervention a été démarrée.",
-            "complete": "L'intervention a été terminée.",
             "cancel": "L'intervention a été annulée.",
         }
-
         messages.success(request, success_messages[action])
 
-    return redirect(
-        "interventions:detail",
-        pk=intervention.pk,
-    )
+    return redirect("interventions:detail", pk=intervention.pk)
 
 
 @login_required

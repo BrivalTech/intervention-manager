@@ -82,7 +82,7 @@ def test_manager_can_cancel_intervention(
 
 
 @pytest.mark.django_db
-def test_manager_can_complete_with_report(
+def test_direct_completion_endpoint_is_forbidden(
     client,
     intervention_author,
     status_intervention,
@@ -92,28 +92,10 @@ def test_manager_can_complete_with_report(
     client.force_login(intervention_author)
     response = client.post(
         status_url(status_intervention, "complete"),
-        {"report": "Intervention réalisée avec succès."},
+        {"report": "Compte rendu valide."},
     )
 
-    assert response.status_code == 302
-
-    status_intervention.refresh_from_db()
-    assert status_intervention.status == Intervention.Status.COMPLETED
-    assert status_intervention.report == "Intervention réalisée avec succès."
-
-
-@pytest.mark.django_db
-def test_cannot_complete_without_report(
-    client,
-    intervention_author,
-    status_intervention,
-):
-    status_intervention.status = Intervention.Status.IN_PROGRESS
-    status_intervention.save(update_fields=["status"])
-    client.force_login(intervention_author)
-    response = client.post(status_url(status_intervention, "complete"))
-
-    assert response.status_code == 302
+    assert response.status_code == 403
 
     status_intervention.refresh_from_db()
     assert status_intervention.status == Intervention.Status.IN_PROGRESS

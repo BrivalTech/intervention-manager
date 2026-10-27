@@ -1,6 +1,7 @@
 import pytest
 from django.urls import reverse
 
+from apps.accounts.models import User
 from apps.clients.models import Client
 from apps.interventions.models import Intervention
 
@@ -98,3 +99,72 @@ def test_completed_intervention_cannot_be_completed_again(
     )
 
     assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_assigned_technician_can_complete_intervention(
+    client,
+    django_user_model,
+    in_progress_intervention,
+):
+    technician = django_user_model.objects.create_user(
+        username="assigned-completion-tech",
+        role=User.Role.TECHNICIAN,
+    )
+
+    in_progress_intervention.technician = technician
+    in_progress_intervention.save(update_fields=["technician"])
+    client.force_login(technician)
+    response = client.post(
+        reverse(
+            "interventions:complete",
+            args=[in_progress_intervention.pk],
+        ),
+        {"report": "Travaux effectués et vérifiés."},
+    )
+
+    assert response.status_code == 302
+
+    in_progress_intervention.refresh_from_db()
+    assert in_progress_intervention.status == Intervention.Status.COMPLETED
+
+
+@pytest.mark.django_db
+def test_unassigned_technician_cannot_complete_intervention(
+    client,
+    django_user_model,
+    in_progress_intervention,
+):
+    technician = django_user_model.objects.create_user(
+        username="unassigned-completion-tech",
+        role=User.Role.TECHNICIAN,
+    )
+
+    client.force_login(technician)
+    response = client.post(
+        reverse(
+            "interventions:complete",
+            args=[in_progress_intervention.pk],
+        ),
+        {"report": "Tentative non autorisée."},
+    )
+
+    assert response.status_code == 403
+
+    in_progress_intervention.refresh_from_db()
+    assert in_progress_intervention.status == Intervention.Status.IN_PROGRESS
+
+
+@pytest.mark.django_db
+def test_anonymous_user_cannot_access_completion(
+    client,
+    in_progress_intervention,
+):
+    response = client.get(
+        reverse(
+            "interventions:complete",
+            args=[in_progress_intervention.pk],
+        )
+    )
+
+    assert response.status_code == 302
