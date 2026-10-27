@@ -7,14 +7,23 @@
     <section aria-labelledby="intervention-detail-title">
         <header class="entity-detail__header">
             <div class="stack">
-                <a
-                    href="{% url 'interventions:list' %}{% if list_query %}?{{ list_query }}{% endif %}"
+                <a href="{% url 'interventions:list' %}{% if list_query %}?{{ list_query }}{% endif %}"
                     class="link"
                 >
                     Retour aux interventions
                 </a>
                 <h1 id="intervention-detail-title">{{ intervention.title }}</h1>
             </div>
+
+            {% if can_edit_intervention %}
+                <div class="entity-detail__actions cluster">
+                    <a href="{% url 'interventions:edit' intervention.pk %}"
+                        class="button button--primary"
+                    >
+                        Modifier l'intervention
+                    </a>
+                </div>
+            {% endif %}
         </header>
         <div class="status status--{{ intervention.status|lower }}">
             {{ intervention.get_status_display }}

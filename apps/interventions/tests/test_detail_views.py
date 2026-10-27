@@ -270,3 +270,79 @@ def test_intervention_list_preserves_filters_in_detail_link(
     assert (
         f"{expected_url}?q=Maintenance&amp;status=TO_PLAN" in response.content.decode()
     )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("role", "expected"),
+    [
+        (User.Role.ADMIN, True),
+        (User.Role.MANAGER, True),
+        (User.Role.TECHNICIAN, False),
+    ],
+)
+def test_edit_link_visibility_by_role(
+    client,
+    django_user_model,
+    intervention,
+    role,
+    expected,
+):
+    user = django_user_model.objects.create_user(
+        username=f"detail-edit-{role.lower()}",
+        role=role,
+    )
+
+    if role == User.Role.TECHNICIAN:
+        intervention.assign_technician(user)
+
+    client.force_login(user)
+    response = client.get(reverse("interventions:detail", args=[intervention.pk]))
+
+    assert response.status_code == 200
+
+    edit_url = reverse(
+        "interventions:edit",
+        args=[intervention.pk],
+    )
+
+    if expected:
+        assert edit_url in response.content.decode()
+    else:
+        assert edit_url not in response.content.decode()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("status", "expected"),
+    [
+        (Intervention.Status.TO_PLAN, True),
+        (Intervention.Status.PLANNED, True),
+        (Intervention.Status.IN_PROGRESS, False),
+        (Intervention.Status.COMPLETED, False),
+        (Intervention.Status.CANCELLED, False),
+    ],
+)
+def test_edit_link_visibility_by_status(
+    client,
+    intervention_author,
+    intervention,
+    status,
+    expected,
+):
+    intervention.status = status
+    intervention.save(update_fields=["status"])
+    client.force_login(intervention_author)
+    response = client.get(reverse("interventions:detail", args=[intervention.pk]))
+
+    assert response.status_code == 200
+
+    edit_url = reverse(
+        "interventions:edit",
+        args=[intervention.pk],
+    )
+
+    if expected:
+        assert edit_url in response.content.decode()
+    else:
+        assert edit_url not in response.content.decode()

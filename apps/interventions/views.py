@@ -95,6 +95,10 @@ def intervention_detail(request, pk):
         {
             "intervention": intervention,
             "list_query": request.GET.urlencode(),
+            "can_edit_intervention": can_edit_intervention(
+                request.user,
+                intervention,
+            ),
         },
     )
 
