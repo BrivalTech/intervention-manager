@@ -712,6 +712,7 @@ textarea.form-control {
     border-radius: var(--border-radius-sm);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
+    margin-bottom: var(--space-2);
 }
 
 .status--planned {

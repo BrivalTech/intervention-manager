@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}
+    {{ intervention.title }} | Gestionnaire d'interventions
+{% endblock %}
+
+{% block content %}
+    <section aria-labelledby="intervention-detail-title">
+        <header class="entity-detail__header">
+            <div class="stack">
+                <a href="{% url 'interventions:list' %}" class="link">
+                    Retour aux interventions
+                </a>
+                <h1 id="intervention-detail-title">{{ intervention.title }}</h1>
+            </div>
+        </header>
+        <div class="status status--{{ intervention.status|lower }}">
+            {{ intervention.get_status_display }}
+        </div>
+        <div class="entity-detail__grid">
+            <section
+                class="card stack"
+                aria-labelledby="intervention-info-title"
+            >
+                <h2 id="intervention-info-title">Informations générales</h2>
+                <dl class="entity-detail__info">
+                    <div>
+                        <dt>Client</dt>
+                        <dd>{{ intervention.client.name }}</dd>
+                    </div>
+                    <div>
+                        <dt>Technicien</dt>
+                        <dd>
+                            {% if intervention.technician %}
+                                {{ intervention.technician.get_full_name|default:intervention.technician.username }}
+                            {% else %}
+                                Non affecté
+                            {% endif %}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Créée le</dt>
+                        <dd>
+                            <time datetime="{{ intervention.created_at|date:'c' }}">
+                                {{ intervention.created_at|date:"d/m/Y H:i" }}
+                            </time>
+                        </dd>
+                    </div>
+                </dl>
+            </section>
+
+            <section
+                class="card stack"
+                aria-labelledby="intervention-schedule-title"
+            >
+                <h2 id="intervention-schedule-title">Planification</h2>
+
+                {% if intervention.starts_at and intervention.ends_at %}
+                    <dl class="entity-detail__info">
+                        <div>
+                            <dt>Début</dt>
+                            <dd>
+                                <time datetime="{{ intervention.starts_at|date:'c' }}">
+                                    {{ intervention.starts_at|date:"d/m/Y H:i" }}
+                                </time>
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>Fin</dt>
+                            <dd>
+                                <time datetime="{{ intervention.ends_at|date:'c' }}">
+                                    {{ intervention.ends_at|date:"d/m/Y H:i" }}
+                                </time>
+                            </dd>
+                        </div>
+                    </dl>
+                {% else %}
+                    <p>Intervention non planifiée.</p>
+                {% endif %}
+            </section>
+        </div>
+    </section>
+{% endblock %}

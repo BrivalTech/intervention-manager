@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db.models import Q
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 
 from apps.accounts.models import User
 from apps.interventions.models import Intervention
@@ -57,5 +57,33 @@ def intervention_list(request):
             "search_query": search_query,
             "status_filter": status_filter,
             "status_choices": Intervention.Status.choices,
+        },
+    )
+
+
+@login_required
+def intervention_detail(request, pk):
+    """Display an intervention according to the user's role."""
+    if not can_view_interventions(request.user):
+        raise PermissionDenied
+
+    interventions = Intervention.objects.select_related(
+        "client",
+        "technician",
+        "created_by",
+    )
+
+    if request.user.role == User.Role.TECHNICIAN:
+        interventions = interventions.filter(
+            technician=request.user,
+        )
+
+    intervention = get_object_or_404(interventions, pk=pk)
+
+    return render(
+        request,
+        "interventions/intervention_detail.html",
+        {
+            "intervention": intervention,
         },
     )
