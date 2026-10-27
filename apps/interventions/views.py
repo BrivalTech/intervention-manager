@@ -1,12 +1,18 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import Paginator
 from django.db.models import Q
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 
 from apps.accounts.models import User
+from apps.interventions.forms import InterventionForm
 from apps.interventions.models import Intervention
-from apps.interventions.permissions import can_view_interventions
+from apps.interventions.permissions import (
+    can_create_intervention,
+    can_view_interventions,
+)
+from apps.interventions.services import create_intervention
 
 
 @login_required
@@ -88,4 +94,48 @@ def intervention_detail(request, pk):
             "intervention": intervention,
             "list_query": request.GET.urlencode(),
         },
+    )
+
+
+@login_required
+def intervention_create(request):
+    """Create an intervention for an authorized user."""
+    if not can_create_intervention(request.user):
+        raise PermissionDenied
+
+    if request.method == "POST":
+        form = InterventionForm(request.POST)
+        form.instance.created_by = request.user
+
+        if form.is_valid():
+            try:
+                intervention = create_intervention(
+                    created_by=request.user,
+                    **form.cleaned_data,
+                )
+            except ValidationError as exc:
+                if hasattr(exc, "error_dict"):
+                    for field, errors in exc.error_dict.items():
+                        form.add_error(
+                            field if field in form.fields else None,
+                            errors,
+                        )
+                else:
+                    form.add_error(None, exc)
+            else:
+                messages.success(
+                    request,
+                    "L'intervention a été créée avec succès.",
+                )
+                return redirect(
+                    "interventions:detail",
+                    pk=intervention.pk,
+                )
+    else:
+        form = InterventionForm()
+
+    return render(
+        request,
+        "interventions/intervention_form.html",
+        {"form": form},
     )

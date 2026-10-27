@@ -17,9 +17,9 @@ class InterventionForm(forms.ModelForm):
             "address",
             "postal_code",
             "city",
+            "technician",
             "starts_at",
             "ends_at",
-            "technician",
         ]
         labels = {
             "client": "Client",
@@ -28,9 +28,9 @@ class InterventionForm(forms.ModelForm):
             "address": "Adresse",
             "postal_code": "Code postal",
             "city": "Ville",
+            "technician": "Technicien",
             "starts_at": "Date et heure de début",
             "ends_at": "Date et heure de fin",
-            "technician": "Technicien",
         }
         widgets = {
             "description": forms.Textarea(attrs={"rows": 4}),
