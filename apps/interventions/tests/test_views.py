@@ -303,3 +303,36 @@ def test_intervention_pagination_preserves_filters(client, intervention_author):
     assert response.context["status_filter"] == Intervention.Status.PLANNED
     assert b"q=Maintenance" in response.content
     assert b"status=PLANNED" in response.content
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("role", "expected"),
+    [
+        (User.Role.ADMIN, True),
+        (User.Role.MANAGER, True),
+        (User.Role.TECHNICIAN, False),
+    ],
+)
+def test_create_intervention_link_visibility(
+    client,
+    django_user_model,
+    role,
+    expected,
+):
+    user = django_user_model.objects.create_user(
+        username=f"list-create-{role.lower()}",
+        role=role,
+    )
+
+    client.force_login(user)
+    response = client.get(reverse("interventions:list"))
+
+    assert response.status_code == 200
+
+    create_url = reverse("interventions:create")
+
+    if expected:
+        assert create_url in response.content.decode()
+    else:
+        assert create_url not in response.content.decode()

@@ -8,6 +8,14 @@
                 <h1 id="interventions-title">Interventions</h1>
                 <p>Consultez les interventions enregistrées.</p>
             </div>
+
+            {% if can_create_intervention %}
+                <a href="{% url 'interventions:create' %}"
+                    class="button button--primary"
+                >
+                    Créer une intervention
+                </a>
+            {% endif %}
         </header>
 
         <form method="get" action="{% url 'interventions:list' %}"

@@ -64,6 +64,7 @@ def intervention_list(request):
             "status_filter": status_filter,
             "status_choices": Intervention.Status.choices,
             "list_query": request.GET.urlencode(),
+            "can_create_intervention": can_create_intervention(request.user),
         },
     )
 
