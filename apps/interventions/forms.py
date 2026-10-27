@@ -93,3 +93,30 @@ class InterventionForm(forms.ModelForm):
             raise forms.ValidationError("Le titre de l'intervention est obligatoire.")
 
         return title
+
+
+class InterventionCompletionForm(forms.Form):
+    """Validate the report required to complete an intervention."""
+
+    report = forms.CharField(
+        label="Compte rendu d'intervention",
+        required=True,
+        strip=True,
+        widget=forms.Textarea(
+            attrs={
+                "rows": 8,
+                "class": "form-control",
+            }
+        ),
+        error_messages={
+            "required": "Le compte rendu est obligatoire.",
+        },
+    )
+
+    def clean_report(self):
+        report = self.cleaned_data["report"].strip()
+
+        if not report:
+            raise forms.ValidationError("Le compte rendu est obligatoire.")
+
+        return report

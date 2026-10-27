@@ -14,4 +14,9 @@ urlpatterns = [
         views.intervention_status_update,
         name="status_update",
     ),
+    path(
+        "<int:pk>/complete/",
+        views.intervention_complete,
+        name="complete",
+    ),
 ]

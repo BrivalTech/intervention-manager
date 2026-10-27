@@ -4,10 +4,10 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_http_methods, require_POST
 
 from apps.accounts.models import User
-from apps.interventions.forms import InterventionForm
+from apps.interventions.forms import InterventionCompletionForm, InterventionForm
 from apps.interventions.models import Intervention
 from apps.interventions.permissions import (
     can_create_intervention,
@@ -114,6 +114,11 @@ def intervention_detail(request, pk):
                 request.user,
                 intervention,
                 "cancel",
+            ),
+            "can_complete": can_update_status(
+                request.user,
+                intervention,
+                "complete",
             ),
         },
     )
@@ -254,4 +259,54 @@ def intervention_status_update(request, pk, action):
     return redirect(
         "interventions:detail",
         pk=intervention.pk,
+    )
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def intervention_complete(request, pk):
+    """Complete an intervention with a mandatory report."""
+    intervention = get_object_or_404(Intervention, pk=pk)
+
+    if not can_update_status(request.user, intervention, "complete"):
+        raise PermissionDenied
+
+    if request.method == "POST":
+        form = InterventionCompletionForm(request.POST)
+        if form.is_valid():
+            try:
+                update_intervention_status(
+                    user=request.user,
+                    intervention=intervention,
+                    action="complete",
+                    report=form.cleaned_data["report"],
+                )
+            except ValidationError as exc:
+                if hasattr(exc, "error_dict"):
+                    for field, errors in exc.error_dict.items():
+                        form.add_error(
+                            field if field in form.fields else None,
+                            errors,
+                        )
+                else:
+                    form.add_error(None, exc)
+            else:
+                messages.success(
+                    request,
+                    "L'intervention a été terminée avec succès.",
+                )
+                return redirect(
+                    "interventions:detail",
+                    pk=intervention.pk,
+                )
+    else:
+        form = InterventionCompletionForm()
+
+    return render(
+        request,
+        "interventions/intervention_complete.html",
+        {
+            "form": form,
+            "intervention": intervention,
+        },
     )
