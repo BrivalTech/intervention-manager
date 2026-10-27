@@ -15,6 +15,19 @@ def can_view_interventions(user):
     )
 
 
+def can_create_intervention(user):
+    """Check whether the user can create an intervention."""
+    return (
+        user.is_authenticated
+        and user.is_active
+        and user.role
+        in {
+            User.Role.ADMIN,
+            User.Role.MANAGER,
+        }
+    )
+
+
 def can_manage_assignment(user):
     """Return whether the user can manage technician assignment."""
     return user.role in {
