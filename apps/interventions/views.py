@@ -4,6 +4,7 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 
 from apps.accounts.models import User
 from apps.interventions.forms import InterventionForm
@@ -11,9 +12,14 @@ from apps.interventions.models import Intervention
 from apps.interventions.permissions import (
     can_create_intervention,
     can_edit_intervention,
+    can_update_status,
     can_view_interventions,
 )
-from apps.interventions.services import create_intervention, update_intervention
+from apps.interventions.services import (
+    create_intervention,
+    update_intervention,
+    update_intervention_status,
+)
 
 
 @login_required
@@ -200,4 +206,42 @@ def intervention_edit(request, pk):
             "intervention": intervention,
             "is_edit": True,
         },
+    )
+
+
+@login_required
+@require_POST
+def intervention_status_update(request, pk, action):
+    """Perform an authorized intervention status transition."""
+    intervention = get_object_or_404(Intervention, pk=pk)
+
+    if not can_update_status(request.user, intervention, action):
+        raise PermissionDenied
+
+    report = request.POST.get("report") if action == "complete" else None
+
+    try:
+        update_intervention_status(
+            user=request.user,
+            intervention=intervention,
+            action=action,
+            report=report,
+        )
+    except ValidationError as exc:
+        messages.error(
+            request,
+            "; ".join(exc.messages),
+        )
+    else:
+        success_messages = {
+            "start": "L'intervention a été démarrée.",
+            "complete": "L'intervention a été terminée.",
+            "cancel": "L'intervention a été annulée.",
+        }
+
+        messages.success(request, success_messages[action])
+
+    return redirect(
+        "interventions:detail",
+        pk=intervention.pk,
     )
