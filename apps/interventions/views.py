@@ -10,9 +10,10 @@ from apps.interventions.forms import InterventionForm
 from apps.interventions.models import Intervention
 from apps.interventions.permissions import (
     can_create_intervention,
+    can_edit_intervention,
     can_view_interventions,
 )
-from apps.interventions.services import create_intervention
+from apps.interventions.services import create_intervention, update_intervention
 
 
 @login_required
@@ -139,4 +140,60 @@ def intervention_create(request):
         request,
         "interventions/intervention_form.html",
         {"form": form},
+    )
+
+
+@login_required
+def intervention_edit(request, pk):
+    """Edit an intervention when the user has permission."""
+    intervention = get_object_or_404(
+        Intervention.objects.select_related(
+            "client",
+            "technician",
+            "created_by",
+        ),
+        pk=pk,
+    )
+
+    if not can_edit_intervention(request.user, intervention):
+        raise PermissionDenied
+
+    if request.method == "POST":
+        form = InterventionForm(request.POST, instance=intervention)
+        if form.is_valid():
+            try:
+                update_intervention(
+                    user=request.user,
+                    intervention=intervention,
+                    **form.cleaned_data,
+                )
+            except ValidationError as exc:
+                if hasattr(exc, "error_dict"):
+                    for field, errors in exc.error_dict.items():
+                        form.add_error(
+                            field if field in form.fields else None,
+                            errors,
+                        )
+                else:
+                    form.add_error(None, exc)
+            else:
+                messages.success(
+                    request,
+                    "L'intervention a été modifiée avec succès.",
+                )
+                return redirect(
+                    "interventions:detail",
+                    pk=intervention.pk,
+                )
+    else:
+        form = InterventionForm(instance=intervention)
+
+    return render(
+        request,
+        "interventions/intervention_form.html",
+        {
+            "form": form,
+            "intervention": intervention,
+            "is_edit": True,
+        },
     )

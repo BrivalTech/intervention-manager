@@ -1,14 +1,29 @@
 {% extends "base.html" %}
 {% block title %}
-    Créer une intervention | Gestionnaire d'interventions
+    {% if is_edit %}
+        Modifier une intervention
+    {% else %}
+        Créer une intervention
+    {% endif %}
+    | Gestionnaire d'interventions
 {% endblock %}
 
 {% block content %}
     <section aria-labelledby="intervention-form-title">
         <header class="stack">
-            <h1 id="intervention-form-title">Créer une intervention</h1>
+            <h1 id="intervention-form-title">
+                {% if is_edit %}
+                    Modifier l'intervention
+                {% else %}
+                    Créer une intervention
+                {% endif %}
+            </h1>
             <p>
-                Renseignez les informations de la nouvelle intervention.
+                {% if is_edit %}
+                    Modifiez les informations de l'intervention.
+                {% else %}
+                    Renseignez les informations de la nouvelle intervention.
+                {% endif %}
                 Les champs marqués d'un astérisque (*) sont obligatoires.
             </p>
         </header>
@@ -72,7 +87,7 @@
                     Enregistrer l'intervention
                 </button>
                 <a
-                    href="{% url 'interventions:list' %}"
+                    href="{% if is_edit %}{% url 'interventions:detail' intervention.pk %}{% else %}{% url 'interventions:list' %}{% endif %}"
                     class="button button--secondary"
                 >
                     Annuler
