@@ -110,3 +110,37 @@ def test_technician_cannot_submit_creation_form(
 
     assert response.status_code == 403
     assert Intervention.objects.count() == 0
+
+
+@pytest.mark.django_db
+def test_create_without_dates_sets_to_plan(
+    client,
+    intervention_author,
+    creation_data,
+):
+    client.force_login(intervention_author)
+    response = client.post(reverse("interventions:create"), creation_data)
+
+    assert response.status_code == 302
+
+    intervention = Intervention.objects.get(title="Maintenance réseau")
+
+    assert intervention.status == Intervention.Status.TO_PLAN
+
+
+@pytest.mark.django_db
+def test_create_with_dates_sets_planned(
+    client,
+    intervention_author,
+    creation_data,
+):
+    client.force_login(intervention_author)
+    creation_data["starts_at"] = "2026-11-10T09:00"
+    creation_data["ends_at"] = "2026-11-10T11:00"
+    response = client.post(reverse("interventions:create"), creation_data)
+
+    assert response.status_code == 302
+
+    intervention = Intervention.objects.get(title="Maintenance réseau")
+
+    assert intervention.status == Intervention.Status.PLANNED

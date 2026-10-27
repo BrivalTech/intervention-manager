@@ -38,12 +38,16 @@ class InterventionForm(forms.ModelForm):
             "postal_code": forms.TextInput(attrs={"autocomplete": "postal-code"}),
             "city": forms.TextInput(attrs={"autocomplete": "address-level2"}),
             "starts_at": forms.DateTimeInput(
-                format="%Y-%m-%dT%H:%M",
-                attrs={"type": "datetime-local"},
+                format="%Y-%m-%dT%H:%M", attrs={"type": "datetime-local"}
             ),
             "ends_at": forms.DateTimeInput(
                 format="%Y-%m-%dT%H:%M",
                 attrs={"type": "datetime-local"},
+            ),
+        }
+        help_texts = {
+            "starts_at": (
+                "Les dates sont facultatives, mais doivent être renseignées ensemble."
             ),
         }
 
