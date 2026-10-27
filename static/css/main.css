@@ -502,7 +502,6 @@ a:active {
 }
 
 .entity-detail__notes-content {
-    white-space: pre-wrap;
     overflow-wrap: anywhere;
 }
 

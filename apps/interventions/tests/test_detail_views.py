@@ -223,3 +223,44 @@ def test_intervention_detail_preserves_list_filters(
 
     assert expected_query in response.content.decode()
     assert reverse("interventions:list") in response.content.decode()
+
+
+@pytest.mark.django_db
+def test_intervention_detail_has_return_link_without_filters(
+    client,
+    intervention_author,
+    intervention,
+):
+    client.force_login(intervention_author)
+    response = client.get(reverse("interventions:detail", args=[intervention.pk]))
+
+    assert response.status_code == 200
+
+    expected_url = reverse("interventions:list")
+    assert f'href="{expected_url}"' in response.content.decode()
+
+
+@pytest.mark.django_db
+def test_intervention_list_preserves_filters_in_detail_link(
+    client,
+    intervention_author,
+    intervention,
+):
+    client.force_login(intervention_author)
+    response = client.get(
+        reverse("interventions:list"),
+        {
+            "q": "Maintenance",
+            "status": Intervention.Status.PLANNED,
+        },
+    )
+
+    assert response.status_code == 200
+
+    expected_url = reverse(
+        "interventions:detail",
+        args=[intervention.pk],
+    )
+    assert (
+        f"{expected_url}?q=Maintenance&amp;status=PLANNED" in response.content.decode()
+    )
