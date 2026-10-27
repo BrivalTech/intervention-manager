@@ -59,3 +59,21 @@ def can_update_status(user, intervention, action):
         "start",
         "complete",
     }
+
+
+def can_edit_intervention(user, intervention):
+    """Check whether the user can edit an intervention."""
+    return (
+        user.is_authenticated
+        and user.is_active
+        and user.role
+        in {
+            User.Role.ADMIN,
+            User.Role.MANAGER,
+        }
+        and intervention.status
+        in {
+            intervention.Status.TO_PLAN,
+            intervention.Status.PLANNED,
+        }
+    )
