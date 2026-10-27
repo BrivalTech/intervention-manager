@@ -59,7 +59,14 @@
                 {% for intervention in interventions %}
                     <li class="card">
                         <div class="card__content">
-                            <h2 class="card__title">{{ intervention.title }}</h2>
+                            <h2 class="card__title">
+                                <a
+                                    href="{% url 'interventions:detail' intervention.pk %}{% if list_query %}?{{ list_query }}{% endif %}"
+                                    class="entity-card__link"
+                                >
+                                    {{ intervention.title }}
+                                </a>
+                            </h2>
                             <dl class="data-list">
                                 <div>
                                     <dt>Client</dt>

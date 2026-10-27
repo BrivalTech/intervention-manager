@@ -57,6 +57,7 @@ def intervention_list(request):
             "search_query": search_query,
             "status_filter": status_filter,
             "status_choices": Intervention.Status.choices,
+            "list_query": request.GET.urlencode(),
         },
     )
 
@@ -85,5 +86,6 @@ def intervention_detail(request, pk):
         "interventions/intervention_detail.html",
         {
             "intervention": intervention,
+            "list_query": request.GET.urlencode(),
         },
     )
