@@ -105,6 +105,16 @@ def intervention_detail(request, pk):
                 request.user,
                 intervention,
             ),
+            "can_start": can_update_status(
+                request.user,
+                intervention,
+                "start",
+            ),
+            "can_cancel": can_update_status(
+                request.user,
+                intervention,
+                "cancel",
+            ),
         },
     )
 

@@ -15,13 +15,37 @@
                 <h1 id="intervention-detail-title">{{ intervention.title }}</h1>
             </div>
 
-            {% if can_edit_intervention %}
+            {% if can_edit_intervention or can_start or can_cancel %}
                 <div class="entity-detail__actions cluster">
-                    <a href="{% url 'interventions:edit' intervention.pk %}"
-                        class="button button--primary"
-                    >
-                        Modifier l'intervention
-                    </a>
+                    {% if can_edit_intervention %}
+                        <a href="{% url 'interventions:edit' intervention.pk %}"
+                            class="button button--primary"
+                        >
+                            Modifier l'intervention
+                        </a>
+                    {% endif %}
+
+                    {% if can_start %}
+                        <form method="post"
+                            action="{% url 'interventions:status_update' intervention.pk 'start' %}"
+                        >
+                            {% csrf_token %}
+                            <button type="submit" class="button button--primary">
+                                Démarrer
+                            </button>
+                        </form>
+                    {% endif %}
+
+                    {% if can_cancel %}
+                        <form method="post"
+                            action="{% url 'interventions:status_update' intervention.pk 'cancel' %}"
+                        >
+                            {% csrf_token %}
+                            <button type="submit" class="button button--secondary">
+                                Annuler l'intervention
+                            </button>
+                        </form>
+                    {% endif %}
                 </div>
             {% endif %}
         </header>
