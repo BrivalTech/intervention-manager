@@ -1,5 +1,11 @@
+from django.db import transaction
+
 from apps.interventions.models import Intervention
-from apps.interventions.permissions import can_manage_assignment, can_update_status
+from apps.interventions.permissions import (
+    can_edit_intervention,
+    can_manage_assignment,
+    can_update_status,
+)
 
 
 def create_intervention(
@@ -36,6 +42,55 @@ def create_intervention(
 
     intervention.full_clean()
     intervention.save()
+
+    return intervention
+
+
+@transaction.atomic
+def update_intervention(*, user, intervention, **data):
+    """Update an editable intervention and validate business rules."""
+    if not can_edit_intervention(user, intervention):
+        raise PermissionError("You do not have permission to edit this intervention.")
+
+    editable_fields = {
+        "client",
+        "title",
+        "description",
+        "address",
+        "postal_code",
+        "city",
+        "technician",
+        "starts_at",
+        "ends_at",
+    }
+
+    unknown_fields = set(data) - editable_fields
+    if unknown_fields:
+        raise ValueError("Unknown intervention fields.")
+
+    intervention.refresh_from_db()
+
+    previous_values = {field: getattr(intervention, field) for field in editable_fields}
+    previous_status = intervention.status
+
+    try:
+        for field, value in data.items():
+            setattr(intervention, field, value)
+
+        if intervention.starts_at is None and intervention.ends_at is None:
+            intervention.status = Intervention.Status.TO_PLAN
+        elif intervention.starts_at is not None and intervention.ends_at is not None:
+            intervention.status = Intervention.Status.PLANNED
+
+        intervention.full_clean()
+        intervention.save()
+
+    except Exception:
+        for field, value in previous_values.items():
+            setattr(intervention, field, value)
+
+        intervention.status = previous_status
+        raise
 
     return intervention
 

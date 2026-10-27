@@ -6,7 +6,7 @@ from apps.interventions.models import Intervention
 
 
 class InterventionForm(forms.ModelForm):
-    """Form for creating an intervention."""
+    """Form for creating and editing an intervention."""
 
     class Meta:
         model = Intervention
