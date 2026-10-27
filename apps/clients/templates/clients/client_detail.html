@@ -86,7 +86,7 @@
             <section class="card stack" aria-labelledby="client-address-title">
                 <h2 id="client-address-title">Adresse</h2>
                 {% if client_obj.address or client_obj.postal_code or client_obj.city %}
-                    <address class="client-detail__address">
+                    <address class="entity-detail__address">
                         {% if client_obj.address %}
                             <span>{{ client_obj.address }}</span>
                         {% endif %}

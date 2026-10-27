@@ -45,6 +45,20 @@
                             </time>
                         </dd>
                     </div>
+                    <div>
+                        <dt>Créée par</dt>
+                        <dd>
+                            {{ intervention.created_by.get_full_name|default:intervention.created_by.username }}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Dernière modification</dt>
+                        <dd>
+                            <time datetime="{{ intervention.updated_at|date:'c' }}">
+                                {{ intervention.updated_at|date:"d/m/Y H:i" }}
+                            </time>
+                        </dd>
+                    </div>
                 </dl>
             </section>
 
@@ -77,6 +91,61 @@
                     <p>Intervention non planifiée.</p>
                 {% endif %}
             </section>
+            <section
+                class="card stack"
+                aria-labelledby="intervention-address-title"
+            >
+                <h2 id="intervention-address-title">Adresse d'intervention</h2>
+
+                {% if intervention.address or intervention.postal_code or intervention.city %}
+                    <address class="entity-detail__address">
+                        {% if intervention.address %}
+                            <span>{{ intervention.address }}</span>
+                        {% endif %}
+
+                        {% if intervention.postal_code or intervention.city %}
+                            <span>
+                                {{ intervention.postal_code }}
+                                {{ intervention.city }}
+                            </span>
+                        {% endif %}
+                    </address>
+                {% else %}
+                    <p>Adresse non renseignée.</p>
+                {% endif %}
+            </section>
+            <section
+                class="card stack entity-detail__notes"
+                aria-labelledby="intervention-description-title"
+            >
+                <h2 id="intervention-description-title">Description</h2>
+
+                {% if intervention.description %}
+                    <p class="entity-detail__notes-content">
+                        {{ intervention.description|linebreaksbr }}
+                    </p>
+                {% else %}
+                    <p>Aucune description renseignée.</p>
+                {% endif %}
+            </section>
+            {% if intervention.status == "COMPLETED" %}
+                <section
+                    class="card stack entity-detail__notes"
+                    aria-labelledby="intervention-report-title"
+                >
+                    <h2 id="intervention-report-title">
+                        Compte rendu d'intervention
+                    </h2>
+
+                    {% if intervention.report %}
+                        <p class="entity-detail__notes-content">
+                            {{ intervention.report|linebreaksbr }}
+                        </p>
+                    {% else %}
+                        <p>Compte rendu indisponible.</p>
+                    {% endif %}
+                </section>
+            {% endif %}
         </div>
     </section>
 {% endblock %}

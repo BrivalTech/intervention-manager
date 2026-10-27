@@ -494,7 +494,7 @@ a:active {
     overflow-wrap: anywhere;
 }
 
-.client-detail__address {
+.entity-detail__address {
     display: flex;
     flex-direction: column;
     font-style: normal;
