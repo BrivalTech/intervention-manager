@@ -6,10 +6,13 @@ from django.utils import timezone
 from apps.accounts.models import User
 from apps.clients.models import Client
 from apps.interventions.forms import InterventionForm
+from apps.interventions.templatetags.intervention_form_tags import (
+    accessible_field,
+)
 
 
 @pytest.fixture
-def active_client(db):
+def active_client():
     return Client.objects.create(name="Entreprise Alpha")
 
 
@@ -149,6 +152,18 @@ def test_form_marks_invalid_fields_accessibly(form_data, intervention_author):
 
     assert not form.is_valid()
 
-    widget = form.fields["title"].widget
-    assert widget.attrs["aria-invalid"] == "true"
-    assert widget.attrs["aria-describedby"] == "id_title_error"
+    html = accessible_field(form["title"])
+    assert 'aria-invalid="true"' in html
+    assert 'aria-describedby="id_title_error"' in html
+
+
+@pytest.mark.django_db
+def test_form_validation_is_not_triggered_during_initialization(
+    form_data,
+    intervention_author,
+):
+    form = InterventionForm(data=form_data)
+    assert form._errors is None
+
+    form.instance.created_by = intervention_author
+    assert form.is_valid(), form.errors

@@ -73,17 +73,9 @@ class InterventionForm(forms.ModelForm):
 
         for name, field in self.fields.items():
             field.widget.attrs["class"] = "form-control"
-            described_by = []
 
             if field.help_text:
-                described_by.append(f"id_{name}_help")
-
-            if self.is_bound and self.errors.get(name):
-                field.widget.attrs["aria-invalid"] = "true"
-                described_by.append(f"id_{name}_error")
-
-            if described_by:
-                field.widget.attrs["aria-describedby"] = " ".join(described_by)
+                field.widget.attrs["aria-describedby"] = f"id_{name}_help"
 
     def clean_title(self):
         """Reject an empty or whitespace-only title."""

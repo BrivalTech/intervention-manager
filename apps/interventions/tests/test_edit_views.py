@@ -128,3 +128,58 @@ def test_unknown_intervention_edit_returns_404(client, intervention_author):
     response = client.get(reverse("interventions:edit", args=[999999]))
 
     assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_archived_client_intervention_can_be_reassigned(
+    client,
+    intervention_author,
+    editable_intervention,
+):
+    archived_client = editable_intervention.client
+    archived_client.archive()
+    active_client = Client.objects.create(name="Nouveau client actif")
+    client.force_login(intervention_author)
+    response = client.post(
+        reverse(
+            "interventions:edit",
+            args=[editable_intervention.pk],
+        ),
+        {
+            "client": active_client.pk,
+            "title": editable_intervention.title,
+            "description": editable_intervention.description,
+        },
+    )
+
+    assert response.status_code == 302
+
+    editable_intervention.refresh_from_db()
+    assert editable_intervention.client == active_client
+
+
+@pytest.mark.django_db
+def test_archived_client_cannot_be_kept_during_edit(
+    client,
+    intervention_author,
+    editable_intervention,
+):
+    archived_client = editable_intervention.client
+    archived_client.archive()
+    client.force_login(intervention_author)
+    response = client.post(
+        reverse(
+            "interventions:edit",
+            args=[editable_intervention.pk],
+        ),
+        {
+            "client": archived_client.pk,
+            "title": "Titre modifié",
+        },
+    )
+
+    assert response.status_code == 200
+    assert "client" in response.context["form"].errors
+
+    editable_intervention.refresh_from_db()
+    assert editable_intervention.title == "Intervention initiale"

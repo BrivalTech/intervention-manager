@@ -1,9 +1,12 @@
+from urllib.parse import parse_qsl, urlencode
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_http_methods, require_POST
 
 from apps.accounts.models import User
@@ -20,6 +23,32 @@ from apps.interventions.services import (
     update_intervention,
     update_intervention_status,
 )
+
+
+def get_list_query(request):
+    """Return supported intervention list parameters."""
+    raw_query = request.POST.get("next") or request.GET.get("next", "")
+
+    allowed = {"q", "status", "page"}
+
+    return urlencode(
+        [(key, value) for key, value in parse_qsl(raw_query) if key in allowed]
+    )
+
+
+def get_intervention_detail_url(request, intervention):
+    """Build the detail URL preserving list navigation."""
+    detail_url = reverse(
+        "interventions:detail",
+        kwargs={"pk": intervention.pk},
+    )
+
+    list_query = get_list_query(request)
+
+    if list_query:
+        return f"{detail_url}?{list_query}"
+
+    return detail_url
 
 
 @login_required
@@ -183,8 +212,11 @@ def intervention_edit(request, pk):
     if not can_edit_intervention(request.user, intervention):
         raise PermissionDenied
 
+    list_query = get_list_query(request)
+
     if request.method == "POST":
         form = InterventionForm(request.POST, instance=intervention)
+
         if form.is_valid():
             try:
                 update_intervention(
@@ -206,9 +238,12 @@ def intervention_edit(request, pk):
                     request,
                     "L'intervention a été modifiée avec succès.",
                 )
+
                 return redirect(
-                    "interventions:detail",
-                    pk=intervention.pk,
+                    get_intervention_detail_url(
+                        request,
+                        intervention,
+                    )
                 )
     else:
         form = InterventionForm(instance=intervention)
@@ -220,6 +255,7 @@ def intervention_edit(request, pk):
             "form": form,
             "intervention": intervention,
             "is_edit": True,
+            "list_query": list_query,
         },
     )
 
@@ -243,15 +279,27 @@ def intervention_status_update(request, pk, action):
             action=action,
         )
     except ValidationError as exc:
-        messages.error(request, "; ".join(exc.messages))
+        messages.error(
+            request,
+            "; ".join(exc.messages),
+        )
     else:
         success_messages = {
             "start": "L'intervention a été démarrée.",
             "cancel": "L'intervention a été annulée.",
         }
-        messages.success(request, success_messages[action])
 
-    return redirect("interventions:detail", pk=intervention.pk)
+        messages.success(
+            request,
+            success_messages[action],
+        )
+
+    return redirect(
+        get_intervention_detail_url(
+            request,
+            intervention,
+        )
+    )
 
 
 @login_required
@@ -263,8 +311,11 @@ def intervention_complete(request, pk):
     if not can_update_status(request.user, intervention, "complete"):
         raise PermissionDenied
 
+    list_query = get_list_query(request)
+
     if request.method == "POST":
         form = InterventionCompletionForm(request.POST)
+
         if form.is_valid():
             try:
                 update_intervention_status(
@@ -287,9 +338,12 @@ def intervention_complete(request, pk):
                     request,
                     "L'intervention a été terminée avec succès.",
                 )
+
                 return redirect(
-                    "interventions:detail",
-                    pk=intervention.pk,
+                    get_intervention_detail_url(
+                        request,
+                        intervention,
+                    )
                 )
     else:
         form = InterventionCompletionForm()
@@ -300,5 +354,6 @@ def intervention_complete(request, pk):
         {
             "form": form,
             "intervention": intervention,
+            "list_query": list_query,
         },
     )

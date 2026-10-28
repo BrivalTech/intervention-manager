@@ -18,8 +18,9 @@
             {% if can_edit_intervention or can_start or can_complete or can_cancel %}
                 <div class="entity-detail__actions cluster">
                     {% if can_edit_intervention %}
-                        <a href="{% url 'interventions:edit' intervention.pk %}"
-                            class="button button--primary"
+                        <a
+                                href="{% url 'interventions:edit' intervention.pk %}{% if list_query %}?next={{ list_query|urlencode }}{% endif %}"
+                                class="button button--primary"
                         >
                             Modifier l'intervention
                         </a>
@@ -30,6 +31,11 @@
                             action="{% url 'interventions:status_update' intervention.pk 'start' %}"
                         >
                             {% csrf_token %}
+
+                            {% if list_query %}
+                                <input type="hidden" name="next" value="{{ list_query }}">
+                            {% endif %}
+
                             <button type="submit" class="button button--primary">
                                 Démarrer
                             </button>
@@ -37,7 +43,8 @@
                     {% endif %}
 
                     {% if can_complete %}
-                        <a href="{% url 'interventions:complete' intervention.pk %}"
+                        <a
+                            href="{% url 'interventions:complete' intervention.pk %}{% if list_query %}?next={{ list_query|urlencode }}{% endif %}"
                             class="button button--primary"
                         >
                             Terminer l'intervention
@@ -49,6 +56,11 @@
                             action="{% url 'interventions:status_update' intervention.pk 'cancel' %}"
                         >
                             {% csrf_token %}
+
+                            {% if list_query %}
+                                <input type="hidden" name="next" value="{{ list_query }}">
+                            {% endif %}
+
                             <button type="submit" class="button button--secondary">
                                 Annuler l'intervention
                             </button>
