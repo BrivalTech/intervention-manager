@@ -323,3 +323,19 @@ def test_navigation_uses_post_logout(client, django_user_model):
     assert response.status_code == 200
     assert 'method="post"' in content
     assert f'action="{reverse("accounts:logout")}"' in content
+
+
+@pytest.mark.django_db
+def test_home_provides_dashboard_data(client, django_user_model):
+    user = django_user_model.objects.create_user(
+        username="dashboard-manager",
+        role=User.Role.MANAGER,
+    )
+
+    client.force_login(user)
+    response = client.get(reverse("core:home"))
+
+    assert response.status_code == 200
+    assert "dashboard" in response.context
+    assert response.context["dashboard"]["today_count"] == 0
+    assert response.context["dashboard"]["today_interventions"] == []
