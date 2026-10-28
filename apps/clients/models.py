@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 
 
@@ -25,7 +26,23 @@ class Client(models.Model):
         return self.is_active
 
     def archive(self):
-        """Archive the client by marking it as inactive."""
+        """Archive the client only when no interventions remain active."""
+        from apps.interventions.models import Intervention
+
+        blocking_statuses = {
+            Intervention.Status.TO_PLAN,
+            Intervention.Status.PLANNED,
+            Intervention.Status.IN_PROGRESS,
+        }
+
+        if self.interventions.filter(
+            status__in=blocking_statuses,
+        ).exists():
+            raise ValidationError(
+                "Impossible d'archiver ce client : "
+                "des interventions sont encore à planifier, planifiées ou en cours."
+            )
+
         self.is_active = False
         self.save(update_fields=["is_active", "updated_at"])
 

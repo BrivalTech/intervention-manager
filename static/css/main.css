@@ -302,6 +302,7 @@ a:active {
     background-color: var(--message-background);
     color: var(--color-text);
     border-radius: var(--border-radius-md);
+    margin-bottom: var(--space-3);
 }
 
 .message__icon {

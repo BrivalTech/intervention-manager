@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
@@ -150,7 +150,7 @@ def client_update(request, pk):
 
 @login_required
 def client_archive(request, pk):
-    """Archive a client"""
+    """Archive a client if no active interventions remain."""
     if not can_archive_client(request.user):
         raise PermissionDenied
 
@@ -161,16 +161,21 @@ def client_archive(request, pk):
             request,
             "Ce client est déjà archivé.",
         )
-
         return redirect("clients:detail", pk=client_obj.pk)
 
     if request.method == "POST":
-        client_obj.archive()
-
-        messages.success(
-            request,
-            "Le client a été archivé avec succès.",
-        )
+        try:
+            client_obj.archive()
+        except ValidationError as exc:
+            messages.error(
+                request,
+                "; ".join(exc.messages),
+            )
+        else:
+            messages.success(
+                request,
+                "Le client a été archivé avec succès.",
+            )
 
         return redirect("clients:detail", pk=client_obj.pk)
 

@@ -1,8 +1,10 @@
 import pytest
+from django.contrib.messages import get_messages
 from django.urls import reverse
 
 from apps.accounts.models import User
 from apps.clients.models import Client
+from apps.interventions.models import Intervention
 
 
 def test_client_list_requires_authentication(client):
@@ -1252,3 +1254,67 @@ def test_archived_client_has_no_archive_link(client, django_user_model):
 
     assert f'href="{archive_url}"' not in response.content.decode()
     assert "Modifier le client" not in response.content.decode()
+
+
+@pytest.mark.django_db
+def test_client_archive_refused_with_active_intervention(
+    client,
+    django_user_model,
+):
+    admin = django_user_model.objects.create_user(
+        username="archive_admin",
+        password="TestPassword123!",
+        role=User.Role.ADMIN,
+    )
+    client_obj = Client.objects.create(
+        name="Client avec intervention en cours",
+    )
+    Intervention.objects.create(
+        client=client_obj,
+        created_by=admin,
+        title="Intervention en cours",
+        status=Intervention.Status.IN_PROGRESS,
+    )
+
+    client.force_login(admin)
+    response = client.post(reverse("clients:archive", args=[client_obj.pk]))
+
+    assert response.status_code == 302
+    assert response.url == reverse(
+        "clients:detail",
+        args=[client_obj.pk],
+    )
+
+    client_obj.refresh_from_db()
+    assert client_obj.is_active
+
+    displayed_messages = [
+        str(message) for message in get_messages(response.wsgi_request)
+    ]
+
+    assert any(
+        "Impossible d'archiver ce client" in message for message in displayed_messages
+    )
+
+
+@pytest.mark.django_db
+def test_client_creation_success_message_is_visible(
+    client,
+    django_user_model,
+):
+    user = django_user_model.objects.create_user(
+        username="message-test-admin",
+        password="TestPassword123!",
+        role=User.Role.ADMIN,
+    )
+    client.force_login(user)
+    response = client.post(
+        reverse("clients:create"),
+        {"name": "Client notification"},
+        follow=True,
+    )
+
+    assert response.status_code == 200
+    assert b"Le client a" in response.content
+    assert "message--success" in response.content.decode()
+    assert "Client notification" in response.content.decode()

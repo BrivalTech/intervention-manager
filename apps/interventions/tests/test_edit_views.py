@@ -1,4 +1,5 @@
 import pytest
+from django.core.exceptions import ValidationError
 from django.urls import reverse
 
 from apps.accounts.models import User
@@ -131,55 +132,30 @@ def test_unknown_intervention_edit_returns_404(client, intervention_author):
 
 
 @pytest.mark.django_db
-def test_archived_client_intervention_can_be_reassigned(
+def test_intervention_remains_editable_when_client_archiving_is_refused(
     client,
     intervention_author,
     editable_intervention,
 ):
-    archived_client = editable_intervention.client
-    archived_client.archive()
-    active_client = Client.objects.create(name="Nouveau client actif")
+    customer = editable_intervention.client
+
+    with pytest.raises(
+        ValidationError,
+        match="Impossible d'archiver ce client",
+    ):
+        customer.archive()
+
+    customer.refresh_from_db()
+    assert customer.is_active
+
     client.force_login(intervention_author)
-    response = client.post(
+    response = client.get(
         reverse(
             "interventions:edit",
             args=[editable_intervention.pk],
-        ),
-        {
-            "client": active_client.pk,
-            "title": editable_intervention.title,
-            "description": editable_intervention.description,
-        },
-    )
-
-    assert response.status_code == 302
-
-    editable_intervention.refresh_from_db()
-    assert editable_intervention.client == active_client
-
-
-@pytest.mark.django_db
-def test_archived_client_cannot_be_kept_during_edit(
-    client,
-    intervention_author,
-    editable_intervention,
-):
-    archived_client = editable_intervention.client
-    archived_client.archive()
-    client.force_login(intervention_author)
-    response = client.post(
-        reverse(
-            "interventions:edit",
-            args=[editable_intervention.pk],
-        ),
-        {
-            "client": archived_client.pk,
-            "title": "Titre modifié",
-        },
+        )
     )
 
     assert response.status_code == 200
-    assert "client" in response.context["form"].errors
-
-    editable_intervention.refresh_from_db()
-    assert editable_intervention.title == "Intervention initiale"
+    assert response.context["form"].instance == editable_intervention
+    assert customer in response.context["form"].fields["client"].queryset
