@@ -2,6 +2,7 @@ import pytest
 from django.core.exceptions import ValidationError
 
 from apps.clients.models import Client
+from apps.interventions.models import Intervention
 
 
 @pytest.mark.django_db
@@ -108,3 +109,73 @@ def test_archived_client_cannot_receive_intervention():
     )
 
     assert not client.can_receive_intervention
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "status",
+    [
+        Intervention.Status.TO_PLAN,
+        Intervention.Status.PLANNED,
+        Intervention.Status.IN_PROGRESS,
+    ],
+)
+def test_client_cannot_be_archived_with_active_interventions(
+    django_user_model,
+    status,
+):
+    user = django_user_model.objects.create_user(
+        username="archive_test_user",
+        password="TestPassword123!",
+    )
+    client = Client.objects.create(name="Client avec intervention")
+    Intervention.objects.create(
+        client=client,
+        created_by=user,
+        title="Intervention bloquante",
+        status=status,
+    )
+
+    with pytest.raises(
+        ValidationError,
+        match="Impossible d'archiver ce client",
+    ):
+        client.archive()
+
+    client.refresh_from_db()
+
+    assert client.is_active
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "status",
+    [
+        Intervention.Status.COMPLETED,
+        Intervention.Status.CANCELLED,
+    ],
+)
+def test_client_can_be_archived_with_final_interventions(
+    django_user_model,
+    status,
+):
+    user = django_user_model.objects.create_user(
+        username="archive_test_user",
+        password="TestPassword123!",
+    )
+    client = Client.objects.create(name="Client avec intervention finalisée")
+    Intervention.objects.create(
+        client=client,
+        created_by=user,
+        title="Intervention finalisée",
+        status=status,
+        report="Intervention effectuée."
+        if status == Intervention.Status.COMPLETED
+        else "",
+    )
+
+    client.archive()
+    client.refresh_from_db()
+
+    assert not client.is_active
+    assert client.interventions.count() == 1

@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load intervention_form_tags %}
+{% block title %}
+    Terminer une intervention | Gestionnaire d'interventions
+{% endblock %}
+
+{% block content %}
+    <section aria-labelledby="completion-title">
+        <header class="stack">
+            <h1 id="completion-title">Terminer l'intervention</h1>
+            <p>{{ intervention.title }}</p>
+            <p>
+                Renseignez le compte rendu avant de terminer
+                définitivement cette intervention.
+            </p>
+        </header>
+
+        {% if form.errors %}
+            <div class="message message--error" role="alert">
+                <div class="message__body">
+                    <p class="message__title">
+                        Le formulaire contient des erreurs
+                    </p>
+                    <p class="message__content">
+                        Vérifiez le compte rendu ci-dessous.
+                    </p>
+                </div>
+            </div>
+        {% endif %}
+
+        <form method="post" class="stack">
+            {% csrf_token %}
+
+            {% if list_query %}
+                <input type="hidden" name="next" value="{{ list_query }}">
+            {% endif %}
+
+            {% for error in form.non_field_errors %}
+                <p class="form-error">{{ error }}</p>
+            {% endfor %}
+
+            <div class="entity-form__fields">
+                <div class="form-field">
+                    <label class="form-label"
+                        for="{{ form.report.id_for_label }}"
+                    >
+                        {{ form.report.label }}
+                        <span aria-hidden="true">*</span>
+                    </label>
+
+                    {{ form.report|accessible_field }}
+
+                    {% if form.report.errors %}
+                        <div class="form-error" id="id_report_error">
+                            {% for error in form.report.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="entity-detail__actions cluster">
+                <button type="submit" class="button button--primary">
+                    Terminer l'intervention
+                </button>
+                <a href="{% url 'interventions:detail' intervention.pk %}{% if list_query %}?{{ list_query }}{% endif %}"
+                    class="button button--secondary"
+                >
+                    Annuler
+                </a>
+            </div>
+        </form>
+    </section>
+{% endblock %}

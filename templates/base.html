@@ -99,6 +99,20 @@
                             </li>
                         {% endif %}
 
+                        {% if nav_can_view_interventions %}
+                            <li>
+                                <a
+                                    href="{% url 'interventions:list' %}"
+                                    class="nav-link"
+                                    {% if request.resolver_match.namespace == "interventions" %}
+                                        aria-current="page"
+                                    {% endif %}
+                                >
+                                    Interventions
+                                </a>
+                            </li>
+                        {% endif %}
+
                         {% if user.is_authenticated %}
                             <li>
                                 <form
@@ -132,7 +146,28 @@
 
         <main id="main-content" class="site-main" tabindex="-1">
             <div class="container">
+                {% if messages %}
+                    <div class="stack" aria-label="Notifications">
+                        {% for message in messages %}
+                            <div class="message message--{{ message.level_tag }}"
+                                {% if message.level_tag == "error" %}
+                                    role="alert"
+                                {% else %}
+                                    role="status"
+                                {% endif %}
+                            >
+                                <div class="message__body">
+                                    <p class="message__content">
+                                        {{ message }}
+                                    </p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
                 {% block content %}{% endblock %}
+
             </div>
         </main>
 

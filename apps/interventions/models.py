@@ -1,9 +1,7 @@
-import pytest
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 
-from apps.accounts.models import User
 from apps.clients.models import Client
 
 
@@ -11,6 +9,7 @@ class Intervention(models.Model):
     """Represent an intervention performed for a client."""
 
     class Status(models.TextChoices):
+        TO_PLAN = "TO_PLAN", "À planifier"
         PLANNED = "PLANNED", "Planifiée"
         IN_PROGRESS = "IN_PROGRESS", "En cours"
         COMPLETED = "COMPLETED", "Terminée"
@@ -21,14 +20,35 @@ class Intervention(models.Model):
         on_delete=models.PROTECT,
         related_name="interventions",
     )
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="created_interventions",
+    )
     title = models.CharField(max_length=255)
     status = models.CharField(
         max_length=20,
         choices=Status.choices,
-        default=Status.PLANNED,
+        default=Status.TO_PLAN,
     )
     description = models.TextField(blank=True)
-    scheduled_at = models.DateTimeField(null=True, blank=True)
+    report = models.TextField(
+        blank=True,
+        verbose_name="Compte rendu d'intervention",
+    )
+    address = models.CharField(max_length=255, blank=True)
+    postal_code = models.CharField(max_length=20, blank=True)
+    city = models.CharField(max_length=100, blank=True)
+    starts_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Date et heure de début",
+    )
+    ends_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Date et heure de fin",
+    )
     technician = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT,
@@ -38,6 +58,20 @@ class Intervention(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=(
+                    models.Q(starts_at__isnull=True, ends_at__isnull=True)
+                    | (
+                        models.Q(starts_at__isnull=False, ends_at__isnull=False)
+                        & models.Q(ends_at__gt=models.F("starts_at"))
+                    )
+                ),
+                name="intervention_valid_schedule",
+            ),
+        ]
 
     def __str__(self):
         return self.title
@@ -62,6 +96,49 @@ class Intervention(models.Model):
                 "affecté à une intervention."
             )
 
+        if (self.starts_at is None) != (self.ends_at is None):
+            errors["ends_at"] = (
+                "Les dates de début et de fin doivent être renseignées ensemble."
+            )
+
+        elif (
+            self.starts_at is not None
+            and self.ends_at is not None
+            and self.ends_at <= self.starts_at
+        ):
+            errors["ends_at"] = (
+                "La date de fin doit être postérieure à la date de début."
+            )
+
+        if (
+            self.technician_id is not None
+            and self.starts_at is not None
+            and self.ends_at is not None
+            and self.ends_at > self.starts_at
+            and self.status != self.Status.CANCELLED
+        ):
+            overlapping = Intervention.objects.filter(
+                technician_id=self.technician_id,
+                starts_at__lt=self.ends_at,
+                ends_at__gt=self.starts_at,
+            ).exclude(
+                status=self.Status.CANCELLED,
+            )
+
+            if self.pk is not None:
+                overlapping = overlapping.exclude(pk=self.pk)
+
+            if overlapping.exists():
+                errors["technician"] = (
+                    "Ce technicien possède déjà une intervention "
+                    "sur cette plage horaire."
+                )
+
+        if self.status == self.Status.COMPLETED and not self.report.strip():
+            errors["report"] = (
+                "Un compte rendu est obligatoire pour terminer une intervention."
+            )
+
         if errors:
             raise ValidationError(errors)
 
@@ -73,17 +150,38 @@ class Intervention(models.Model):
         self.status = self.Status.IN_PROGRESS
         self.save(update_fields=["status", "updated_at"])
 
-    def complete(self):
-        """Complete an intervention in progress."""
+    def complete(self, report):
+        """Complete an intervention with a mandatory report."""
         if self.status != self.Status.IN_PROGRESS:
             raise ValidationError("Only an intervention in progress can be completed.")
 
+        if not isinstance(report, str) or not report.strip():
+            raise ValidationError(
+                {
+                    "report": "Un compte rendu est obligatoire pour"
+                    "terminer l'intervention."
+                }
+            )
+
+        previous_status = self.status
+        previous_report = self.report
+
+        self.report = report.strip()
         self.status = self.Status.COMPLETED
-        self.save(update_fields=["status", "updated_at"])
+
+        try:
+            self.full_clean()
+        except ValidationError:
+            self.status = previous_status
+            self.report = previous_report
+            raise
+
+        self.save(update_fields=["report", "status", "updated_at"])
 
     def cancel(self):
         """Cancel a planned or in-progress intervention."""
         if self.status not in {
+            self.Status.TO_PLAN,
             self.Status.PLANNED,
             self.Status.IN_PROGRESS,
         }:
@@ -110,7 +208,16 @@ class Intervention(models.Model):
                 "Only a user with a technician role can be assigned to an intervention."
             )
 
+        previous_technician = self.technician
+
         self.technician = technician
+
+        try:
+            self.full_clean()
+        except ValidationError:
+            self.technician = previous_technician
+            raise
+
         self.save(update_fields=["technician", "updated_at"])
 
     def unassign_technician(self):
@@ -126,44 +233,3 @@ class Intervention(models.Model):
 
         self.technician = None
         self.save(update_fields=["technician", "updated_at"])
-
-    @pytest.mark.django_db
-    def test_technician_can_be_reassigned_on_active_intervention():
-        client = Client.objects.create(
-            naùe="Entreprise Test",
-        )
-        first_technician = User.objects.create_user(
-            username="first-technician",
-            password="test-password",
-            role=User.Role.TECHNICIAN,
-        )
-        second_technician = User.objects.create_user(
-            username="second-technician",
-            password="test-password",
-            role=User.Role.TECHNICIAN,
-        )
-        intervention = Intervention.objects.create(
-            client=client,
-            title="Maintenance du poste de travail",
-            technician=first_technician,
-        )
-
-        intervention.assign_technician(second_technician)
-        intervention.refresh_from_db()
-
-        assert intervention.technician == second_technician
-
-    @pytest.mark.django_db
-    def test_intervention_without__technician_can_be_unassigned():
-        client = Client.objects.create(
-            name="Entreprise Test",
-        )
-        intervention = Intervention.objects.create(
-            client=client,
-            title="Maintenance du poste de travail",
-        )
-
-        intervention.unassign_technician()
-        intervention.refresh_from_db()
-
-        assert intervention.technician is None

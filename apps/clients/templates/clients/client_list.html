@@ -33,18 +33,20 @@
                 class="entity-filters">
 
             <div class="entity-filters__field">
-                <label for="client-search">Rechercher un client</label>
+                <label for="client-search" class="form-label">
+                    Rechercher un client</label>
                 <input
-                    type="search"
-                    id="client-search"
-                    name="q"
-                    value="{{ query }}"
-                    placeholder="Nom, contact, e-mail ou ville"
+                        class="form-control"
+                        type="search"
+                        id="client-search"
+                        name="q"
+                        value="{{ query }}"
+                        placeholder="Nom, contact, e-mail ou ville"
                 >
             </div>
             <div class="entity-filters__field">
-                <label for="client-status">Statut</label>
-                <select id="client-status" name="status">
+                <label for="client-status" class="form-label">Statut</label>
+                <select id="client-status" name="status" class="form-control">
                     <option value="active"
                             {% if status == "active" %}selected{% endif %}>
                         Actifs
@@ -77,37 +79,6 @@
           trouvé{{ result_count|pluralize }}.
         </p>
 
-        {% if page_obj.paginator.num_pages > 1 %}
-            <nav class="pagination" aria-label="Pagination des clients">
-                <ul class="pagination__list">
-                    {% if page_obj.has_previous %}
-                        <li>
-                            <a href="?q={{ query|urlencode }}&amp;status={{ status|urlencode }}&amp;page={{ page_obj.previous_page_number }}"
-                               class="pagination__link"
-                            >
-                                Précédent
-                            </a>
-                        </li>
-                    {% endif %}
-                    <li>
-                        <span class="pagination__current" aria-current="page">
-                            Page {{ page_obj.number }}
-                            sur {{ page_obj.paginator.num_pages }}
-                        </span>
-                    </li>
-                    {% if page_obj.has_next %}
-                        <li>
-                            <a href="?q={{ query|urlencode }}&amp;status={{ status|urlencode }}&amp;page={{ page_obj.next_page_number }}"
-                               class="pagination__link"
-                            >
-                                Suivant
-                            </a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </nav>
-        {% endif %}
-
         {% if clients %}
             <ul class="entity-list" aria-label="Liste des clients">
                 {% for client in clients %}
@@ -138,20 +109,58 @@
                     </li>
                 {% endfor %}
             </ul>
-            {% else %}
-                <div class="empty-state">
-                    {% if query %}
-                        <p>Aucun client ne correspond à votre recherche.</p>
-                    {% elif status == "archived" %}
-                        <p>Aucun client archivé.</p>
-                    {% elif status == "all" %}
-                        <p>Aucun client enregistré.</p>
-                    {% else %}
-                        <p>Aucun client actif.</p>
-                    {% endif %}
-                </div>
+            {% if page_obj.paginator.num_pages > 1 %}
+                <nav class="pagination" aria-label="Pagination des clients">
+                    <ul class="pagination__list">
+                        {% if page_obj.has_previous %}
+                            <li>
+                                <a href="?q={{ query|urlencode }}&amp;status={{ status|urlencode }}&amp;page={{ page_obj.previous_page_number }}"
+                                   class="pagination__link"
+                                >
+                                    Précédent
+                                </a>
+                            </li>
+                        {% endif %}
+                        <li>
+                            <span class="pagination__current" aria-current="page">
+                                Page {{ page_obj.number }}
+                                sur {{ page_obj.paginator.num_pages }}
+                            </span>
+                        </li>
+                        {% if page_obj.has_next %}
+                            <li>
+                                <a href="?q={{ query|urlencode }}&amp;status={{ status|urlencode }}&amp;page={{ page_obj.next_page_number }}"
+                                   class="pagination__link"
+                                >
+                                    Suivant
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="empty-state">
+                {% if query %}
+                    <p>Aucun client ne correspond à votre recherche.</p>
+                    <a
+                        href="{% url 'clients:list' %}"
+                        class="button button--secondary"
+                    >
+                        Effacer les filtres
+                {% elif status == "archived" %}
+                    <p>Aucun client archivé.</p>
+                    <a
+                        href="{% url 'clients:list' %}"
+                        class="button button--secondary"
+                    >
+                        Effacer les filtres
+                {% elif status == "all" %}
+                    <p>Aucun client enregistré.</p>
+                {% else %}
+                    <p>Aucun client actif.</p>
+                {% endif %}
+            </div>
         {% endif %}
-
-
     </section>
 {% endblock%}
