@@ -59,7 +59,7 @@ def test_home_accessible_to_authenticated_user(client, django_user_model):
         (
             "ADMIN",
             "Tableau de bord - Administration",
-            "Administration de l'application",
+            "Synthèse des interventions",
         ),
         (
             "MANAGER",
@@ -339,3 +339,75 @@ def test_home_provides_dashboard_data(client, django_user_model):
     assert "dashboard" in response.context
     assert response.context["dashboard"]["today_count"] == 0
     assert response.context["dashboard"]["today_interventions"] == []
+
+
+@pytest.mark.django_db
+def test_admin_dashboard_displays_operational_indicators(
+    client,
+    django_user_model,
+):
+    admin = django_user_model.objects.create_user(
+        username="dashboard-admin",
+        role=User.Role.ADMIN,
+    )
+
+    client.force_login(admin)
+    response = client.get(reverse("core:home"))
+
+    assert response.status_code == 200
+
+    content = response.content.decode()
+
+    assert "Tableau de bord - Administration" in content
+    assert "Interventions du jour" in content
+    assert "À planifier" in content
+    assert "En cours" in content
+
+
+@pytest.mark.django_db
+def test_admin_dashboard_displays_management_links(client, django_user_model):
+    admin = django_user_model.objects.create_user(
+        username="dashboard-admin-links",
+        role=User.Role.ADMIN,
+    )
+
+    client.force_login(admin)
+    response = client.get(reverse("core:home"))
+    content = response.content.decode()
+
+    assert response.status_code == 200
+
+    expected_urls = [
+        reverse("interventions:list"),
+        reverse("clients:list"),
+        reverse("accounts:technician_list"),
+        reverse("accounts:manager_list"),
+    ]
+
+    for url in expected_urls:
+        assert f'href="{url}"' in content
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "role",
+    [
+        User.Role.MANAGER,
+        User.Role.TECHNICIAN,
+    ],
+)
+def test_admin_dashboard_is_not_displayed_to_other_roles(
+    client,
+    django_user_model,
+    role,
+):
+    user = django_user_model.objects.create_user(
+        username=f"dashboard-{role.lower()}",
+        role=role,
+    )
+
+    client.force_login(user)
+    response = client.get(reverse("core:home"))
+
+    assert response.status_code == 200
+    assert "Tableau de bord - Administration" not in response.content.decode()
