@@ -127,3 +127,68 @@ def test_dashboard_returns_no_data_for_invalid_role(django_user_model):
     assert data["today_interventions"] == []
     assert data["to_plan_count"] == 0
     assert data["in_progress_count"] == 0
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("role", "expected_queries"),
+    [
+        (User.Role.ADMIN, 4),
+        (User.Role.MANAGER, 4),
+        (User.Role.TECHNICIAN, 5),
+    ],
+)
+def test_dashboard_query_count(
+    dashboard_users,
+    intervention_factory,
+    today_at,
+    django_assert_num_queries,
+    role,
+    expected_queries,
+):
+    user = dashboard_users[role]
+    intervention_factory(
+        "Intervention du jour",
+        status=Intervention.Status.PLANNED,
+        technician=(user if role == User.Role.TECHNICIAN else None),
+        starts_at=today_at(9),
+    )
+
+    with django_assert_num_queries(expected_queries):
+        data = get_dashboard_data(user)
+
+    assert data["today_count"] == 1
+
+
+@pytest.mark.django_db
+def test_dashboard_interventions_preload_relations(
+    dashboard_users,
+    intervention_factory,
+    today_at,
+    django_assert_num_queries,
+):
+    intervention_factory(
+        "Intervention planifiée",
+        status=Intervention.Status.PLANNED,
+        technician=dashboard_users[User.Role.TECHNICIAN],
+        starts_at=today_at(9),
+    )
+    data = get_dashboard_data(dashboard_users[User.Role.ADMIN])
+
+    with django_assert_num_queries(0):
+        for intervention in data["today_interventions"]:
+            assert intervention.client.name
+            assert intervention.technician.username
+
+
+@pytest.mark.django_db
+def test_inactive_user_has_no_dashboard_data(dashboard_users):
+    user = dashboard_users[User.Role.TECHNICIAN]
+    user.is_active = False
+    user.save(update_fields=["is_active"])
+
+    data = get_dashboard_data(user)
+
+    assert data["today_count"] == 0
+    assert data["today_interventions"] == []
+    assert data["upcoming_count"] == 0
