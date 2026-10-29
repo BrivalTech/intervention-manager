@@ -55,11 +55,9 @@ h3 {
 }
 
 .header-layout {
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-4);
+    display: flex;flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3);
 }
 
 .site-brand {
@@ -120,16 +118,17 @@ h3 {
 
 /* Navigation */
 .site-nav {
-    max-width: 100%;
+    width: 100%;
+    min-width: 0;
 }
 
 .nav-list {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-2);
+    justify-content: flex-start;
     padding: 0;
     margin: 0;
+    gap: var(--space-2);
     list-style: none;
 }
 
@@ -745,7 +744,7 @@ textarea.form-control {
 
 /* Dashboards */
 .dashboard {
-    gap: var(--space-5);
+    gap: var(--space-4);
 }
 
 .dashboard-section {
@@ -774,8 +773,21 @@ textarea.form-control {
     gap: var(--space-4);
 }
 
+.dashboard-metrics > .card {
+    min-width: 0;
+}
+
+.dashboard-metrics > .card > .card__content {
+    gap: var(--space-2);
+    padding: var(--space-3);
+}
+
+.dashboard-metrics > .card p {
+    margin: 0;
+}
+
 .dashboard-metric__value {
-    font-size: 2rem;
+    font-size: 1.75rem;
     font-weight: 700;
     line-height: 1.2;
     font-variant-numeric: tabular-nums;
@@ -802,9 +814,10 @@ textarea.form-control {
 .dashboard-shortcut {
     display: flex;
     align-items: center;
-    min-height: 4rem;
     width: 100%;
+    min-height: 3rem;
     box-sizing: border-box;
+    padding: var(--space-3);
     color: var(--color-text);
     font-weight: 600;
     text-decoration: none;
@@ -830,9 +843,10 @@ textarea.form-control {
 
 .dashboard-intervention {
     display: grid;
+    align-content: start;
     gap: var(--space-2);
     min-width: 0;
-    padding: var(--space-4);
+    padding: var(--space-3);
 }
 
 .dashboard-intervention__header {
@@ -844,9 +858,11 @@ textarea.form-control {
 }
 
 .dashboard-intervention__title {
+    min-width: 0;
     margin: 0;
     font-size: 1rem;
     line-height: 1.4;
+    overflow-wrap: anywhere;
 }
 
 .dashboard-intervention__status {
@@ -862,9 +878,21 @@ textarea.form-control {
     gap: var(--space-2);
     margin: 0;
     font-size: 0.875rem;
+    line-height: 1.4;
 }
 
 @media (min-width: 48rem) {
+    .header-layout {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-4);
+    }
+
+    .site-nav {
+        width: auto;
+    }
+
     .entity-list {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
