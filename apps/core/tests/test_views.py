@@ -1,9 +1,13 @@
+from datetime import datetime, time, timedelta
 from urllib.parse import parse_qs, urlsplit
 
 import pytest
 from django.urls import reverse
+from django.utils import timezone
 
 from apps.accounts.models import User
+from apps.clients.models import Client
+from apps.interventions.models import Intervention
 
 
 @pytest.mark.django_db
@@ -64,7 +68,7 @@ def test_home_accessible_to_authenticated_user(client, django_user_model):
         (
             "MANAGER",
             "Tableau de bord - Gestion",
-            "Gestion des activités",
+            "Synthèse des interventions",
         ),
         (
             "TECHNICIAN",
@@ -411,3 +415,95 @@ def test_admin_dashboard_is_not_displayed_to_other_roles(
 
     assert response.status_code == 200
     assert "Tableau de bord - Administration" not in response.content.decode()
+
+
+@pytest.mark.django_db
+def test_manager_dashboard_displays_indicators(client, django_user_model):
+    manager = django_user_model.objects.create_user(
+        username="manager-dashboard-indicators",
+        role=User.Role.MANAGER,
+    )
+
+    client.force_login(manager)
+    response = client.get(reverse("core:home"))
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert "Tableau de bord - Gestion" in content
+    assert "Interventions du jour" in content
+    assert "À planifier" in content
+    assert "En cours" in content
+
+
+@pytest.mark.django_db
+def test_manager_dashboard_displays_operational_links(
+    client,
+    django_user_model,
+):
+    manager = django_user_model.objects.create_user(
+        username="manager-dashboard-links",
+        role=User.Role.MANAGER,
+    )
+
+    client.force_login(manager)
+    response = client.get(reverse("core:home"))
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert f'href="{reverse("interventions:list")}"' in content
+    assert f'href="{reverse("clients:list")}"' in content
+    assert f'href="{reverse("accounts:manager_list")}"' not in content
+    assert f'href="{reverse("accounts:technician_list")}"' in content
+
+
+@pytest.mark.django_db
+def test_manager_dashboard_is_not_displayed_to_other_roles(
+    client,
+    django_user_model,
+):
+    for role in (User.Role.ADMIN, User.Role.TECHNICIAN):
+        user = django_user_model.objects.create_user(
+            username=f"manager-dashboard-check-{role.lower()}",
+            role=role,
+        )
+
+        client.force_login(user)
+        response = client.get(reverse("core:home"))
+
+        assert response.status_code == 200
+        assert "Tableau de bord - Gestion" not in response.content.decode()
+
+
+@pytest.mark.django_db
+def test_manager_dashboard_displays_today_intervention(
+    client,
+    django_user_model,
+):
+    manager = django_user_model.objects.create_user(
+        username="manager-today",
+        role=User.Role.MANAGER,
+    )
+    customer = Client.objects.create(name="Client planning")
+    starts_at = timezone.make_aware(
+        datetime.combine(timezone.localdate(), time(9)),
+        timezone.get_current_timezone(),
+    )
+    intervention = Intervention.objects.create(
+        title="Maintenance réseau",
+        client=customer,
+        created_by=manager,
+        status=Intervention.Status.PLANNED,
+        starts_at=starts_at,
+        ends_at=starts_at + timedelta(hours=1),
+    )
+
+    client.force_login(manager)
+    response = client.get(reverse("core:home"))
+
+    assert response.status_code == 200
+    assert intervention.title in response.content.decode()
+    assert customer.name in response.content.decode()
+    assert "09:00" in response.content.decode()
+    assert f'href="{reverse("interventions:detail", args=[intervention.pk])}"' in (
+        response.content.decode()
+    )

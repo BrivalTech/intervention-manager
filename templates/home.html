@@ -16,20 +16,7 @@
         {% if user.role == "ADMIN" %}
             {% include "core/dashboards/admin.html" %}
         {% elif user.role == "MANAGER" %}
-            <div class="stack">
-                <h2>Tableau de bord - Gestion</h2>
-                <p>Bienvenue dans votre espace de gestion.</p>
-            </div>
-            <div class="card">
-                <h3 class="card__title">Gestion des activités</h3>
-                <div class="card__content">
-                    <p>
-                        Cet espace vous permet de suivre les clients, de
-                        planifier les interventions et de gérer leurs états
-                        d'avancement.
-                    </p>
-                </div>
-            </div>
+            {% include "core/dashboards/manager.html" %}
         {% elif user.role == "TECHNICIAN" %}
             <div class="stack">
                 <h2>Mes interventions</h2>
