@@ -1,0 +1,56 @@
+<section class="stack dashboard-section" aria-labelledby="{{ today_id }}">
+    <div class="dashboard-section__header">
+        <h3 id="{{ today_id }}">{{ today_title }}</h3>
+
+        <a href="{% url 'interventions:list' %}" class="link">
+            {{ today_link_label }}
+        </a>
+    </div>
+
+    {% if dashboard.today_interventions %}
+        <ul class="dashboard-interventions">
+            {% for intervention in dashboard.today_interventions %}
+                <li class="card dashboard-intervention">
+                    <div class="dashboard-intervention__header">
+                        <h4 class="dashboard-intervention__title">
+                            <a href="{% url 'interventions:detail' intervention.pk %}">
+                                {{ intervention.title }}
+                            </a>
+                        </h4>
+
+                        <span class="dashboard-intervention__status">
+                            {{ intervention.get_status_display }}
+                        </span>
+                    </div>
+
+                    <p class="dashboard-intervention__meta">
+                        <time datetime="{{ intervention.starts_at|date:'c' }}">
+                            {{ intervention.starts_at|date:"H:i" }}
+                        </time>
+                        <span aria-hidden="true">·</span>
+                        {{ intervention.client.name }}
+                    </p>
+
+                    {% if user.role == "TECHNICIAN" %}
+                        {% if intervention.city %}
+                            <p class="dashboard-intervention__meta">
+                                Lieu : {{ intervention.city }}
+                            </p>
+                        {% endif %}
+                    {% else %}
+                        <p class="dashboard-intervention__meta">
+                            Technicien :
+                            {% if intervention.technician %}
+                                {{ intervention.technician.get_full_name|default:intervention.technician.username }}
+                            {% else %}
+                                Non affecté
+                            {% endif %}
+                        </p>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>{{ empty_message }}</p>
+    {% endif %}
+</section>

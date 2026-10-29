@@ -660,3 +660,36 @@ def test_dashboard_has_single_main_heading(
 
     assert response.status_code == 200
     assert response.content.decode().count("<h1") == 1
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("role", "prefix"),
+    [
+        (User.Role.ADMIN, "admin"),
+        (User.Role.MANAGER, "manager"),
+        (User.Role.TECHNICIAN, "technician"),
+    ],
+)
+def test_dashboard_renders_shared_components(
+    client,
+    django_user_model,
+    role,
+    prefix,
+):
+    user = django_user_model.objects.create_user(
+        username=f"shared-components-{role.lower()}",
+        role=role,
+    )
+
+    client.force_login(user)
+    response = client.get(reverse("core:home"))
+
+    assert response.status_code == 200
+
+    content = response.content.decode()
+    assert f'id="{prefix}-metrics-title"' in content
+    assert f'id="{prefix}-today-title"' in content
+    assert f'id="{prefix}-links-title"' in content
+    assert content.count('class="dashboard-metrics"') == 1
+    assert content.count('class="dashboard-shortcuts"') == 1

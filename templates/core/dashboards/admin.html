@@ -1,122 +1,12 @@
 <section class="stack dashboard" aria-labelledby="admin-dashboard-title">
     <div class="stack">
         <h2 id="admin-dashboard-title">Tableau de bord - Administration</h2>
-        <p>
-            Vue d'ensemble de l'activité et des interventions.
-        </p>
+        <p>Vue d'ensemble de l'activité et des interventions.</p>
     </div>
 
-    <section class="stack dashboard-section" aria-labelledby="admin-metrics-title">
-        <h3 id="admin-metrics-title">Synthèse des interventions</h3>
-        <div class="dashboard-metrics">
-            <div class="card">
-                <div class="card__content stack">
-                    <p>Interventions du jour</p>
-                    <p class="dashboard-metric__value">
-                        {{ dashboard.today_count }}
-                    </p>
-                </div>
-            </div>
+    {% include "core/dashboards/components/metrics.html" with metrics_id="admin-metrics-title" metrics_title="Synthèse des interventions" today_label="Interventions du jour" %}
 
-            <div class="card">
-                <div class="card__content stack">
-                    <p>À planifier</p>
-                    <p class="dashboard-metric__value">
-                        {{ dashboard.to_plan_count }}
-                    </p>
-                </div>
-            </div>
+    {% include "core/dashboards/components/intervention_list.html" with today_id="admin-today-title" today_title="Interventions du jour" today_link_label="Voir toutes les interventions" empty_message="Aucune intervention prévue aujourd'hui." %}
 
-            <div class="card">
-                <div class="card__content stack">
-                    <p>En cours</p>
-                    <p class="dashboard-metric__value">
-                        {{ dashboard.in_progress_count }}
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="stack dashboard-section" aria-labelledby="admin-today-title">
-        <div class="dashboard-section__header">
-            <h3 id="admin-today-title">Interventions du jour</h3>
-            <a href="{% url 'interventions:list' %}" class="link">
-                Voir toutes les interventions
-            </a>
-        </div>
-
-        {% if dashboard.today_interventions %}
-            <ul class="dashboard-interventions">
-                {% for intervention in dashboard.today_interventions %}
-                    <li class="card dashboard-intervention">
-                        <div class="dashboard-intervention__header">
-                            <h4 class="dashboard-intervention__title">
-                                <a href="{% url 'interventions:detail' intervention.pk %}">
-                                    {{ intervention.title }}
-                                </a>
-                            </h4>
-
-                            <span class="dashboard-intervention__status">
-                                {{ intervention.get_status_display }}
-                            </span>
-                        </div>
-
-                        <p class="dashboard-intervention__meta">
-                            <time datetime="{{ intervention.starts_at|date:'c' }}">
-                                {{ intervention.starts_at|date:"H:i" }}
-                            </time>
-                            <span aria-hidden="true">·</span>
-                            {{ intervention.client.name }}
-                        </p>
-
-                        <p class="dashboard-intervention__meta">
-                            Technicien :
-                            {% if intervention.technician %}
-                                {{ intervention.technician.get_full_name|default:intervention.technician.username }}
-                            {% else %}
-                                Non affecté
-                            {% endif %}
-                        </p>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>Aucune intervention prévue aujourd'hui.</p>
-        {% endif %}
-    </section>
-
-    <section class="stack dashboard-section" aria-labelledby="admin-links-title">
-        <h3 id="admin-links-title">Accès rapides</h3>
-        <ul class="dashboard-shortcuts">
-            <li>
-                <a href="{% url 'interventions:list' %}"
-                    class="card dashboard-shortcut"
-                >
-                    Interventions
-                </a>
-            </li>
-            <li>
-                <a href="{% url 'clients:list' %}"
-                    class="card dashboard-shortcut"
-                >
-                    Clients
-                </a>
-            </li>
-            <li>
-                <a href="{% url 'accounts:technician_list' %}"
-                    class="card dashboard-shortcut"
-                >
-                    Techniciens
-                </a>
-            </li>
-            <li>
-                <a href="{% url 'accounts:manager_list' %}"
-                    class="card dashboard-shortcut"
-                >
-                    Gestionnaires
-                </a>
-            </li>
-        </ul>
-    </section>
+    {% include "core/dashboards/components/shortcuts.html" with shortcuts_id="admin-links-title" %}
 </section>
