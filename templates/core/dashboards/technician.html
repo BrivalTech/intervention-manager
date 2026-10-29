@@ -1,0 +1,12 @@
+<section class="stack dashboard" aria-labelledby="technician-dashboard-title">
+    <div class="stack">
+        <h2 id="technician-dashboard-title">Mes interventions</h2>
+        <p>Consultez votre planning et suivez vos interventions.</p>
+    </div>
+
+    {% include "core/dashboards/components/metrics.html" with metrics_id="technician-metrics-title" metrics_title="Synthèse de mes interventions" today_label="Mes interventions du jour" %}
+
+    {% include "core/dashboards/components/intervention_list.html" with today_id="technician-today-title" today_title="Mon planning du jour" today_link_label="Voir toutes mes interventions" empty_message="Vous n'avez aucune intervention prévue aujourd'hui." %}
+
+    {% include "core/dashboards/components/shortcuts.html" with shortcuts_id="technician-links-title" %}
+</section>

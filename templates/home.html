@@ -14,48 +14,11 @@
             </h1>
         </div>
         {% if user.role == "ADMIN" %}
-            <div class="stack">
-                <h2>Tableau de bord - Administration</h2>
-                <p>Bienvenue dans votre espace d'administration.</p>
-            </div>
-            <div class="card">
-                <h3 class="card__title">Administration de l'application</h3>
-                <div class="card__content">
-                    <p>
-                        Cet espace vous permet de superviser les
-                        utilisateurs, les clients et les interventions.
-                    </p>
-                </div>
-            </div>
+            {% include "core/dashboards/admin.html" %}
         {% elif user.role == "MANAGER" %}
-            <div class="stack">
-                <h2>Tableau de bord - Gestion</h2>
-                <p>Bienvenue dans votre espace de gestion.</p>
-            </div>
-            <div class="card">
-                <h3 class="card__title">Gestion des activités</h3>
-                <div class="card__content">
-                    <p>
-                        Cet espace vous permet de suivre les clients, de
-                        planifier les interventions et de gérer leurs états
-                        d'avancement.
-                    </p>
-                </div>
-            </div>
+            {% include "core/dashboards/manager.html" %}
         {% elif user.role == "TECHNICIAN" %}
-            <div class="stack">
-                <h2>Mes interventions</h2>
-                <p>Bienvenue dans votre espace technicien.</p>
-            </div>
-            <div class="card">
-                <h3 class="card__title">Interventions attribuées</h3>
-                <div class="card__content">
-                    <p>
-                        Cet espace vous permet de consulter vos interventions
-                        et de suivre leur état d'avancement.
-                    </p>
-                </div>
-            </div>
+            {% include "core/dashboards/technician.html" %}
         {% else %}
             <div class="stack">
             <h2>Tableau de bord</h2>

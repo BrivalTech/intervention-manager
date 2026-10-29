@@ -3,6 +3,7 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
 
 from apps.accounts.models import User
+from apps.core.dashboard import get_dashboard_data
 
 
 @login_required
@@ -16,5 +17,13 @@ def design_system(request):
 
 @login_required
 def home(request):
-    """Display the application home page."""
-    return render(request, "home.html")
+    """Display the dashboard according to the user's role."""
+    dashboard_data = get_dashboard_data(request.user)
+
+    return render(
+        request,
+        "home.html",
+        {
+            "dashboard": dashboard_data,
+        },
+    )

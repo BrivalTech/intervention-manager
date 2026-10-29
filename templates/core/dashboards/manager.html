@@ -1,0 +1,12 @@
+<section class="stack dashboard" aria-labelledby="manager-dashboard-title">
+    <div class="stack">
+        <h2 id="manager-dashboard-title">Tableau de bord - Gestion</h2>
+        <p>Suivez les interventions et organisez les activités.</p>
+    </div>
+
+    {% include "core/dashboards/components/metrics.html" with metrics_id="manager-metrics-title" metrics_title="Synthèse des interventions" today_label="Interventions du jour" %}
+
+    {% include "core/dashboards/components/intervention_list.html" with today_id="manager-today-title" today_title="Interventions du jour" today_link_label="Voir toutes les interventions" empty_message="Aucune intervention prévue aujourd'hui." %}
+
+    {% include "core/dashboards/components/shortcuts.html" with shortcuts_id="manager-links-title" %}
+</section>

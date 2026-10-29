@@ -1,0 +1,38 @@
+<section class="stack dashboard-section" aria-labelledby="{{ metrics_id }}">
+    <h3 id="{{ metrics_id }}">{{ metrics_title }}</h3>
+    <div class="dashboard-metrics">
+        <div class="card">
+            <div class="card__content stack">
+                <p>{{ today_label }}</p>
+                <p class="dashboard-metric__value">
+                    {{ dashboard.today_count }}
+                </p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card__content stack">
+                {% if user.role == "TECHNICIAN" %}
+                    <p>À venir</p>
+                    <p class="dashboard-metric__value">
+                        {{ dashboard.upcoming_count }}
+                    </p>
+                {% else %}
+                    <p>À planifier</p>
+                    <p class="dashboard-metric__value">
+                        {{ dashboard.to_plan_count }}
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card__content stack">
+                <p>En cours</p>
+                <p class="dashboard-metric__value">
+                    {{ dashboard.in_progress_count }}
+                </p>
+            </div>
+        </div>
+    </div>
+</section>

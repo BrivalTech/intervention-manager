@@ -1,0 +1,40 @@
+<section class="stack dashboard-section" aria-labelledby="{{ shortcuts_id }}">
+    <h3 id="{{ shortcuts_id }}">Accès rapides</h3>
+    <ul class="dashboard-shortcuts">
+        <li>
+            <a href="{% url 'interventions:list' %}"
+               class="card dashboard-shortcut">
+                {% if user.role == "TECHNICIAN" %}
+                    Mes interventions
+                {% else %}
+                    Interventions
+                {% endif %}
+            </a>
+        </li>
+
+        {% if user.role == "ADMIN" or user.role == "MANAGER" %}
+            <li>
+                <a href="{% url 'clients:list' %}"
+                   class="card dashboard-shortcut">
+                    Clients
+                </a>
+            </li>
+
+            <li>
+                <a href="{% url 'accounts:technician_list' %}"
+                   class="card dashboard-shortcut">
+                    Techniciens
+                </a>
+            </li>
+        {% endif %}
+
+        {% if user.role == "ADMIN" %}
+            <li>
+                <a href="{% url 'accounts:manager_list' %}"
+                   class="card dashboard-shortcut">
+                    Gestionnaires
+                </a>
+            </li>
+        {% endif %}
+    </ul>
+</section>
