@@ -634,3 +634,29 @@ def test_technician_dashboard_hides_colleague_interventions(
     assert "Intervention confidentielle du collègue" not in content
     assert "Tableau de bord - Administration" not in content
     assert "Tableau de bord - Gestion" not in content
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "role",
+    [
+        User.Role.ADMIN,
+        User.Role.MANAGER,
+        User.Role.TECHNICIAN,
+    ],
+)
+def test_dashboard_has_single_main_heading(
+    client,
+    django_user_model,
+    role,
+):
+    user = django_user_model.objects.create_user(
+        username=f"heading-{role.lower()}",
+        role=role,
+    )
+
+    client.force_login(user)
+    response = client.get(reverse("core:home"))
+
+    assert response.status_code == 200
+    assert response.content.decode().count("<h1") == 1
