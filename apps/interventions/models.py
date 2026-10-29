@@ -1,3 +1,5 @@
+import uuid
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -15,6 +17,11 @@ class Intervention(models.Model):
         COMPLETED = "COMPLETED", "Terminée"
         CANCELLED = "CANCELLED", "Annulée"
 
+    public_id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+    )
     client = models.ForeignKey(
         Client,
         on_delete=models.PROTECT,
