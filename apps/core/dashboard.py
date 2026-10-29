@@ -13,6 +13,7 @@ def get_dashboard_data(user):
         "today_interventions": [],
         "to_plan_count": 0,
         "in_progress_count": 0,
+        "upcoming_count": 0,
     }
 
     if not user.is_authenticated or not user.is_active:
@@ -53,5 +54,11 @@ def get_dashboard_data(user):
             "pk",
         )[:DASHBOARD_INTERVENTION_LIMIT]
     )
+
+    if user.role == User.Role.TECHNICIAN:
+        data["upcoming_count"] = interventions.filter(
+            status=Intervention.Status.PLANNED,
+            starts_at__date__gt=today,
+        ).count()
 
     return data

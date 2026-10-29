@@ -7,6 +7,7 @@ from django.utils import timezone
 
 from apps.accounts.models import User
 from apps.clients.models import Client
+from apps.core.dashboard import get_dashboard_data
 from apps.interventions.models import Intervention
 
 
@@ -73,7 +74,7 @@ def test_home_accessible_to_authenticated_user(client, django_user_model):
         (
             "TECHNICIAN",
             "Mes interventions",
-            "Interventions attribuées",
+            "Synthèse de mes interventions",
         ),
     ],
 )
@@ -507,3 +508,129 @@ def test_manager_dashboard_displays_today_intervention(
     assert f'href="{reverse("interventions:detail", args=[intervention.pk])}"' in (
         response.content.decode()
     )
+
+
+@pytest.mark.django_db
+def test_technician_dashboard_counts_upcoming_interventions(
+    dashboard_users,
+    intervention_factory,
+    today_at,
+):
+    technician = dashboard_users[User.Role.TECHNICIAN]
+    other_technician = User.objects.create_user(
+        username="technician-colleague",
+        role=User.Role.TECHNICIAN,
+    )
+    intervention_factory(
+        "Intervention demain",
+        status=Intervention.Status.PLANNED,
+        technician=technician,
+        starts_at=today_at(9) + timedelta(days=1),
+    )
+    intervention_factory(
+        "Intervention dans trois jours",
+        status=Intervention.Status.PLANNED,
+        technician=technician,
+        starts_at=today_at(9) + timedelta(days=3),
+    )
+    intervention_factory(
+        "Intervention aujourd'hui",
+        status=Intervention.Status.PLANNED,
+        technician=technician,
+        starts_at=today_at(11),
+    )
+    intervention_factory(
+        "Intervention d'un collègue",
+        status=Intervention.Status.PLANNED,
+        technician=other_technician,
+        starts_at=today_at(14) + timedelta(days=1),
+    )
+    intervention_factory(
+        "Intervention annulée",
+        status=Intervention.Status.CANCELLED,
+        technician=technician,
+        starts_at=today_at(16) + timedelta(days=1),
+    )
+
+    data = get_dashboard_data(technician)
+
+    assert data["upcoming_count"] == 2
+    assert data["today_count"] == 1
+
+
+@pytest.mark.django_db
+def test_technician_dashboard_counts_only_own_in_progress(
+    dashboard_users,
+    intervention_factory,
+    today_at,
+):
+    technician = dashboard_users[User.Role.TECHNICIAN]
+    colleague = User.objects.create_user(
+        username="another-technician",
+        role=User.Role.TECHNICIAN,
+    )
+    intervention_factory(
+        "Mon intervention en cours",
+        status=Intervention.Status.IN_PROGRESS,
+        technician=technician,
+        starts_at=today_at(9),
+    )
+    intervention_factory(
+        "Intervention du collègue",
+        status=Intervention.Status.IN_PROGRESS,
+        technician=colleague,
+        starts_at=today_at(11),
+    )
+
+    data = get_dashboard_data(technician)
+
+    assert data["in_progress_count"] == 1
+    assert data["today_count"] == 1
+
+
+@pytest.mark.django_db
+def test_technician_dashboard_hides_colleague_interventions(
+    client,
+    django_user_model,
+):
+    technician = django_user_model.objects.create_user(
+        username="dashboard-technician",
+        role=User.Role.TECHNICIAN,
+    )
+    colleague = django_user_model.objects.create_user(
+        username="dashboard-colleague",
+        role=User.Role.TECHNICIAN,
+    )
+    customer = Client.objects.create(name="Client technicien")
+    starts_at = timezone.make_aware(
+        datetime.combine(timezone.localdate(), time(9)),
+        timezone.get_current_timezone(),
+    )
+    own_intervention = Intervention.objects.create(
+        title="Mon dépannage",
+        client=customer,
+        created_by=technician,
+        technician=technician,
+        status=Intervention.Status.PLANNED,
+        starts_at=starts_at,
+        ends_at=starts_at + timedelta(hours=1),
+    )
+    Intervention.objects.create(
+        title="Intervention confidentielle du collègue",
+        client=customer,
+        created_by=technician,
+        technician=colleague,
+        status=Intervention.Status.PLANNED,
+        starts_at=starts_at,
+        ends_at=starts_at + timedelta(hours=1),
+    )
+
+    client.force_login(technician)
+    response = client.get(reverse("core:home"))
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert own_intervention.title in content
+    assert "Intervention confidentielle du collègue" not in content
+    assert "Tableau de bord - Administration" not in content
+    assert "Tableau de bord - Gestion" not in content

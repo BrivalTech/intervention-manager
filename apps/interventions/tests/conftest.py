@@ -1,5 +1,3 @@
-"""Fixtures shared by intervention model, service and permission tests."""
-
 import pytest
 
 from apps.accounts.models import User

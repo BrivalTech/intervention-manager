@@ -1,0 +1,96 @@
+<section class="stack dashboard" aria-labelledby="technician-dashboard-title">
+    <div class="stack">
+        <h2 id="technician-dashboard-title">Mes interventions</h2>
+        <p>Consultez votre planning et suivez vos interventions.</p>
+    </div>
+
+    <section class="stack dashboard-section" aria-labelledby="technician-metrics-title">
+        <h3 id="technician-metrics-title">Synthèse de mes interventions</h3>
+        <div class="dashboard-metrics">
+            <div class="card">
+                <div class="card__content stack">
+                    <p>Mes interventions du jour</p>
+                    <p class="dashboard-metric__value">
+                        {{ dashboard.today_count }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card__content stack">
+                    <p>À venir</p>
+                    <p class="dashboard-metric__value">
+                        {{ dashboard.upcoming_count }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card__content stack">
+                    <p>En cours</p>
+                    <p class="dashboard-metric__value">
+                        {{ dashboard.in_progress_count }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="stack dashboard-section" aria-labelledby="technician-today-title">
+        <div class="dashboard-section__header">
+            <h3 id="technician-today-title">Mon planning du jour</h3>
+            <a href="{% url 'interventions:list' %}" class="link">
+                Voir toutes mes interventions
+            </a>
+        </div>
+
+        {% if dashboard.today_interventions %}
+            <ul class="dashboard-interventions">
+                {% for intervention in dashboard.today_interventions %}
+                    <li class="card dashboard-intervention">
+                        <div class="dashboard-intervention__header">
+                            <h4 class="dashboard-intervention__title">
+                                <a href="{% url 'interventions:detail' intervention.pk %}">
+                                    {{ intervention.title }}
+                                </a>
+                            </h4>
+                            <span class="dashboard-intervention__status">
+                                {{ intervention.get_status_display }}
+                            </span>
+                        </div>
+
+                        <p class="dashboard-intervention__meta">
+                            <time datetime="{{ intervention.starts_at|date:'c' }}">
+                                {{ intervention.starts_at|date:"H:i" }}
+                            </time>
+                            <span aria-hidden="true">·</span>
+                            {{ intervention.client.name }}
+                        </p>
+
+                        {% if intervention.city %}
+                            <p class="dashboard-intervention__meta">
+                                Lieu : {{ intervention.city }}
+                            </p>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Vous n'avez aucune intervention prévue aujourd'hui.</p>
+        {% endif %}
+    </section>
+
+    <section class="stack dashboard-section" aria-labelledby="technician-links-title">
+        <h3 id="technician-links-title">Accès rapides</h3>
+
+        <ul class="dashboard-shortcuts">
+            <li>
+                <a href="{% url 'interventions:list' %}"
+                    class="card dashboard-shortcut"
+                >
+                    Mes interventions
+                </a>
+            </li>
+        </ul>
+    </section>
+</section>

@@ -18,19 +18,7 @@
         {% elif user.role == "MANAGER" %}
             {% include "core/dashboards/manager.html" %}
         {% elif user.role == "TECHNICIAN" %}
-            <div class="stack">
-                <h2>Mes interventions</h2>
-                <p>Bienvenue dans votre espace technicien.</p>
-            </div>
-            <div class="card">
-                <h3 class="card__title">Interventions attribuées</h3>
-                <div class="card__content">
-                    <p>
-                        Cet espace vous permet de consulter vos interventions
-                        et de suivre leur état d'avancement.
-                    </p>
-                </div>
-            </div>
+            {% include "core/dashboards/technician.html" %}
         {% else %}
             <div class="stack">
             <h2>Tableau de bord</h2>
