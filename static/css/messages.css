@@ -1,0 +1,58 @@
+/* Message */
+.message {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background-color: var(--message-background);
+    color: var(--color-text);
+    border-radius: var(--border-radius-md);
+    margin-bottom: var(--space-3);
+}
+
+.message__icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    background-color: var(--message-color);
+    color: var(--color-white);
+    border-radius: var(--border-radius-sm);
+}
+
+.message__body {
+    flex: 1;
+    min-width: 0;
+}
+
+.message__content {
+    margin-block: 0;
+}
+
+.message__title {
+    margin-block: 0 var(--space-1);
+    color: var(--message-color);
+    font-weight: var(--font-weight-bold);
+}
+
+.message--info {
+    --message-color: var(--color-info);
+    --message-background: var(--color-info-background);
+}
+
+.message--success {
+    --message-color: var(--color-success);
+    --message-background: var(--color-success-background);
+}
+
+.message--warning {
+    --message-color: var(--color-warning);
+    --message-background: var(--color-warning-background);
+}
+
+.message--error {
+    --message-color: var(--color-danger);
+    --message-background: var(--color-danger-background);
+}
