@@ -178,3 +178,8 @@ Ils concernent notamment :
 
 Les paramètres HTTPS ne doivent pas être activés sans tenir compte de la
 configuration réelle du serveur et du proxy éventuel.
+
+## 10. Identifiants publics et navigation (Sprint 8)
+Les URL des ressources utilisateurs exposent `public_id` (UUID) plutôt que la clé primaire numérique. Les vues doivent toujours appliquer les règles d'autorisation correspondant au rôle et à la ressource ; connaître un UUID ne donne aucun droit supplémentaire.
+
+La navigation mobile/tablette repose sur `<details>` et `<summary>` sans JavaScript. Sur desktop, la navigation horizontale est affichée séparément. Les deux présentations partagent les mêmes liens et conditions de rôles via un template inclus. Le bouton de déconnexion reste un formulaire POST protégé par CSRF.

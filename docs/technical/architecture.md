@@ -109,52 +109,32 @@ templates/
 └-- core/
 ```
 ## Architecture CSS
+Les styles sont organisés par responsabilité. Les feuilles sont référencées dans `templates/base.html` et `templates/500.html` dans un ordre explicite, pour préserver la cascade CSS.
+
 ```text
-static/
-└-- css/
-    ├-- variables.css
-    ├-- reset.css
-    ├-- base.css
-    ├-- accessibility.css
-    │
-    ├-- components/
-    │   ├-- button.css
-    │   ├-- form.css
-    │   ├-- message.css
-    │   ├-- navigation.css
-    │   ├-- status.css
-    │   └-- table.css
-    │
-    └-- pages/
+static/css/
+├── variables.css
+├── base.css
+├── layout-navigation.css
+├── buttons-links.css
+├── messages.css
+├── cards-entities.css
+├── forms-status.css
+├── dashboards.css
+├── responsive.css
+└── accessibility.css
 ```
-Le dossier `pages/` ne comprendra des fichiers pour les besoins spécifiques.
+
+`variables.css` centralise les tokens ; `accessibility.css` porte les ajustements d'accessibilité. `responsive.css` contient les adaptations tablette et desktop. L'ancien `main.css` est remplacé par les huit modules intermédiaires.
+
 ## JavaScript
 Le fonctionnement métier ne dépend pas de JavaScript sauf justification
 documentée.
 ## Stratégie de tests
-```text
-apps/
-├-- accounts/
-│   └-- tests/
-│       ├-- test_models.py
-│       ├-- test_forms.py
-│       └-- test_views.py
-│
-├-- clients/
-│   └-- tests/
-│
-└-- interventions/
-    └-- tests/
-        ├-- test_models.py
-        ├-- test_forms.py
-        ├-- test_services.py
-        └-- test_views.py
-```
-Les tests suivront ces catégories :
-1. métier : est-ce que la règle fonctionne ?
-2. HTTP : l'utilisateur peut-il réaliser l'action ?
-3. présentation / accessibilité : l'interface contient-elle les éléments
-   attendus ?
+Les tests `pytest` sont regroupés par domaine dans `apps/accounts/tests/`, `apps/clients/tests/`, `apps/interventions/tests/` et `apps/core/tests/`. Les fichiers de vues, services et modèles sont découpés par fonctionnalité (liste, création, détail, permissions, transitions, etc.). Les fixtures communes sont placées dans les `conftest.py` appropriés. La fixture HTTP `client` de pytest-django ne doit pas être masquée par une fixture métier homonyme.
+
+Les tests couvrent les règles métier, les autorisations, les réponses HTTP et la structure des interfaces. Les pages d'erreur personnalisées 403, 404 et 500 disposent de tests dédiés.
+
 ## Gestion des dépendances
 Les dépendances sont gérées selon les nécessités de l'application.
 - `base.txt`: uniquement ce qui est nécessaire à l'application
@@ -218,3 +198,11 @@ intervention-manager/
 - monitoring
 - SMTP
 - architecture de déploiement définitive
+
+## Identifiants publics (Sprint 8.1)
+Les modèles `User`, `Client` et `Intervention` conservent leur clé primaire interne et possèdent un champ `public_id` de type UUID. Les relations entre modèles restent basées sur les clés internes ; les URL de consultation et de modification exposent les UUID publics.
+
+L'UUID évite d'exposer un identifiant séquentiel, mais **ne constitue pas un mécanisme d'autorisation** : chaque vue doit continuer à vérifier l'authentification, le rôle et les règles de visibilité. Les migrations ont été réalisées en plusieurs étapes pour attribuer un UUID unique aux enregistrements existants.
+
+## Pages d'erreur (Sprint 8.3)
+Les templates `templates/403.html`, `templates/404.html` et `templates/500.html` présentent des messages compréhensibles sans exposer d'informations techniques. La page 500 doit rester autonome autant que possible, car une erreur serveur peut empêcher l'accès au contexte applicatif habituel. Les tests de rendu des pages personnalisées utilisent `DEBUG=False`.
