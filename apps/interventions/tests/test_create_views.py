@@ -71,7 +71,7 @@ def test_authorized_user_can_create_intervention(
     assert response.status_code == 302
     assert response.url == reverse(
         "interventions:detail",
-        args=[intervention.pk],
+        args=[intervention.public_id],
     )
     assert intervention.created_by == intervention_author
     assert intervention.status == Intervention.Status.TO_PLAN

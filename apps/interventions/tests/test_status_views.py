@@ -21,7 +21,7 @@ def status_intervention(db, intervention_author):
 def status_url(intervention, action):
     return reverse(
         "interventions:status_update",
-        args=[intervention.pk, action],
+        args=[intervention.public_id, action],
     )
 
 
@@ -59,7 +59,7 @@ def test_manager_can_start_intervention(
     assert response.status_code == 302
     assert response.url == reverse(
         "interventions:detail",
-        args=[status_intervention.pk],
+        args=[status_intervention.public_id],
     )
 
     status_intervention.refresh_from_db()

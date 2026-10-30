@@ -1,0 +1,34 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Erreur du serveur — Gestionnaire d’interventions</title>
+        <link rel="stylesheet" href="{% static 'css/variables.css' %}">
+        <link rel="stylesheet" href="{% static 'css/base.css' %}">
+        <link rel="stylesheet" href="{% static 'css/layout-navigation.css' %}">
+        <link rel="stylesheet" href="{% static 'css/buttons-links.css' %}">
+        <link rel="stylesheet" href="{% static 'css/messages.css' %}">
+        <link rel="stylesheet" href="{% static 'css/cards-entities.css' %}">
+        <link rel="stylesheet" href="{% static 'css/forms-status.css' %}">
+        <link rel="stylesheet" href="{% static 'css/dashboards.css' %}">
+        <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+        <link rel="stylesheet" href="{% static 'css/accessibility.css' %}">
+    </head>
+    <body>
+        <a class="skip-link" href="#main-content">Aller au contenu principal</a>
+        <header class="site-header">
+            <div class="container">
+                <span class="site-title">Gestionnaire d’interventions</span>
+            </div>
+        </header>
+        <main id="main-content" class="container">
+            <section aria-labelledby="error-title">
+                <h1 id="error-title">Une erreur est survenue</h1>
+                <p>Le service rencontre un problème temporaire. Veuillez réessayer dans quelques instants.</p>
+                <p><a href="/">Retour à l’accueil</a></p>
+            </section>
+        </main>
+    </body>
+</html>

@@ -1,3 +1,5 @@
+import uuid
+
 from django.core.exceptions import ValidationError
 from django.db import models
 
@@ -5,6 +7,11 @@ from django.db import models
 class Client(models.Model):
     """Represent a client for whom interventions can be managed."""
 
+    public_id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+    )
     name = models.CharField(max_length=255)
     contact_name = models.CharField(max_length=255, blank=True)
     email = models.EmailField(blank=True)

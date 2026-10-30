@@ -22,21 +22,21 @@
             {% if can_edit_client or can_archive_client or can_restore_client %}
                 <div class="entity-detail__actions cluster">
                     {% if can_edit_client %}
-                        <a href="{% url "clients:update" client_obj.pk %}"
+                        <a href="{% url "clients:update" client_obj.public_id %}"
                            class="button button--primary"
                         >
                             Modifier le client
                         </a>
                     {% endif %}
                     {% if can_archive_client %}
-                        <a href="{% url "clients:archive" client_obj.pk %}"
+                        <a href="{% url "clients:archive" client_obj.public_id %}"
                            class="button button--danger"
                         >
                             Archiver le client
                         </a>
                     {% endif %}
                     {% if can_restore_client %}
-                        <a href="{% url "clients:restore" client_obj.pk %}"
+                        <a href="{% url "clients:restore" client_obj.public_id %}"
                            class="button button--primary"
                         >
                             Réactiver le client

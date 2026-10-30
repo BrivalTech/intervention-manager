@@ -28,7 +28,9 @@ def test_admin_can_access_technician_update(
     )
 
     client.force_login(admin)
-    response = client.get(reverse("accounts:technician_update", args=[technician.pk]))
+    response = client.get(
+        reverse("accounts:technician_update", args=[technician.public_id])
+    )
 
     assert response.status_code == 200
     assert response.context["form"].instance == technician
@@ -53,7 +55,7 @@ def test_non_admin_cannot_update_technician(
     )
 
     client.force_login(user)
-    url = reverse("accounts:technician_update", args=[technician.pk])
+    url = reverse("accounts:technician_update", args=[technician.public_id])
     response = client.get(url)
 
     assert response.status_code == 403
@@ -87,7 +89,7 @@ def test_admin_updates_technician_without_changing_password(
     client.force_login(admin)
     original_password = technician.password
     response = client.post(
-        reverse("accounts:technician_update", args=[technician.pk]),
+        reverse("accounts:technician_update", args=[technician.public_id]),
         {
             "first_name": "Alicia",
             "last_name": "Martin",
@@ -121,7 +123,7 @@ def test_invalid_update_does_not_save(
 
     client.force_login(admin)
     response = client.post(
-        reverse("accounts:technician_update", args=[technician.pk]),
+        reverse("accounts:technician_update", args=[technician.public_id]),
         {
             "first_name": "Alicia",
             "last_name": "Martin",
@@ -142,7 +144,7 @@ def test_technician_update_requires_authentication(client, technician):
     response = client.get(
         reverse(
             "accounts:technician_update",
-            args=[technician.pk],
+            args=[technician.public_id],
         )
     )
 
@@ -157,6 +159,6 @@ def test_cannot_update_non_technician(client, django_user_model):
     )
 
     client.force_login(admin)
-    response = client.get(reverse("accounts:technician_update", args=[admin.pk]))
+    response = client.get(reverse("accounts:technician_update", args=[admin.public_id]))
 
     assert response.status_code == 404

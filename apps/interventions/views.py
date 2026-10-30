@@ -40,7 +40,7 @@ def get_intervention_detail_url(request, intervention):
     """Build the detail URL preserving list navigation."""
     detail_url = reverse(
         "interventions:detail",
-        kwargs={"pk": intervention.pk},
+        kwargs={"public_id": intervention.public_id},
     )
 
     list_query = get_list_query(request)
@@ -106,7 +106,7 @@ def intervention_list(request):
 
 
 @login_required
-def intervention_detail(request, pk):
+def intervention_detail(request, public_id):
     """Display an intervention according to the user's role."""
     if not can_view_interventions(request.user):
         raise PermissionDenied
@@ -122,7 +122,7 @@ def intervention_detail(request, pk):
             technician=request.user,
         )
 
-    intervention = get_object_or_404(interventions, pk=pk)
+    intervention = get_object_or_404(interventions, public_id=public_id)
 
     return render(
         request,
@@ -185,7 +185,7 @@ def intervention_create(request):
                 )
                 return redirect(
                     "interventions:detail",
-                    pk=intervention.pk,
+                    public_id=intervention.public_id,
                 )
     else:
         form = InterventionForm()
@@ -198,7 +198,7 @@ def intervention_create(request):
 
 
 @login_required
-def intervention_edit(request, pk):
+def intervention_edit(request, public_id):
     """Edit an intervention when the user has permission."""
     intervention = get_object_or_404(
         Intervention.objects.select_related(
@@ -206,7 +206,7 @@ def intervention_edit(request, pk):
             "technician",
             "created_by",
         ),
-        pk=pk,
+        public_id=public_id,
     )
 
     if not can_edit_intervention(request.user, intervention):
@@ -262,9 +262,9 @@ def intervention_edit(request, pk):
 
 @login_required
 @require_POST
-def intervention_status_update(request, pk, action):
+def intervention_status_update(request, public_id, action):
     """Start or cancel an intervention when authorized."""
-    intervention = get_object_or_404(Intervention, pk=pk)
+    intervention = get_object_or_404(Intervention, public_id=public_id)
 
     if action not in {"start", "cancel"}:
         raise PermissionDenied
@@ -304,9 +304,9 @@ def intervention_status_update(request, pk, action):
 
 @login_required
 @require_http_methods(["GET", "POST"])
-def intervention_complete(request, pk):
+def intervention_complete(request, public_id):
     """Complete an intervention with a mandatory report."""
-    intervention = get_object_or_404(Intervention, pk=pk)
+    intervention = get_object_or_404(Intervention, public_id=public_id)
 
     if not can_update_status(request.user, intervention, "complete"):
         raise PermissionDenied

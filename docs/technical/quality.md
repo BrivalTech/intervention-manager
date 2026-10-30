@@ -491,3 +491,20 @@ Elle pourra évoluer avec l'application, notamment avec l'ajout futur de :
 Les nouveaux outils ne seront ajoutés que lorsqu'ils apporteront une valeur
 réelle au projet afin de conserver une chaîne de développement simple et
 maintenable.
+
+## 13. Organisation des tests après le Sprint 8
+Les tests sont séparés par fonctionnalité plutôt que concentrés dans de grands fichiers de vues ou de services. Conserver des noms explicites et des fixtures partagées uniquement lorsqu'elles sont réellement réutilisées. Ne pas créer de fixture `client` métier : ce nom est réservé au client HTTP de pytest-django.
+
+Pour les URL publiques, vérifier la résolution des UUID et le rejet des identifiants numériques. Pour les pages 403, 404 et 500, contrôler les statuts HTTP et le rendu avec `DEBUG=False`. Les tests de structure HTML ne remplacent pas les vérifications manuelles au clavier, au zoom et sur différentes largeurs d'écran.
+
+Avant une PR :
+
+```bash
+python manage.py check
+pytest -q
+ruff check .
+ruff format --check .
+git diff --check
+```
+
+Après une évolution CSS, contrôler les références aux feuilles supprimées, les éventuels débordements, les formulaires POST et le comportement responsive.

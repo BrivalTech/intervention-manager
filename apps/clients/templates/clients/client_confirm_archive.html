@@ -5,7 +5,7 @@
     <section class="entity-archive stack stack--large"
              aria-labelledby="archive-title">
         <header class="stack">
-            <a href="{% url 'clients:detail' client_obj.pk %}" class="link">
+            <a href="{% url 'clients:detail' client_obj.public_id %}" class="link">
                 Retour à la fiche client
             </a>
             <h1 id="archive-title">Archiver un client</h1>
@@ -30,7 +30,7 @@
                 <button type="submit" class="button button--danger">
                     Confirmer l'archivage
                 </button>
-                <a href="{% url "clients:detail" client_obj.pk %}"
+                <a href="{% url "clients:detail" client_obj.public_id %}"
                    class="button button--secondary"
                 >
                     Annuler

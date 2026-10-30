@@ -108,11 +108,11 @@ def account_create(request, config):
     )
 
 
-def account_update(request, pk, config):
+def account_update(request, public_id, config):
     if not config.can_manage(request.user):
         raise PermissionDenied
 
-    account = get_object_or_404(User, pk=pk, role=config.role)
+    account = get_object_or_404(User, public_id=public_id, role=config.role)
 
     if request.method == "POST":
         form = config.update_form(request.POST, instance=account)
@@ -139,11 +139,11 @@ def account_update(request, pk, config):
     )
 
 
-def account_resend_invitation(request, pk, config):
+def account_resend_invitation(request, public_id, config):
     if not config.can_manage(request.user):
         raise PermissionDenied
 
-    account = get_object_or_404(User, pk=pk, role=config.role)
+    account = get_object_or_404(User, public_id=public_id, role=config.role)
 
     if not account.is_active:
         messages.error(
@@ -180,11 +180,11 @@ def account_resend_invitation(request, pk, config):
     return redirect(config.list_url)
 
 
-def account_set_active(request, pk, config, *, active):
+def account_set_active(request, public_id, config, *, active):
     if not config.can_manage(request.user):
         raise PermissionDenied
 
-    account = get_object_or_404(User, pk=pk, role=config.role)
+    account = get_object_or_404(User, public_id=public_id, role=config.role)
 
     if account.is_active != active:
         account.is_active = active

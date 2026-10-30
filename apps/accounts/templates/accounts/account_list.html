@@ -112,7 +112,7 @@
 
                             {% if can_manage_accounts %}
                                 <div class="technician-card__actions">
-                                    <a href="{% url account_config.update_url account.pk %}"
+                                    <a href="{% url account_config.update_url account.public_id %}"
                                        class="button button--secondary"
                                        aria-label="Modifier {{ account.get_full_name|default:account.username }}">
                                         Modifier
@@ -120,7 +120,7 @@
 
                                     {% if account.is_active %}
                                         <form method="post"
-                                              action="{% url account_config.deactivate_url account.pk %}">
+                                              action="{% url account_config.deactivate_url account.public_id %}">
                                             {% csrf_token %}
                                             <button type="submit"
                                                     class="button button--secondary"
@@ -130,7 +130,7 @@
                                         </form>
                                     {% else %}
                                         <form method="post"
-                                              action="{% url account_config.reactivate_url account.pk %}">
+                                              action="{% url account_config.reactivate_url account.public_id %}">
                                             {% csrf_token %}
                                             <button type="submit"
                                                     class="button button--secondary"
@@ -142,7 +142,7 @@
 
                                     {% if account.is_active and not account.has_usable_password %}
                                         <form method="post"
-                                              action="{% url account_config.resend_url account.pk %}">
+                                              action="{% url account_config.resend_url account.public_id %}">
                                             {% csrf_token %}
                                             <button type="submit"
                                                     class="button button--secondary"

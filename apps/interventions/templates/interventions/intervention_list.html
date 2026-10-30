@@ -69,7 +69,7 @@
                         <div class="card__content">
                             <h2 class="card__title">
                                 <a
-                                    href="{% url 'interventions:detail' intervention.pk %}{% if list_query %}?{{ list_query }}{% endif %}"
+                                    href="{% url 'interventions:detail' intervention.public_id %}{% if list_query %}?{{ list_query }}{% endif %}"
                                     class="entity-card__link"
                                 >
                                     {{ intervention.title }}

@@ -85,7 +85,7 @@
                     <li class="card">
                         <div class="card__content">
                             <h2 class="card__title">
-                                <a href="{% url 'clients:detail' client.pk %}"
+                                <a href="{% url 'clients:detail' client.public_id %}"
                                    class="entity-card__link"
                                 >
                                     {{ client.name }}

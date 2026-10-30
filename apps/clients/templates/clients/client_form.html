@@ -98,7 +98,7 @@
                 <a
                         class="button button--secondary"
                         {% if is_edit %}
-                            href="{% url 'clients:detail' client_obj.pk %}"
+                            href="{% url 'clients:detail' client_obj.public_id %}"
                         {% else %}
                             href="{% url 'clients:list' %}"
                         {% endif %}

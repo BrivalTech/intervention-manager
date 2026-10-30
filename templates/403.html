@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Accès interdit — Gestionnaire d’interventions{% endblock %}
+
+{% block content %}
+    <section aria-labelledby="error-title">
+        <h1 id="error-title">Accès interdit</h1>
+        <p>
+            Vous ne disposez pas des autorisations nécessaires pour
+            consulter cette page.</p>
+        <p><a href="{% url 'core:home' %}">Retour à l’accueil</a></p>
+    </section>
+{% endblock %}

@@ -89,7 +89,7 @@ def test_manager_update_rejects_technician_account(
     response = client.get(
         reverse(
             "accounts:manager_update",
-            args=[technician_user.pk],
+            args=[technician_user.public_id],
         )
     )
 

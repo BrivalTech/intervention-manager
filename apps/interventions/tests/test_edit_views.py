@@ -1,3 +1,5 @@
+import uuid
+
 import pytest
 from django.core.exceptions import ValidationError
 from django.urls import reverse
@@ -21,7 +23,7 @@ def editable_intervention(db, intervention_author):
 @pytest.mark.django_db
 def test_edit_requires_authentication(client, editable_intervention):
     response = client.get(
-        reverse("interventions:edit", args=[editable_intervention.pk])
+        reverse("interventions:edit", args=[editable_intervention.public_id])
     )
 
     assert response.status_code == 302
@@ -45,7 +47,7 @@ def test_authorized_user_can_access_edit_form(
 
     client.force_login(user)
     response = client.get(
-        reverse("interventions:edit", args=[editable_intervention.pk])
+        reverse("interventions:edit", args=[editable_intervention.public_id])
     )
 
     assert response.status_code == 200
@@ -66,7 +68,7 @@ def test_technician_cannot_edit_intervention(
 
     client.force_login(technician)
     response = client.get(
-        reverse("interventions:edit", args=[editable_intervention.pk])
+        reverse("interventions:edit", args=[editable_intervention.public_id])
     )
 
     assert response.status_code == 403
@@ -80,7 +82,7 @@ def test_authorized_user_can_update_intervention(
 ):
     client.force_login(intervention_author)
     response = client.post(
-        reverse("interventions:edit", args=[editable_intervention.pk]),
+        reverse("interventions:edit", args=[editable_intervention.public_id]),
         {
             "client": editable_intervention.client_id,
             "title": "Intervention modifiée",
@@ -91,7 +93,7 @@ def test_authorized_user_can_update_intervention(
     assert response.status_code == 302
     assert response.url == reverse(
         "interventions:detail",
-        args=[editable_intervention.pk],
+        args=[editable_intervention.public_id],
     )
 
     editable_intervention.refresh_from_db()
@@ -109,7 +111,7 @@ def test_invalid_edit_does_not_change_intervention(
 ):
     client.force_login(intervention_author)
     response = client.post(
-        reverse("interventions:edit", args=[editable_intervention.pk]),
+        reverse("interventions:edit", args=[editable_intervention.public_id]),
         {
             "client": editable_intervention.client_id,
             "title": "",
@@ -126,7 +128,12 @@ def test_invalid_edit_does_not_change_intervention(
 @pytest.mark.django_db
 def test_unknown_intervention_edit_returns_404(client, intervention_author):
     client.force_login(intervention_author)
-    response = client.get(reverse("interventions:edit", args=[999999]))
+    response = client.get(
+        reverse(
+            "interventions:edit",
+            args=[uuid.uuid4()],
+        )
+    )
 
     assert response.status_code == 404
 
@@ -152,7 +159,7 @@ def test_intervention_remains_editable_when_client_archiving_is_refused(
     response = client.get(
         reverse(
             "interventions:edit",
-            args=[editable_intervention.pk],
+            args=[editable_intervention.public_id],
         )
     )
 

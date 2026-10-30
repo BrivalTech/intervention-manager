@@ -11,18 +11,24 @@ Il vise à garantir :
 - une limitation du CSS, du JavaScript et des dépendances externes
 - une séparation entre présentation et logique métier
 ## 2. Organisation des fichiers
-Les styles sont répartis en trois fichiers :
-```text
-| Fichier                        | Responsabilité
-|--------------------------------|---------------------------------------------------------------------------------
-| `static/css/variables.css`     | Design tokens : couleurs, typographie, espacements, bordures et dimensions
-| `static/css/main.css`          | Styles globaux, disposition et composants réutilisables
-| `static/css/accessibility.css` | Lien d'évitement, focus visible, masquage accessible et réduction des animations
-```
-Les feuilles de style sont chargées depuis `templates/base.html` avec le système de fichiers statiques de Django.
+Les styles sont répartis en modules CSS, chacun consacré à une responsabilité :
 
-La page `templates/design-system.html` constitue la référence visuelle des composants.
-Elle est accessible à l'adresse `/design-system/`.
+```text
+static/css/
+├── variables.css
+├── base.css
+├── layout-navigation.css
+├── buttons-links.css
+├── messages.css
+├── cards-entities.css
+├── forms-status.css
+├── dashboards.css
+├── responsive.css
+└── accessibility.css
+```
+
+`base.html` charge ces feuilles dans l'ordre de la cascade ; la page d'erreur 500 charge les styles nécessaires indépendamment de la navigation applicative. La page `/design-system/` reste la référence visuelle des composants.
+
 ## 3. Design tokens
 Les valeurs communes sont centralisées dans `variables.css` sous forme de propriétés CSS personnalisées.
 
@@ -159,3 +165,15 @@ Avant d'intégrer un nouveau composant ou de modifier un composant existant, vé
 Les vérifications techniques du projet sont décrites dans `docs/technical/quality.md`.
 Tout nouveau composant générique doit être ajouté à la page de référence et documenté ici lorsque cela apporte une information utile.
 Le Design System évolue en fonction des besoins réels de l'application, sans anticipation excessive de fonctionnalités non utilisées.
+
+## 10. Évolutions du Sprint 8
+### Navigation responsive
+Sur mobile et tablette, le menu principal utilise l'élément HTML natif `<details>` et son déclencheur `<summary>` ; l'ouverture et la fermeture ne nécessitent pas JavaScript. La navigation horizontale desktop est distincte. Les liens et contrôles de permissions sont mutualisés dans un template inclus afin d'éviter la duplication de logique.
+
+Vérifier au clavier l'ouverture et la fermeture du menu, l'ordre de tabulation, la visibilité du focus et la déconnexion par formulaire POST. Les seuils responsive sont définis en CSS mobile-first.
+
+### Cartes et actions
+Les listes Interventions, Clients, Gestionnaires et Techniciens utilisent une grille commune `.entity-list`. Les cartes s'étirent sur la hauteur de leur ligne sans hauteur fixe, pour préserver l'agrandissement du texte. Les actions des cartes de comptes sont alignées en bas et s'adaptent à la largeur disponible, sans masquer les libellés.
+
+### Pages d'erreur
+Les pages 403, 404 et 500 utilisent des titres explicites, des liens de retour et des éléments sémantiques. Elles ne doivent pas divulguer de détails internes ni nécessiter JavaScript.

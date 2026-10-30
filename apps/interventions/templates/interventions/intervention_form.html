@@ -91,7 +91,7 @@
                 <button type="submit" class="button button--primary">
                     Enregistrer l'intervention
                 </button>
-                <a href="{% if is_edit %}{% url 'interventions:detail' intervention.pk %}{% else %}{% url 'interventions:list' %}{% endif %}{% if list_query %}?{{ list_query }}{% endif %}"
+                <a href="{% if is_edit %}{% url 'interventions:detail' intervention.public_id %}{% else %}{% url 'interventions:list' %}{% endif %}{% if list_query %}?{{ list_query }}{% endif %}"
                     class="button button--secondary"
                 >
                     Annuler
