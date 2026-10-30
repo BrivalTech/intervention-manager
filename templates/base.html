@@ -36,110 +36,29 @@
                     </span>
                     <span class="site-title">Gestionnaire d'interventions</span>
                 </a>
-
-                <nav
-                        id="primary-navigation"
+                <!-- Navigation mobile -->
+                <details class="navigation-disclosure">
+                    <summary class="navigation-toggle">
+                        <span class="navigation-toggle__label">Menu</span>
+                        <span
+                            class="navigation-toggle__icon"
+                            aria-hidden="true"
+                        ></span>
+                    </summary>
+                    <nav
                         class="site-nav"
-                        aria-label="Navigation principale"
+                        aria-label="Navigation principale mobile"
+                    >
+                        {% include "includes/navigation_links.html" %}
+                    </nav>
+                </details>
+
+                <!-- Navigation desktop -->
+                <nav
+                    class="site-nav site-nav--desktop"
+                    aria-label="Navigation principale"
                 >
-                    <ul class="nav-list">
-                        {% if user.is_authenticated %}
-                            <li>
-                                <a
-                                        href="{% url 'core:home' %}"
-                                        class="nav-link"
-                                        {% if request.resolver_match.view_name == "core:home" %}
-                                        aria-current="page"
-                                        {% endif %}
-                                >
-                                    Accueil
-                                </a>
-                            </li>
-                        {% endif %}
-
-                        {% if nav_can_view_managers %}
-                            <li>
-                                <a
-                                        href="{% url 'accounts:manager_list' %}"
-                                        class="nav-link"
-                                        {% if request.resolver_match.url_name == "manager_list" %}
-                                            aria-current="page"
-                                        {% endif %}
-                                >
-                                    Gestionnaires
-                                </a>
-                            </li>
-                        {% endif %}
-
-                        {% if nav_can_view_technicians %}
-                            <li>
-                                <a
-                                        href="{% url 'accounts:technician_list' %}"
-                                        class="nav-link"
-                                        {% if request.resolver_match.url_name == "technician_list" %}
-                                            aria-current="page"
-                                        {% endif %}
-                                >
-                                    Techniciens
-                                </a>
-                            </li>
-                        {% endif %}
-
-                        {% if nav_can_view_clients %}
-                            <li>
-                                <a
-                                        href="{% url 'clients:list' %}"
-                                        class="nav-link"
-                                        {% if request.resolver_match.namespace == "clients" %}
-                                            aria-current="page"
-                                        {% endif %}
-                                >
-                                    Clients
-                                </a>
-                            </li>
-                        {% endif %}
-
-                        {% if nav_can_view_interventions %}
-                            <li>
-                                <a
-                                    href="{% url 'interventions:list' %}"
-                                    class="nav-link"
-                                    {% if request.resolver_match.namespace == "interventions" %}
-                                        aria-current="page"
-                                    {% endif %}
-                                >
-                                    Interventions
-                                </a>
-                            </li>
-                        {% endif %}
-
-                        {% if user.is_authenticated %}
-                            <li>
-                                <form
-                                        method="post"
-                                        action="{% url 'accounts:logout' %}"
-                                >
-                                    {% csrf_token %}
-
-                                    <button class="nav-button" type="submit">
-                                        Se déconnecter
-                                    </button>
-                                </form>
-                            </li>
-                        {% else %}
-                            <li>
-                                <a
-                                        href="{% url 'accounts:login' %}"
-                                        class="nav-link"
-                                        {% if request.resolver_match.view_name == "accounts:login" %}
-                                            aria-current="page"
-                                        {% endif %}
-                                >
-                                    Se connecter
-                                </a>
-                            </li>
-                        {% endif %}
-                    </ul>
+                    {% include "includes/navigation_links.html" %}
                 </nav>
             </div>
         </header>
