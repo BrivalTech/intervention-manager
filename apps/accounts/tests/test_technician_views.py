@@ -367,7 +367,7 @@ def test_manager_cannot_see_resend_invitation_button(
 
     invitation_url = reverse(
         "accounts:technician_resend_invitation",
-        args=[technician.pk],
+        args=[technician.public_id],
     )
 
     assert invitation_url not in response.content.decode()
@@ -395,7 +395,7 @@ def test_resend_invitation_button_hidden_after_activation(
 
     invitation_url = reverse(
         "accounts:technician_resend_invitation",
-        args=[technician.pk],
+        args=[technician.public_id],
     )
 
     assert invitation_url not in response.content.decode()

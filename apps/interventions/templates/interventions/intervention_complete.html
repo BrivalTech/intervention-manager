@@ -63,7 +63,7 @@
                 <button type="submit" class="button button--primary">
                     Terminer l'intervention
                 </button>
-                <a href="{% url 'interventions:detail' intervention.pk %}{% if list_query %}?{{ list_query }}{% endif %}"
+                <a href="{% url 'interventions:detail' intervention.public_id %}{% if list_query %}?{{ list_query }}{% endif %}"
                     class="button button--secondary"
                 >
                     Annuler

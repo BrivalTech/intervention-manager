@@ -22,7 +22,9 @@ urlpatterns = [
     path("technicians/", views.technician_list, name="technician_list"),
     path("technicians/create/", views.technician_create, name="technician_create"),
     path(
-        "technicians/<int:pk>/edit/", views.technician_update, name="technician_update"
+        "technicians/<uuid:public_id>/edit/",
+        views.technician_update,
+        name="technician_update",
     ),
     path(
         "invitation/<uidb64>/<token>/",
@@ -34,39 +36,39 @@ urlpatterns = [
         name="invitation_confirm",
     ),
     path(
-        "technicians/<int:pk>/resend-invitation/",
+        "technicians/<uuid:public_id>/resend-invitation/",
         views.technician_resend_invitation,
         name="technician_resend_invitation",
     ),
     path(
-        "technicians/<int:pk>/deactivate",
+        "technicians/<uuid:public_id>/deactivate/",
         views.technician_deactivate,
         name="technician_deactivate",
     ),
     path(
-        "technicians/<int:pk>/reactivate",
+        "technicians/<uuid:public_id>/reactivate/",
         views.technician_reactivate,
         name="technician_reactivate",
     ),
     path("managers/", views.manager_list, name="manager_list"),
     path("managers/create/", views.manager_create, name="manager_create"),
     path(
-        "managers/<int:pk>/edit/",
+        "managers/<uuid:public_id>/edit/",
         views.manager_update,
         name="manager_update",
     ),
     path(
-        "managers/<int:pk>/resend-invitation/",
+        "managers/<uuid:public_id>/resend-invitation/",
         views.manager_resend_invitation,
         name="manager_resend_invitation",
     ),
     path(
-        "managers/<int:pk>/deactivate/",
+        "managers/<uuid:public_id>/deactivate/",
         views.manager_deactivate,
         name="manager_deactivate",
     ),
     path(
-        "managers/<int:pk>/reactivate/",
+        "managers/<uuid:public_id>/reactivate/",
         views.manager_reactivate,
         name="manager_reactivate",
     ),

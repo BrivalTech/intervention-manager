@@ -94,7 +94,7 @@ def test_manager_update_preserves_role_and_password(admin_client, manager):
     original_password = manager.password
 
     response = admin_client.post(
-        reverse("accounts:manager_update", args=[manager.pk]),
+        reverse("accounts:manager_update", args=[manager.public_id]),
         {
             "first_name": "Alice",
             "last_name": "Dupont",
@@ -115,11 +115,11 @@ def test_manager_update_preserves_role_and_password(admin_client, manager):
 def test_manager_deactivation_and_reactivation(admin_client, manager):
     deactivate_url = reverse(
         "accounts:manager_deactivate",
-        args=[manager.pk],
+        args=[manager.public_id],
     )
     reactivate_url = reverse(
         "accounts:manager_reactivate",
-        args=[manager.pk],
+        args=[manager.public_id],
     )
 
     assert admin_client.get(deactivate_url).status_code == 405
@@ -151,7 +151,7 @@ def test_manager_resend_invitation(admin_client, manager):
         response = admin_client.post(
             reverse(
                 "accounts:manager_resend_invitation",
-                args=[manager.pk],
+                args=[manager.public_id],
             )
         )
 
@@ -167,7 +167,7 @@ def test_manager_with_password_cannot_receive_invitation(admin_client, manager):
         response = admin_client.post(
             reverse(
                 "accounts:manager_resend_invitation",
-                args=[manager.pk],
+                args=[manager.public_id],
             )
         )
 
@@ -216,7 +216,9 @@ def test_manager_actions_reject_technician(admin_client, django_user_model, url_
         role=User.Role.TECHNICIAN,
     )
 
-    response = admin_client.post(reverse(f"accounts:{url_name}", args=[technician.pk]))
+    response = admin_client.post(
+        reverse(f"accounts:{url_name}", args=[technician.public_id])
+    )
 
     assert response.status_code == 404
 
@@ -235,6 +237,8 @@ def test_manager_actions_reject_technician(admin_client, django_user_model, url_
     ],
 )
 def test_manager_actions_require_post(admin_client, manager, url_name):
-    response = admin_client.get(reverse(f"accounts:{url_name}", args=[manager.pk]))
+    response = admin_client.get(
+        reverse(f"accounts:{url_name}", args=[manager.public_id])
+    )
 
     assert response.status_code == 405

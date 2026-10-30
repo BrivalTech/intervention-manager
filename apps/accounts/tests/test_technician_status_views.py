@@ -26,7 +26,7 @@ def test_admin_can_deactivate_technician(client, admin, technician):
     client.force_login(admin)
 
     response = client.post(
-        reverse("accounts:technician_deactivate", args=[technician.pk])
+        reverse("accounts:technician_deactivate", args=[technician.public_id])
     )
 
     assert response.status_code == 302
@@ -42,7 +42,7 @@ def test_admin_can_reactivate_technician(client, admin, technician):
     technician.save(update_fields=["is_active"])
     client.force_login(admin)
     response = client.post(
-        reverse("accounts:technician_reactivate", args=[technician.pk])
+        reverse("accounts:technician_reactivate", args=[technician.public_id])
     )
 
     assert response.status_code == 302
@@ -58,7 +58,7 @@ def test_admin_can_reactivate_technician(client, admin, technician):
 )
 def test_status_change_requires_post(client, admin, technician, action):
     client.force_login(admin)
-    response = client.get(reverse(f"accounts:{action}", args=[technician.pk]))
+    response = client.get(reverse(f"accounts:{action}", args=[technician.public_id]))
 
     assert response.status_code == 405
 
@@ -86,7 +86,7 @@ def test_non_admin_cannot_change_technician_status(
 
     client.force_login(user)
     original_status = technician.is_active
-    response = client.post(reverse(f"accounts:{action}", args=[technician.pk]))
+    response = client.post(reverse(f"accounts:{action}", args=[technician.public_id]))
 
     assert response.status_code == 403
 
@@ -101,7 +101,7 @@ def test_non_admin_cannot_change_technician_status(
 )
 def test_cannot_change_non_technician_status(client, admin, action):
     client.force_login(admin)
-    response = client.post(reverse(f"accounts:{action}", args=[admin.pk]))
+    response = client.post(reverse(f"accounts:{action}", args=[admin.public_id]))
 
     assert response.status_code == 404
 

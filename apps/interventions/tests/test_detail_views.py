@@ -1,3 +1,4 @@
+import uuid
 from datetime import timedelta
 
 import pytest
@@ -22,7 +23,9 @@ def intervention(db, intervention_author):
 
 @pytest.mark.django_db
 def test_intervention_detail_requires_authentication(client, intervention):
-    response = client.get(reverse("interventions:detail", args=[intervention.pk]))
+    response = client.get(
+        reverse("interventions:detail", args=[intervention.public_id])
+    )
 
     assert response.status_code == 302
     assert response.url.startswith(reverse("accounts:login"))
@@ -45,7 +48,9 @@ def test_admin_and_manager_can_view_intervention(
     )
 
     client.force_login(user)
-    response = client.get(reverse("interventions:detail", args=[intervention.pk]))
+    response = client.get(
+        reverse("interventions:detail", args=[intervention.public_id])
+    )
 
     assert response.status_code == 200
     assert response.context["intervention"] == intervention
@@ -64,7 +69,9 @@ def test_assigned_technician_can_view_intervention(
 
     intervention.assign_technician(technician)
     client.force_login(technician)
-    response = client.get(reverse("interventions:detail", args=[intervention.pk]))
+    response = client.get(
+        reverse("interventions:detail", args=[intervention.public_id])
+    )
 
     assert response.status_code == 200
 
@@ -81,7 +88,9 @@ def test_unassigned_technician_cannot_view_intervention(
     )
 
     client.force_login(technician)
-    response = client.get(reverse("interventions:detail", args=[intervention.pk]))
+    response = client.get(
+        reverse("interventions:detail", args=[intervention.public_id])
+    )
 
     assert response.status_code == 404
 
@@ -89,7 +98,12 @@ def test_unassigned_technician_cannot_view_intervention(
 @pytest.mark.django_db
 def test_unknown_intervention_returns_404(client, intervention_author):
     client.force_login(intervention_author)
-    response = client.get(reverse("interventions:detail", args=[999999]))
+    response = client.get(
+        reverse(
+            "interventions:detail",
+            args=[uuid.uuid4()],
+        )
+    )
 
     assert response.status_code == 404
 
@@ -101,7 +115,9 @@ def test_intervention_detail_displays_information(
     intervention,
 ):
     client.force_login(intervention_author)
-    response = client.get(reverse("interventions:detail", args=[intervention.pk]))
+    response = client.get(
+        reverse("interventions:detail", args=[intervention.public_id])
+    )
 
     assert response.status_code == 200
     assert "Maintenance serveur" in response.content.decode()
@@ -129,7 +145,9 @@ def test_intervention_detail_displays_additional_information(
     )
 
     client.force_login(intervention_author)
-    response = client.get(reverse("interventions:detail", args=[intervention.pk]))
+    response = client.get(
+        reverse("interventions:detail", args=[intervention.public_id])
+    )
 
     assert response.status_code == 200
     assert "12 rue des Lilas" in response.content.decode()
@@ -148,7 +166,9 @@ def test_intervention_detail_displays_missing_information(
     intervention,
 ):
     client.force_login(intervention_author)
-    response = client.get(reverse("interventions:detail", args=[intervention.pk]))
+    response = client.get(
+        reverse("interventions:detail", args=[intervention.public_id])
+    )
 
     assert response.status_code == 200
     assert b"Adresse non renseign" in response.content
@@ -171,7 +191,9 @@ def test_completed_intervention_displays_report(
     intervention.complete("Maintenance effectuée.\nTests de fonctionnement réussis.")
 
     client.force_login(intervention_author)
-    response = client.get(reverse("interventions:detail", args=[intervention.pk]))
+    response = client.get(
+        reverse("interventions:detail", args=[intervention.public_id])
+    )
 
     assert response.status_code == 200
     assert "Compte rendu d'intervention" in response.content.decode()
@@ -187,7 +209,9 @@ def test_planned_intervention_does_not_display_report(
 ):
     client.force_login(intervention_author)
 
-    response = client.get(reverse("interventions:detail", args=[intervention.pk]))
+    response = client.get(
+        reverse("interventions:detail", args=[intervention.public_id])
+    )
 
     assert response.status_code == 200
     assert "Compte rendu d'intervention" not in response.content.decode()
@@ -201,7 +225,7 @@ def test_intervention_list_links_to_detail(
 ):
     client.force_login(intervention_author)
     response = client.get(reverse("interventions:list"))
-    detail_url = reverse("interventions:detail", args=[intervention.pk])
+    detail_url = reverse("interventions:detail", args=[intervention.public_id])
 
     assert response.status_code == 200
     assert detail_url in response.content.decode()
@@ -215,7 +239,7 @@ def test_intervention_detail_preserves_list_filters(
 ):
     client.force_login(intervention_author)
     response = client.get(
-        reverse("interventions:detail", args=[intervention.pk]),
+        reverse("interventions:detail", args=[intervention.public_id]),
         {
             "q": "maintenance serveur",
             "status": Intervention.Status.TO_PLAN,
@@ -238,7 +262,9 @@ def test_intervention_detail_has_return_link_without_filters(
     intervention,
 ):
     client.force_login(intervention_author)
-    response = client.get(reverse("interventions:detail", args=[intervention.pk]))
+    response = client.get(
+        reverse("interventions:detail", args=[intervention.public_id])
+    )
 
     assert response.status_code == 200
 
@@ -265,7 +291,7 @@ def test_intervention_list_preserves_filters_in_detail_link(
 
     expected_url = reverse(
         "interventions:detail",
-        args=[intervention.pk],
+        args=[intervention.public_id],
     )
     assert (
         f"{expected_url}?q=Maintenance&amp;status=TO_PLAN" in response.content.decode()
@@ -297,13 +323,15 @@ def test_edit_link_visibility_by_role(
         intervention.assign_technician(user)
 
     client.force_login(user)
-    response = client.get(reverse("interventions:detail", args=[intervention.pk]))
+    response = client.get(
+        reverse("interventions:detail", args=[intervention.public_id])
+    )
 
     assert response.status_code == 200
 
     edit_url = reverse(
         "interventions:edit",
-        args=[intervention.pk],
+        args=[intervention.public_id],
     )
 
     if expected:
@@ -333,13 +361,15 @@ def test_edit_link_visibility_by_status(
     intervention.status = status
     intervention.save(update_fields=["status"])
     client.force_login(intervention_author)
-    response = client.get(reverse("interventions:detail", args=[intervention.pk]))
+    response = client.get(
+        reverse("interventions:detail", args=[intervention.public_id])
+    )
 
     assert response.status_code == 200
 
     edit_url = reverse(
         "interventions:edit",
-        args=[intervention.pk],
+        args=[intervention.public_id],
     )
 
     if expected:
@@ -370,17 +400,19 @@ def test_status_actions_visibility_by_status(
     intervention.status = status
     intervention.save(update_fields=["status"])
     client.force_login(intervention_author)
-    response = client.get(reverse("interventions:detail", args=[intervention.pk]))
+    response = client.get(
+        reverse("interventions:detail", args=[intervention.public_id])
+    )
 
     assert response.status_code == 200
 
     start_url = reverse(
         "interventions:status_update",
-        args=[intervention.pk, "start"],
+        args=[intervention.public_id, "start"],
     )
     cancel_url = reverse(
         "interventions:status_update",
-        args=[intervention.pk, "cancel"],
+        args=[intervention.public_id, "cancel"],
     )
 
     content = response.content.decode()
@@ -404,17 +436,19 @@ def test_assigned_technician_sees_start_but_not_cancel(
     intervention.status = Intervention.Status.PLANNED
     intervention.save(update_fields=["technician", "status"])
     client.force_login(technician)
-    response = client.get(reverse("interventions:detail", args=[intervention.pk]))
+    response = client.get(
+        reverse("interventions:detail", args=[intervention.public_id])
+    )
 
     assert response.status_code == 200
 
     start_url = reverse(
         "interventions:status_update",
-        args=[intervention.pk, "start"],
+        args=[intervention.public_id, "start"],
     )
     cancel_url = reverse(
         "interventions:status_update",
-        args=[intervention.pk, "cancel"],
+        args=[intervention.public_id, "cancel"],
     )
 
     content = response.content.decode()

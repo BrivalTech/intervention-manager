@@ -505,9 +505,9 @@ def test_manager_dashboard_displays_today_intervention(
     assert intervention.title in response.content.decode()
     assert customer.name in response.content.decode()
     assert "09:00" in response.content.decode()
-    assert f'href="{reverse("interventions:detail", args=[intervention.pk])}"' in (
-        response.content.decode()
-    )
+    assert (
+        f'href="{reverse("interventions:detail", args=[intervention.public_id])}"'
+    ) in (response.content.decode())
 
 
 @pytest.mark.django_db

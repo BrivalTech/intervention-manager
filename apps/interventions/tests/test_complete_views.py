@@ -28,7 +28,7 @@ def test_completion_form_is_accessible(
     response = client.get(
         reverse(
             "interventions:complete",
-            args=[in_progress_intervention.pk],
+            args=[in_progress_intervention.public_id],
         )
     )
 
@@ -46,7 +46,7 @@ def test_completion_requires_report(
     response = client.post(
         reverse(
             "interventions:complete",
-            args=[in_progress_intervention.pk],
+            args=[in_progress_intervention.public_id],
         ),
         {"report": "   "},
     )
@@ -68,7 +68,7 @@ def test_completion_with_report(
     response = client.post(
         reverse(
             "interventions:complete",
-            args=[in_progress_intervention.pk],
+            args=[in_progress_intervention.public_id],
         ),
         {"report": "Intervention réalisée et contrôlée."},
     )
@@ -94,7 +94,7 @@ def test_completed_intervention_cannot_be_completed_again(
     response = client.get(
         reverse(
             "interventions:complete",
-            args=[in_progress_intervention.pk],
+            args=[in_progress_intervention.public_id],
         )
     )
 
@@ -118,7 +118,7 @@ def test_assigned_technician_can_complete_intervention(
     response = client.post(
         reverse(
             "interventions:complete",
-            args=[in_progress_intervention.pk],
+            args=[in_progress_intervention.public_id],
         ),
         {"report": "Travaux effectués et vérifiés."},
     )
@@ -144,7 +144,7 @@ def test_unassigned_technician_cannot_complete_intervention(
     response = client.post(
         reverse(
             "interventions:complete",
-            args=[in_progress_intervention.pk],
+            args=[in_progress_intervention.public_id],
         ),
         {"report": "Tentative non autorisée."},
     )
@@ -163,7 +163,7 @@ def test_anonymous_user_cannot_access_completion(
     response = client.get(
         reverse(
             "interventions:complete",
-            args=[in_progress_intervention.pk],
+            args=[in_progress_intervention.public_id],
         )
     )
 

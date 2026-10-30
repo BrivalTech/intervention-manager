@@ -40,7 +40,7 @@ def test_admin_can_resend_invitation(client, admin, technician):
     response = client.post(
         reverse(
             "accounts:technician_resend_invitation",
-            args=[technician.pk],
+            args=[technician.public_id],
         )
     )
 
@@ -57,7 +57,7 @@ def test_resend_invitation_requires_post(client, admin, technician):
     response = client.get(
         reverse(
             "accounts:technician_resend_invitation",
-            args=[technician.pk],
+            args=[technician.public_id],
         )
     )
 
@@ -84,7 +84,7 @@ def test_non_admin_cannot_resend_invitation(
     response = client.post(
         reverse(
             "accounts:technician_resend_invitation",
-            args=[technician.pk],
+            args=[technician.public_id],
         )
     )
 
@@ -102,7 +102,7 @@ def test_cannot_invite_activated_technician(client, admin, technician):
         response = client.post(
             reverse(
                 "accounts:technician_resend_invitation",
-                args=[technician.pk],
+                args=[technician.public_id],
             )
         )
 
@@ -121,7 +121,7 @@ def test_cannot_invite_inactive_technician(client, admin, technician):
         response = client.post(
             reverse(
                 "accounts:technician_resend_invitation",
-                args=[technician.pk],
+                args=[technician.public_id],
             )
         )
 

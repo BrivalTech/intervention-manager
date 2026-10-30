@@ -1,3 +1,5 @@
+import uuid
+
 import pytest
 from django.contrib.messages import get_messages
 from django.urls import reverse
@@ -607,7 +609,7 @@ def test_client_detail_access_by_role(
 
     client.force_login(user)
     client_obj = Client.objects.create(name="Entreprise Allibi")
-    response = client.get(reverse("clients:detail", args=[client_obj.pk]))
+    response = client.get(reverse("clients:detail", args=[client_obj.public_id]))
 
     assert response.status_code == expected_status
 
@@ -615,7 +617,7 @@ def test_client_detail_access_by_role(
 @pytest.mark.django_db
 def test_client_detail_requires_authentication(client):
     client_obj = Client.objects.create(name="Entreprise Alpha")
-    response = client.get(reverse("clients:detail", args=[client_obj.pk]))
+    response = client.get(reverse("clients:detail", args=[client_obj.public_id]))
 
     assert response.status_code == 302
     assert response.url.startswith(reverse("accounts:login"))
@@ -638,7 +640,7 @@ def test_client_detail_displays_information(client, django_user_model):
         city="Paris",
     )
 
-    response = client.get(reverse("clients:detail", args=[client_obj.pk]))
+    response = client.get(reverse("clients:detail", args=[client_obj.public_id]))
 
     assert response.status_code == 200
     assert response.context["client_obj"] == client_obj
@@ -663,7 +665,7 @@ def test_client_detail_displays_archived_client(client, django_user_model):
         is_active=False,
     )
 
-    response = client.get(reverse("clients:detail", args=[client_obj.pk]))
+    response = client.get(reverse("clients:detail", args=[client_obj.public_id]))
 
     assert response.status_code == 200
     assert "Client archivé" in response.content.decode()
@@ -681,7 +683,9 @@ def test_client_detail_returns_404_for_unknown_client(
     )
 
     client.force_login(user)
-    response = client.get(reverse("clients:detail", args=[999999]))
+    unknown_public_id = uuid.uuid4()
+    url = reverse("clients:detail", args=[unknown_public_id])
+    response = client.get(url)
 
     assert response.status_code == 404
 
@@ -709,7 +713,7 @@ def test_client_detail_displays_complete_information(
         notes="Accès par la cour intérieure.",
     )
 
-    response = client.get(reverse("clients:detail", args=[client_obj.pk]))
+    response = client.get(reverse("clients:detail", args=[client_obj.public_id]))
 
     assert response.status_code == 200
 
@@ -736,7 +740,7 @@ def test_client_detail_displays_empty_optional_fields(
 
     client.force_login(user)
     client_obj = Client.objects.create(name="Entreprise Allibi")
-    response = client.get(reverse("clients:detail", args=[client_obj.pk]))
+    response = client.get(reverse("clients:detail", args=[client_obj.public_id]))
 
     assert response.status_code == 200
     assert "Non renseigné" in response.content.decode()
@@ -762,7 +766,7 @@ def test_client_detail_displays_accessible_links(
         phone="0102030405",
     )
 
-    response = client.get(reverse("clients:detail", args=[client_obj.pk]))
+    response = client.get(reverse("clients:detail", args=[client_obj.public_id]))
 
     assert response.status_code == 200
     assert 'href="mailto:contact@allibi.fr"' in response.content.decode()
@@ -786,11 +790,11 @@ def test_client_list_displays_detail_links(client, django_user_model):
 
     assert response.status_code == 200
     assert (
-        f'href="{reverse("clients:detail", args=[client_allibi.pk])}"'
+        f'href="{reverse("clients:detail", args=[client_allibi.public_id])}"'
         in response.content.decode()
     )
     assert (
-        f'href="{reverse("clients:detail", args=[client_bonpain.pk])}"'
+        f'href="{reverse("clients:detail", args=[client_bonpain.public_id])}"'
         in response.content.decode()
     )
 
@@ -810,7 +814,7 @@ def test_client_detail_navigation_displays_selected_client(
     client_allibi = Client.objects.create(name="Entreprise Allibi")
     Client.objects.create(name="Entreprise Bon Pain")
 
-    response = client.get(reverse("clients:detail", args=[client_allibi.pk]))
+    response = client.get(reverse("clients:detail", args=[client_allibi.public_id]))
 
     assert response.status_code == 200
     assert response.context["client_obj"] == client_allibi
@@ -828,7 +832,7 @@ def test_client_detail_has_back_link(client, django_user_model):
     client.force_login(user)
     client_obj = Client.objects.create(name="Entreprise Allibi")
 
-    response = client.get(reverse("clients:detail", args=[client_obj.pk]))
+    response = client.get(reverse("clients:detail", args=[client_obj.public_id]))
 
     assert response.status_code == 200
     assert f'href="{reverse("clients:list")}"' in response.content.decode()
@@ -855,14 +859,14 @@ def test_client_list_detail_links_respect_pagination(
     for client_obj in clients[:10]:
         detail_url = reverse(
             "clients:detail",
-            args=[client_obj.pk],
+            args=[client_obj.public_id],
         )
         assert f'href="{detail_url}"' in response.content.decode()
 
     for client_obj in clients[10:]:
         detail_url = reverse(
             "clients:detail",
-            args=[client_obj.pk],
+            args=[client_obj.public_id],
         )
         assert f'href="{detail_url}"' not in response.content.decode()
 
@@ -891,7 +895,7 @@ def test_client_update_access_by_role(
 
     client.force_login(user)
     client_obj = Client.objects.create(name="Entreprise Allibi", is_active=True)
-    response = client.get(reverse("clients:update", args=[client_obj.pk]))
+    response = client.get(reverse("clients:update", args=[client_obj.public_id]))
 
     assert response.status_code == expected_status
 
@@ -902,7 +906,7 @@ def test_client_update_requires_authentication(client):
         name="Entreprise Allibi",
         is_active=True,
     )
-    response = client.get(reverse("clients:update", args=[client_obj.pk]))
+    response = client.get(reverse("clients:update", args=[client_obj.public_id]))
 
     assert response.status_code == 302
     assert response.url.startswith(reverse("accounts:login"))
@@ -927,7 +931,7 @@ def test_client_update_form_is_prefilled(
         is_active=True,
     )
 
-    response = client.get(reverse("clients:update", args=[client_obj.pk]))
+    response = client.get(reverse("clients:update", args=[client_obj.public_id]))
     assert response.status_code == 200
 
     form = response.context["form"]
@@ -954,7 +958,7 @@ def test_client_update_success(client, django_user_model):
     )
 
     response = client.post(
-        reverse("clients:update", args=[client_obj.pk]),
+        reverse("clients:update", args=[client_obj.public_id]),
         {
             "name": "Entreprise Allibi Modifiée",
             "city": "Lyon",
@@ -964,7 +968,7 @@ def test_client_update_success(client, django_user_model):
     assert response.status_code == 302
     assert response.url == reverse(
         "clients:detail",
-        args=[client_obj.pk],
+        args=[client_obj.public_id],
     )
 
     client_obj.refresh_from_db()
@@ -990,7 +994,7 @@ def test_client_update_invalid_data(client, django_user_model):
     )
 
     response = client.post(
-        reverse("clients:update", args=[client_obj.pk]),
+        reverse("clients:update", args=[client_obj.public_id]),
         {
             "name": "",
             "email": "adresse-invalide",
@@ -1021,7 +1025,7 @@ def test_technician_cannot_update_client(client, django_user_model):
     )
 
     response = client.post(
-        reverse("clients:update", args=[client_obj.pk]),
+        reverse("clients:update", args=[client_obj.public_id]),
         {"name": "Modification interdite"},
     )
 
@@ -1049,14 +1053,14 @@ def test_client_update_displays_correct_form_labels(
         is_active=True,
     )
 
-    response = client.get(reverse("clients:update", args=[client_obj.pk]))
+    response = client.get(reverse("clients:update", args=[client_obj.public_id]))
 
     assert response.status_code == 200
     assert response.context["is_edit"] is True
     assert "Modifier un client" in response.content.decode()
     assert "Enregistrer les modifications" in response.content.decode()
     assert (
-        f'href="{reverse("clients:detail", args=[client_obj.pk])}"'
+        f'href="{reverse("clients:detail", args=[client_obj.public_id])}"'
         in response.content.decode()
     )
     assert 'value="Entreprise Allibi"' in response.content.decode()
@@ -1084,14 +1088,14 @@ def test_client_detail_displays_edit_link(
 
     client.force_login(user)
     client_obj = Client.objects.create(name="Entreprise Allibi")
-    response = client.get(reverse("clients:detail", args=[client_obj.pk]))
+    response = client.get(reverse("clients:detail", args=[client_obj.public_id]))
 
     assert response.status_code == 200
     assert response.context["can_edit_client"] is True
 
     edit_url = reverse(
         "clients:update",
-        args=[client_obj.pk],
+        args=[client_obj.public_id],
     )
 
     assert f'href="{edit_url}"' in response.content.decode()
@@ -1122,7 +1126,7 @@ def test_client_archive_access_by_role(
 
     client.force_login(user)
     client_obj = Client.objects.create(name="Entreprise Allibi")
-    response = client.get(reverse("clients:archive", args=[client_obj.pk]))
+    response = client.get(reverse("clients:archive", args=[client_obj.public_id]))
 
     assert response.status_code == expected_status
 
@@ -1137,18 +1141,18 @@ def test_client_archive_success(client, django_user_model):
 
     client.force_login(user)
     client_obj = Client.objects.create(name="Entreprise Allibi")
-    response = client.post(reverse("clients:archive", args=[client_obj.pk]))
+    response = client.post(reverse("clients:archive", args=[client_obj.public_id]))
 
     assert response.status_code == 302
     assert response.url == reverse(
         "clients:detail",
-        args=[client_obj.pk],
+        args=[client_obj.public_id],
     )
 
     client_obj.refresh_from_db()
 
     assert client_obj.is_active is False
-    assert Client.objects.filter(pk=client_obj.pk).exists()
+    assert Client.objects.filter(public_id=client_obj.public_id).exists()
 
 
 @pytest.mark.django_db
@@ -1165,12 +1169,12 @@ def test_client_archive_already_archived(client, django_user_model):
         is_active=False,
     )
 
-    response = client.post(reverse("clients:archive", args=[client_obj.pk]))
+    response = client.post(reverse("clients:archive", args=[client_obj.public_id]))
 
     assert response.status_code == 302
     assert response.url == reverse(
         "clients:detail",
-        args=[client_obj.pk],
+        args=[client_obj.public_id],
     )
 
     client_obj.refresh_from_db()
@@ -1188,14 +1192,14 @@ def test_admin_can_see_archive_link(client, django_user_model):
 
     client.force_login(user)
     client_obj = Client.objects.create(name="Entreprise Allibi")
-    response = client.get(reverse("clients:detail", args=[client_obj.pk]))
+    response = client.get(reverse("clients:detail", args=[client_obj.public_id]))
 
     assert response.status_code == 200
     assert response.context["can_archive_client"] is True
 
     archive_url = reverse(
         "clients:archive",
-        args=[client_obj.pk],
+        args=[client_obj.public_id],
     )
 
     assert f'href="{archive_url}"' in response.content.decode()
@@ -1214,14 +1218,14 @@ def test_manager_cannot_see_archive_link(client, django_user_model):
     client_obj = Client.objects.create(
         name="Entreprise Allibi",
     )
-    response = client.get(reverse("clients:detail", args=[client_obj.pk]))
+    response = client.get(reverse("clients:detail", args=[client_obj.public_id]))
 
     assert response.status_code == 200
     assert response.context["can_archive_client"] is False
 
     archive_url = reverse(
         "clients:archive",
-        args=[client_obj.pk],
+        args=[client_obj.public_id],
     )
 
     assert f'href="{archive_url}"' not in response.content.decode()
@@ -1242,14 +1246,14 @@ def test_archived_client_has_no_archive_link(client, django_user_model):
         is_active=False,
     )
 
-    response = client.get(reverse("clients:detail", args=[client_obj.pk]))
+    response = client.get(reverse("clients:detail", args=[client_obj.public_id]))
 
     assert response.status_code == 200
     assert response.context["can_archive_client"] is False
 
     archive_url = reverse(
         "clients:archive",
-        args=[client_obj.pk],
+        args=[client_obj.public_id],
     )
 
     assert f'href="{archive_url}"' not in response.content.decode()
@@ -1277,12 +1281,12 @@ def test_client_archive_refused_with_active_intervention(
     )
 
     client.force_login(admin)
-    response = client.post(reverse("clients:archive", args=[client_obj.pk]))
+    response = client.post(reverse("clients:archive", args=[client_obj.public_id]))
 
     assert response.status_code == 302
     assert response.url == reverse(
         "clients:detail",
-        args=[client_obj.pk],
+        args=[client_obj.public_id],
     )
 
     client_obj.refresh_from_db()

@@ -25,26 +25,26 @@ def technician_create(request):
 
 
 @login_required
-def technician_update(request, pk):
-    return account_update(request, pk, TECHNICIAN_CONFIG)
+def technician_update(request, public_id):
+    return account_update(request, public_id, TECHNICIAN_CONFIG)
 
 
 @login_required
 @require_POST
-def technician_resend_invitation(request, pk):
-    return account_resend_invitation(request, pk, TECHNICIAN_CONFIG)
+def technician_resend_invitation(request, public_id):
+    return account_resend_invitation(request, public_id, TECHNICIAN_CONFIG)
 
 
 @login_required
 @require_POST
-def technician_deactivate(request, pk):
-    return account_set_active(request, pk, TECHNICIAN_CONFIG, active=False)
+def technician_deactivate(request, public_id):
+    return account_set_active(request, public_id, TECHNICIAN_CONFIG, active=False)
 
 
 @login_required
 @require_POST
-def technician_reactivate(request, pk):
-    return account_set_active(request, pk, TECHNICIAN_CONFIG, active=True)
+def technician_reactivate(request, public_id):
+    return account_set_active(request, public_id, TECHNICIAN_CONFIG, active=True)
 
 
 @login_required
@@ -58,23 +58,23 @@ def manager_create(request):
 
 
 @login_required
-def manager_update(request, pk):
-    return account_update(request, pk, MANAGER_CONFIG)
+def manager_update(request, public_id):
+    return account_update(request, public_id, MANAGER_CONFIG)
 
 
 @login_required
 @require_POST
-def manager_resend_invitation(request, pk):
-    return account_resend_invitation(request, pk, MANAGER_CONFIG)
+def manager_resend_invitation(request, public_id):
+    return account_resend_invitation(request, public_id, MANAGER_CONFIG)
 
 
 @login_required
 @require_POST
-def manager_deactivate(request, pk):
-    return account_set_active(request, pk, MANAGER_CONFIG, active=False)
+def manager_deactivate(request, public_id):
+    return account_set_active(request, public_id, MANAGER_CONFIG, active=False)
 
 
 @login_required
 @require_POST
-def manager_reactivate(request, pk):
-    return account_set_active(request, pk, MANAGER_CONFIG, active=True)
+def manager_reactivate(request, public_id):
+    return account_set_active(request, public_id, MANAGER_CONFIG, active=True)

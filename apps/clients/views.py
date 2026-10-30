@@ -87,12 +87,12 @@ def client_create(request):
 
 
 @login_required
-def client_detail(request, pk):
+def client_detail(request, public_id):
     """Display client detailed information"""
     if not can_view_clients(request.user):
         raise PermissionDenied
 
-    client_obj = get_object_or_404(Client, pk=pk)
+    client_obj = get_object_or_404(Client, public_id=public_id)
 
     return render(
         request,
@@ -113,12 +113,12 @@ def client_detail(request, pk):
 
 
 @login_required
-def client_update(request, pk):
+def client_update(request, public_id):
     """Update an existing client"""
     if not can_manage_clients(request.user):
         raise PermissionDenied
 
-    client_obj = get_object_or_404(Client, pk=pk)
+    client_obj = get_object_or_404(Client, public_id=public_id)
 
     if not client_obj.is_active:
         raise PermissionDenied(
@@ -132,7 +132,7 @@ def client_update(request, pk):
             form.save()
             messages.success(request, "Les informations du client on été mises à jour.")
 
-            return redirect("clients:detail", pk=client_obj.pk)
+            return redirect("clients:detail", public_id=client_obj.public_id)
 
     else:
         form = ClientForm(instance=client_obj)
@@ -149,19 +149,19 @@ def client_update(request, pk):
 
 
 @login_required
-def client_archive(request, pk):
+def client_archive(request, public_id):
     """Archive a client if no active interventions remain."""
     if not can_archive_client(request.user):
         raise PermissionDenied
 
-    client_obj = get_object_or_404(Client, pk=pk)
+    client_obj = get_object_or_404(Client, public_id=public_id)
 
     if not client_obj.is_active:
         messages.info(
             request,
             "Ce client est déjà archivé.",
         )
-        return redirect("clients:detail", pk=client_obj.pk)
+        return redirect("clients:detail", public_id=client_obj.public_id)
 
     if request.method == "POST":
         try:
@@ -177,7 +177,7 @@ def client_archive(request, pk):
                 "Le client a été archivé avec succès.",
             )
 
-        return redirect("clients:detail", pk=client_obj.pk)
+        return redirect("clients:detail", public_id=client_obj.public_id)
 
     return render(
         request,
@@ -189,12 +189,12 @@ def client_archive(request, pk):
 
 
 @login_required
-def client_restore(request, pk):
+def client_restore(request, public_id):
     """Restore an archived client"""
     if not can_restore_client(request.user):
         raise PermissionDenied
 
-    client_obj = get_object_or_404(Client, pk=pk)
+    client_obj = get_object_or_404(Client, public_id=public_id)
 
     if client_obj.is_active:
         messages.info(
@@ -202,7 +202,7 @@ def client_restore(request, pk):
             "Ce client est déjà actif.",
         )
 
-        return redirect("clients:detail", pk=client_obj.pk)
+        return redirect("clients:detail", public_id=client_obj.public_id)
 
     if request.method == "POST":
         client_obj.restore()
@@ -212,7 +212,7 @@ def client_restore(request, pk):
             "Le client a été réactivé avec succès.",
         )
 
-        return redirect("clients:detail", pk=client_obj.pk)
+        return redirect("clients:detail", public_id=client_obj.public_id)
 
     return render(
         request,
