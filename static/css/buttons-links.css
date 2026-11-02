@@ -36,26 +36,20 @@ a:active {
     color: var(--color-white);
 }
 
-.button--primary:hover {
-    background-color: var(--color-primary-hover);
-}
-
+.button--primary:hover,
 .button--primary:active {
     background-color: var(--color-primary-hover);
 }
 
 .button--secondary {
-    background-color: var(--color-surface);
+    background-color: var(--color-gray-300);
     color: var(--color-primary);
-    border-color: var(--color-primary);
 }
 
-.button--secondary:hover {
-    background-color: var(--color-gray-100);
-}
-
+.button--secondary:hover,
 .button--secondary:active {
     background-color: var(--color-gray-100);
+    font-weight: bold;
 }
 
 .button:disabled,
