@@ -8,9 +8,9 @@
     --color-gray-900: #243447;
 
     /* Brand colors */
-    --color-primary: #087e82;
-    --color-primary-hover: #066569;
-    --color-navy: #27445E;
+    --color-primary: #514d91;
+    --color-primary-hover: #3d396f;
+    --color-navy: #303b50;
 
     /* Semantic colors */
     --color-info: #205c91;
@@ -20,12 +20,12 @@
     --color-danger-hover: #dd505f;
 
     /* Interface colors */
-    --color-background: var(--color-gray-50);
+    --color-background: var(--color-gray-100);
     --color-surface: var(--color-white);
     --color-text: var(--color-gray-900);
     --color-text-muted: var(--color-gray-600);
     --color-border: var(--color-gray-300);
-    --color-link: #08676b;
+    --color-link: #514d91;
     --color-focus: #b45309;
 
     /* Header and navigation */
