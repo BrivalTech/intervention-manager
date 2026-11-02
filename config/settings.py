@@ -23,11 +23,23 @@ load_dotenv(BASE_DIR / ".env")
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
+DJANGO_ENV = os.getenv("DJANGO_ENV", "development").lower()
+IS_PRODUCTION = DJANGO_ENV == "production"
+
+if DJANGO_ENV not in {"development", "production"}:
+    raise ValueError("DJANGO_ENV must be 'development' or 'production'.")
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("SECRET_KEY")
 
+if not SECRET_KEY:
+    raise ValueError("SECRET_KEY environment variable is required.")
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
+
+if IS_PRODUCTION and DEBUG:
+    raise ValueError("DEBUG must be False in production.")
 
 ALLOWED_HOSTS = [
     host.strip()
@@ -38,6 +50,27 @@ ALLOWED_HOSTS = [
     if host.strip()
 ]
 
+# Production security
+
+SESSION_COOKIE_SECURE = IS_PRODUCTION
+CSRF_COOKIE_SECURE = IS_PRODUCTION
+SECURE_SSL_REDIRECT = IS_PRODUCTION
+SECURE_HSTS_SECONDS = int(os.getenv("SECURE_HSTS_SECONDS", "0")) if IS_PRODUCTION else 0
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+SECURE_HSTS_PRELOAD = False
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = "DENY"
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
+    if origin.strip()
+]
+
+if IS_PRODUCTION and os.getenv("TRUST_PROXY_SSL_HEADER") == "True":
+    SECURE_PROXY_SSL_HEADER = (
+        "HTTP_X_FORWARDED_PROTO",
+        "https",
+    )
 
 # Application definition
 
@@ -139,6 +172,7 @@ STATIC_URL = "static/"
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -154,8 +188,21 @@ LOGOUT_REDIRECT_URL = "accounts:login"
 
 # Invitation tokens expire after 1 hour.
 PASSWORD_RESET_TIMEOUT = 60 * 60 * 1
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+# Email configuration
 DEFAULT_FROM_EMAIL = os.getenv(
     "DEFAULT_FROM_EMAIL",
     "no-reply@example.com",
 )
+
+if IS_PRODUCTION:
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_HOST = os.environ["EMAIL_HOST"]
+    EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
+    EMAIL_USE_TLS = True
+    EMAIL_USE_SSL = False
+    EMAIL_HOST_USER = os.environ["EMAIL_HOST_USER"]
+    EMAIL_HOST_PASSWORD = os.environ["EMAIL_HOST_PASSWORD"]
+    EMAIL_TIMEOUT = 10
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
