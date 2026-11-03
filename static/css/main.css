@@ -1,7 +1,6 @@
 @import url("variables.css");
 @import url("base.css");
 @import url("accessibility.css");
-@import url("responsive.css");
 
 @import url("buttons-links.css");
 @import url("cards-entities.css");
@@ -10,3 +9,5 @@
 @import url("dashboards.css");
 @import url("forms-status.css");
 @import url("messages.css");
+
+@import url("responsive.css");
